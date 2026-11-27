@@ -1,6 +1,6 @@
 ---
 title: App Pages & Widgets
-description: Canvas app-page model, widget types, layout, expression data-binding, events, and real-time runtime.
+description: Canvas app-page model, widget types, layout, expression data-binding, events, composites, and the runtime used by standalone pages and Applications.
 sidebar_position: 7
 ---
 
@@ -18,20 +18,24 @@ sidebar_position: 7
   - [Page Data Sources](#page-data-sources)
   - [Page Variables](#page-variables)
   - [Layout System](#layout-system)
+  - [Scrolling, Responsive Layout, Conditions & Repeats](#scrolling-responsive-layout-conditions-repeats)
 5. [Widgets](#widgets)
   - [Widget Configuration Fields](#widget-configuration-fields)
   - [Widget Types Reference](#widget-types-reference)
+  - [Composite Runtime](#composite-runtime)
   - [Widget Properties (Styling)](#widget-properties-styling)
   - [Widget Events System](#widget-events-system)
   - [Widget Methods](#widget-methods)
 6. [Expression Engine & Data Binding](#expression-engine-data-binding)
-7. [Real-Time & Async Behaviour](#real-time-async-behaviour)
-8. [Integration Points](#integration-points)
-9. [Access Control](#access-control)
-10. [Error States & Edge Cases](#error-states-edge-cases)
-11. [Best Practices](#best-practices)
-12. [Limitations & Constraints](#limitations-constraints)
-13. [Related Modules](#related-modules)
+7. [Applications & App Studio Integration](#applications-app-studio-integration)
+8. [Real-Time & Async Behaviour](#real-time-async-behaviour)
+9. [Integration Points](#integration-points)
+10. [Access Control](#access-control)
+11. [Error States & Edge Cases](#error-states-edge-cases)
+12. [Best Practices](#best-practices)
+13. [Common Use Cases](#common-use-cases)
+14. [Limitations & Constraints](#limitations-constraints)
+15. [Related Modules](#related-modules)
 
 * * *
 
@@ -47,7 +51,12 @@ A completed App Page acts as a dashboard, data entry form, report viewer, or ope
 
 Together, App Pages and Widgets implement the **Apps → Pages → Widgets** canvas model that forms the user-facing product surface of Jet Admin.
 
-![image-20260619-071334.png](./attachments/image-20260619-071334.png)
+A page can be used in two ways:
+
+- **Standalone** at its App Page route, with live widget definitions and the page's own Socket.IO subscription path.
+- **Composed into an Application** as a linked, routed page. The Application supplies the shell, route context, application state/events, and release-scoped runtime. Application release behavior is documented in [Applications](../applications/applications.md).
+
+![App Page builder with the widget palette, canvas, and properties panel](/img/screenshots/app-page-builder.png)
 
 * * *
 
@@ -59,17 +68,22 @@ Together, App Pages and Widgets implement the **Apps → Pages → Widgets** can
 | --- | --- |
 | **App Page** | A named, configurable canvas consisting of a layout, data sources, variables, and a set of placed widget instances. |
 | **Widget** | A reusable visual component (chart, table, form, etc.) with its own configuration, stored independently and referenced by pages. |
-| **Widget Instance** (Widget Key) | A unique placement of a widget on a specific page. Represented as `widget_{widgetID}_{timestamp}`. The same widget definition can appear multiple times on the same or different pages. |
+| **Widget Instance** (Widget Key) | A unique placement of a widget on a specific page. Represented as `widget_{widgetID}_{instanceIndex}`. The same widget definition can appear multiple times on the same or different pages. |
 | **Page Config** | The JSON object stored with an App Page that defines its layout tree, data source bindings, variable definitions, and widget placement keys. |
 | **Widget Config** | The JSON object stored with a Widget that defines its visual properties, data binding expressions, and event handlers. |
 | **State Tree** | The live, in-memory reactive data object maintained by the Page Runtime. It holds the current values of all data sources (queries, workflows, listeners), page variables, widget states, and globally accessible items. |
 | **Expression** | A `{{ }}` mustache-style template that resolves a value from the state tree at render time. Expressions may be simple path lookups or full JavaScript expressions. |
 | **Data Source** | A binding from the page to a Data Query, Workflow, or Listener. Each data source is given an alias through which its result is accessible in expressions. |
 | **Page Variable** | A typed, named local state value (string, number, boolean, object, array) whose value can be updated at runtime by widget events. |
-| **Layout Tree** | The hierarchical node structure (column → row → widget/container/stack) that defines where and how widgets are arranged on the page canvas. |
+| **Layout Tree** | The hierarchical node structure (column → row → widget/container/stack/z-stack) that defines where and how widgets are arranged on the page canvas. |
 | **Event Handler** | A named sequence of one or more actions attached to a widget event (e.g., `onRowSelect`) that execute when the event fires. |
 | **Action** | A single step in an event handler, such as setting a variable, executing a data source, triggering a workflow, or showing a toast. |
-| **Trigger Mode** | A per-data-source setting that controls when a data source is executed: automatically on page load, reactively when a variable changes, or manually only when an event fires. |
+| **Trigger Mode** | A per-data-source setting that controls when a data source is executed: `auto` and `reactive` run on page load, `reactive` also re-runs on tracked state changes, and `manual` only runs when an event fires. |
+| **Application** | A routed composition of linked App Pages with a shell, routes, shared state, releases, and environments. Pages receive route/application context when rendered inside one. |
+| **Application Variable** | A release-scoped, declared variable shared by every route in an Application. Read as `state.application.variables.{key}`. |
+| **Application Event** | A transient, in-memory broadcast between mounted widgets/pages in an Application runtime. Not persisted and not replayed. |
+| **Section Snippet** | A saved `layout-snippet` widget containing a captured layout tree. Inserting it copies the structure and remaps widget instance keys. |
+| **Composite Widget** | A `composite` widget containing a captured layout with inlined child widget definitions, typed inputs, and declared outputs/events. |
 
 * * *
 
@@ -77,9 +91,27 @@ Together, App Pages and Widgets implement the **Apps → Pages → Widgets** can
 
 ## How It Works — End-to-End Lifecycle {#how-it-works}
 
+```mermaid
+flowchart LR
+    C[App Page config] --> R[Page Runtime provider]
+    R --> Q[Page data sources]
+    Q --> S[State tree]
+    S --> W[Widget slots]
+    W --> E[Widget events]
+    E --> A[Action chain]
+    A --> V[Page variables]
+    A --> AP[Application state / events]
+    A --> Q
+    A --> N[Application route navigation]
+    S --> L[Layout renderer]
+    L --> W
+```
+
 <a id="creating-and-editing-an-app-page"></a>
 
 ### Creating and Editing an App Page
+
+![App Page editor with the widget palette, canvas, and properties panel](/img/screenshots/app-page-builder.png)
 
 A user opens the App Page editor, which presents a split-panel interface: a left sidebar (Widgets tab, Data tab, Variables tab, Settings tab) and a right canvas (the layout editor).
 
@@ -98,14 +130,29 @@ The user saves the page when ready.
 When a user opens a page in **View mode**, the system loads the page configuration and renders the **Page Runtime** — an invisible provider that:
 
 1. Reads the page config's `dataSources` list.
-2. For each data source with `triggerMode: "auto"`, immediately executes the underlying query or workflow and places the result in the state tree under `state.queries.{alias}` or `state.workflows.{alias}`.
-3. For data sources with `triggerMode: "reactive"`, sets up watchers on the referenced page variables and re-executes when those variables change.
+2. For each data source with `triggerMode: "auto"` or `"reactive"`, executes the underlying query or workflow on mount and places the result in the state tree under `state.queries.{alias}` or `state.workflows.{alias}`.
+3. For data sources with `triggerMode: "reactive"` and one or more `refreshOn` paths, re-executes when a tracked page state path changes.
 4. For data sources with `triggerMode: "manual"`, does nothing until an event handler explicitly triggers them.
-5. For listeners, subscribes to the relevant socket channel and pushes incoming events into `state.listeners.{alias}`.
+5. For listeners, subscribes through the standalone page runtime's Socket.IO path or, inside an Application, observes the deployed release's saved buffer. Incoming events are pushed into `state.listeners.{alias}`.
 
 Each widget on the canvas is rendered inside a **Widget Slot**, which fetches the widget's stored configuration, resolves all `{{ }}` expressions against the current state tree, and passes the resolved values to the widget component. Widget components re-render reactively whenever the relevant parts of the state tree change.
 
 When a widget fires an event (a row is clicked, a form is submitted, a button is pressed), the registered event handler runs its action sequence — updating variables, re-fetching data sources, triggering workflows, or showing notifications.
+
+<a id="running-inside-an-application"></a>
+
+### Running Inside an Application
+
+When the same page is opened through an Application route, the page runtime receives additional context:
+
+- the application shell (sidebar/top bar/bottom bar/hamburger) and route matching;
+- `state.application.variables` and optional reset actions;
+- `state.route` containing the matched route ID, path params, and typed query;
+- `state.composite` when the page contains a composite widget;
+- application event emit/subscribe functions;
+- release-scoped runtime services: page manifest resolution, pinned query execution, workflow observation, and buffered listener observation.
+
+Page variables, layout, widgets, and page data sources are otherwise the same. Application releases restrict which widget types and action types survive compilation, and strip widget-level data sources. See [Applications](../applications/applications.md) and [Application State](../applications/application-state.md).
 
 <a id="cloning-and-deleting"></a>
 
@@ -135,11 +182,13 @@ The **App Page Config** object contains the following sub-fields:
 
 | Sub-Field | Description |
 | --- | --- |
-| `widgets` | An ordered array of widget instance keys placed on this page (e.g. `["widget_abc123_1717000000000"]`). |
-| `layout` | The V2 layout tree (a column node at the root, containing row and widget/container/stack nodes). |
+| `widgets` | An ordered array of widget instance keys placed on this page (e.g. `["widget_6f1c2b3a-..._1"]`). Keys have the form `widget_<widgetID>_<instanceIndex>`; the suffix keeps multiple placements of the same definition independent. |
+| `layout` | The V2 layout tree (a column node at the root, containing row and widget/container/stack/z-stack nodes). |
 | `layoutVersion` | Set to `2` for the current layout system. Pages with `layoutVersion` not set or set to `1` are automatically migrated to V2 on first load. |
 | `dataSources` | An array of data source binding objects (see Page Data Sources section). |
 | `variables` | An array of page variable definitions (see Page Variables section). |
+| `widgetVersionSelections` | Optional map of widget ID to `{ versionMode: "latest-at-capture" \| "specific", widgetVersionID }`. Used when a page version is captured for an Application release. |
+| `_legacyLayouts` | Migration backup for pages converted from the V1 layout format. Preserved, not rendered. |
 
 * * *
 
@@ -151,14 +200,17 @@ Each entry in the `dataSources` array defines one binding from the page to an ex
 
 | Field | Description | Type | Required | Default |
 | --- | --- | --- | --- | --- |
-| **Alias** | The key by which this data source's result is accessed in expressions. Must be alphanumeric and underscore only. | Text | Yes | —   |
+| **Alias** | The key by which this data source's result is accessed in expressions. Must be unique on the page. | Text | Yes | —   |
 | **Source Type** | Whether this data source is a Data Query, Workflow, or Listener. | `query` / `workflow` / `listener` | Yes | `query` |
 | **Query / Workflow / Listener** | The specific Query, Workflow, or Listener to bind. | Reference | Yes | —   |
-| **Trigger Mode** | Controls when this data source is executed. | `auto` / `reactive` / `manual` | No  | `auto` |
-| **Refresh When Variable Changes** | (Reactive mode only) A list of page variable paths that trigger a re-fetch when their value changes. | Array of variable paths | No  | —   |
-| **Refetch Interval (ms)** | If set, the data source is re-executed automatically at this interval. 0 or empty disables polling. | Number | No  | None |
-| **Input Arguments** | Key-value pairs passed as inputs when the data source is executed. Values support `{{ }}` expressions referencing page state. | Key-Value Map | No  | —   |
-| **Channel Name** | (Listener type only) The socket channel to subscribe to. Defaults to `listener:{listenerID}` if left blank. | Text | No  | `listener:{listenerID}` |
+| **Version Mode** | Whether a page version captures the latest published version of the bound asset or a specific version. | `latest-at-capture` / `specific` | No  | `latest-at-capture` |
+| **Query / Workflow / Listener Version** | (Specific mode only) The exact published version ID captured when a page version is created. | Reference | No  | —   |
+| **Trigger Mode** | Controls when this data source is executed. `auto` and `reactive` both run on mount; only `reactive` reacts to `refreshOn` changes. | `auto` / `reactive` / `manual` | No  | `auto` |
+| **Refresh When Variable Changes** | (Reactive mode only) A list of page state paths that trigger a re-fetch when their value changes, e.g. `variables.selectedID` or `application.variables.selectedID`. | Array of paths | No  | —   |
+| **Refetch Interval (ms)** | If set, the data source is re-executed automatically at this interval. 0 or empty disables polling. Hidden tabs do not poll. | Number | No  | None |
+| **Input Arguments** | Key-value pairs passed as inputs when the data source is executed. Values support `{{ }}` expressions referencing page state, application state, and event context. | Key-Value Map | No  | —   |
+| **Runtime Buffer** | (Listener type only) The saved listener buffer that a deployed Application observes. Add a matching enabled **Save to buffer** action to the listener before publishing. | Text | No  | `default` |
+| **Channel Name** | (Listener type only) The channel used by the standalone page runtime. Defaults to `listener:{listenerID}` if left blank. Application runtimes observe the saved buffer instead of joining this channel directly. | Text | No  | `listener:{listenerID}` |
 
 **Accessing data source results in expressions:**
 
@@ -167,6 +219,15 @@ Each entry in the `dataSources` array defines one binding from the page to an ex
 - Query error: `{{ state.queries.{alias}.error }}`
 - Workflow results: `{{ state.workflows.{alias}.data }}`
 - Listener payloads: `{{ state.listeners.{alias}.data }}`
+
+**Version capture.** When a page version is created for an Application (at publish or when a page version is captured explicitly), each source is resolved using its version mode:
+
+- `latest-at-capture` captures the current query/workflow/listener, reusing the latest published version when the content hash is unchanged.
+- `specific` uses the selected published version ID.
+
+Changing the bound asset resets the selection to latest-at-capture. A specific version must be published and belong to the same tenant asset; otherwise page capture fails with `APP_PAGE_SOURCE_VERSION_NOT_FOUND` (or `APP_PAGE_SOURCE_VERSION_REQUIRED` when no version ID was selected).
+
+**Reactive refresh and application variables.** The editor lists both page variables and declared application variables as refresh triggers. The runtime's change detector currently compares the `queries`, `workflows`, `widgets`, `variables`, `listeners`, and `globals` namespaces; it does not include `application`. A page-variable change can therefore trigger a reactive refetch, while an application-variable-only change may not. For a guaranteed refetch, chain an `EXECUTE_QUERY` action after `SET_APPLICATION_VARIABLE`, or mirror the value into a page variable used by `refreshOn`.
 
 * * *
 
@@ -187,6 +248,10 @@ Page Variables hold reactive local state for the page. Their values can be read 
 
 `{{ state.variables.{key} }}`
 
+Page variables are local to one page runtime and are lost when the page unmounts unless an Application route uses `keepAlive` (which caches a bounded snapshot). For values that must be shared across routes, declare them in application state and read `{{ state.application.variables.{key} }}`; see [Application State](../applications/application-state.md).
+
+Application route query synchronization (`syncPageVariables` / `syncAllPageVariables`) can seed these variables from the URL and write non-default values back. See [Applications — Routes](../applications/applications.md#routes).
+
 * * *
 
 <a id="layout-system"></a>
@@ -206,6 +271,7 @@ The **Layout System** (V2) organises widgets on the canvas using a tree of nodes
 | **Widget Slot** | A single placed widget instance within a row. | None (renders a widget) |
 | **Container** | A nestable box with its own inner column, allowing grouped widget layouts. | Column (which contains rows) |
 | **Stack** | A flex container for placing widgets either vertically or horizontally with configurable gap and alignment. | Widget Slots, Containers |
+| **Z-Stack** | A layered container that overlaps its children in the same grid cell, with optional per-layer opacity. | Widget Slots, Containers, Stacks |
 
 <a id="layout-node-properties"></a>
 
@@ -216,7 +282,15 @@ The **Layout System** (V2) organises widgets on the canvas using a tree of nodes
 | **Span** | How many of the 12 grid columns this node occupies within its parent row. | 1–12 |
 | **Sizing** | How the node determines its height. | `auto` (content-driven), `fill` (stretch to parent), `fixed` (explicit pixel height) |
 | **Fixed Height** | The height in pixels when `sizing` is set to `fixed`. | Any positive integer |
-| **Style** | Optional inline style overrides: padding, margin, gap, border radius, alignment. | See Style Settings |
+| **Width / Height** | Optional explicit sizing for a widget slot. Outside a row, `width` may be `grow`, a percentage, or pixels; inside a row the grid span controls the width. | CSS size, percentage, pixels, or `grow` |
+| **Direction** | Stack orientation. | `vertical` / `horizontal` |
+| **Gap / Alignment / Wrap** | Flex gap, cross-axis alignment, and wrapping for stacks and rows. | Style-dependent |
+| **Style** | Optional inline style overrides: padding, margin, gap, border radius, alignment, background, border. | See Style Settings |
+| **Condition** | A `{{ }}` visibility expression evaluated in view mode. | Boolean expression |
+| **Hide Mode** | What happens when the condition is false: `collapse` (unmount) or `preserve-space` (stay in layout but visually hidden). With `keepMounted`, collapse hides via CSS instead of unmounting. | `collapse` / `preserve-space` |
+| **Keep Mounted** | Keeps a conditionally hidden widget mounted so its local state survives. | Boolean |
+| **Repeat** | Iterates a node over an array expression, binding item/index aliases into scoped page variables. | `{ collection, itemAlias, indexAlias }` |
+| **Responsive** | Per-breakpoint overrides for span, direction, and visibility. | `{ tablet: {...}, mobile: {...} }` |
 
 <a id="layout-editor-controls"></a>
 
@@ -234,6 +308,42 @@ From the **node toolbar** (appears when a layout node is selected on the canvas)
 - **Edit Widget** (opens the Widget IDE for the placed widget)
 
 A **resize handle** on the right edge of any widget slot or container allows dragging to change its span within its parent row. Rows can be reordered by dragging the grip handle in the top-left corner of each row.
+
+#### Scrolling, Responsive Layout, Conditions & Repeats {#scrolling-responsive-layout-conditions-repeats}
+
+**Scrolling.** `AppPageView` is the single view-mode renderer. It owns the page's scroll container and defaults to:
+
+```text
+w-full flex-1 min-h-0 overflow-y-auto bg-muted p-2
+```
+
+The parent must constrain height for `flex-1 min-h-0` to work. In standalone view mode the page fills the available content area; in an Application the page sits inside `ApplicationShellFrame`'s `min-h-0` content column and the same scroller handles page scrolling. Shell navigation and tables may have their own scroll regions. Avoid wrapping the page in an unbounded-height container or adding a second vertical scroller around it.
+
+`fill` sizing stretches a node to its parent only when the parent has a constrained height. `auto` lets content determine height. `fixed` uses the configured pixel height. A widget slot's explicit `height` overrides its `sizing` class.
+
+**Responsive layout.** Each node may carry per-breakpoint overrides:
+
+```json
+{
+  "responsive": {
+    "tablet": { "span": 6, "direction": "vertical" },
+    "mobile": { "span": 12, "hidden": false }
+  }
+}
+```
+
+- Breakpoints: mobile ≤ 640 px, tablet 641–1023 px, desktop > 1023 px.
+- Desktop always uses the node's base properties.
+- Tablet inherits the base span/direction unless an override is present.
+- Mobile defaults to a full-width span (12), so legacy layouts stack without explicit overrides.
+- `hidden: true` removes the node at that breakpoint.
+- Stacks can switch `direction` per breakpoint.
+
+The shell's own breakpoint (768 px for sidebar-to-mobile layout) is independent of these page-layout tiers.
+
+**Conditions.** A condition is evaluated only in view mode. In the default expression mode the result is truthy/falsy; in `safe-path` mode only a literal `true` is visible. Evaluation errors hide the node (fail closed) and log a warning. `hideMode` controls whether a false node unmounts or reserves space, and `keepMounted` lets a widget preserve local state while hidden.
+
+**Repeats.** A node with `repeat` resolves `collection` to an array, renders the node once per item, and injects `itemAlias` (and optional `indexAlias`) into scoped page `variables` for that iteration. At most 1,000 items are rendered. Repeat-qualified widget instances get isolated state and methods per iteration. A missing or non-array collection renders nothing.
 
 * * *
 
@@ -261,6 +371,8 @@ These fields are set when creating or updating a standalone Widget.
 ### Widget Types Reference
 
 Each widget type has its own configuration fields, accessible in the **Properties** tab of the Widget IDE or editor.
+
+![Widget palette and widget types available for a page](/img/screenshots/widgets.png)
 
 * * *
 
@@ -538,6 +650,72 @@ The selected range is accessible as `.start`, `.end`, `.startDate`, `.endDate` u
 
 * * *
 
+#### Composite Widget {#composite-runtime}
+
+A **Composite Widget** (`composite`) packages a captured page section and its child widget definitions into one reusable widget.
+
+The Widget IDE exposes a **Composite Config** editor with the captured layout node count, typed **Inputs**, and **Outputs / events**. The captured layout itself is immutable in that editor; recreate the composite from a canvas selection to change its structure.
+
+```json
+{
+  "widgetType": "composite",
+  "widgetConfig": {
+    "composite": {
+      "schemaVersion": 1,
+      "layout": {
+        "type": "column",
+        "id": "root",
+        "children": [
+          {
+            "type": "inline-widget",
+            "id": "slot_1",
+            "inlineWidget": {
+              "widgetType": "text",
+              "widgetTitle": "Heading",
+              "widgetConfig": {
+                "content": "{{ state.composite.inputs.title }}"
+              }
+            }
+          }
+        ]
+      },
+      "inputs": [
+        { "key": "title", "type": "string", "default": "Customer summary" }
+      ],
+      "outputs": [
+        { "key": "changed", "description": "Customer context changed" }
+      ],
+      "values": {}
+    }
+  }
+}
+```
+
+| Composite field | Description |
+| --- | --- |
+| `schemaVersion` | `1`. |
+| `layout` | Canonical layout with widget nodes converted to `inline-widget` nodes carrying the widget type, title, and full child config. |
+| `inputs` | `{ key, type, default }`; types are `string`, `number`, `boolean`, `object`, `array`. |
+| `outputs` | `{ key, description }` declarations. Metadata only; no automatic emission. |
+| `values` | Optional per-input overrides. Resolved before render and take precedence over defaults. |
+
+Runtime behavior:
+
+- The page widget slot renders `CompositeWidgetBody`, which exposes `state.composite.inputs` and `state.composite.outputs` and renders the captured layout.
+- Inputs resolve from `values` first, then the declared default. Numbers/booleans coerce, objects/arrays parse JSON, and invalid values fall back to `null`, `{}`, or `[]` according to type. `values` may contain `{{ }}` expressions.
+- Child widgets receive the page state tree, page query results, their own widget-local state, and application event emit/subscribe props. Child events run through the page action chain.
+- Inline child widget-level data sources are not executed; child data binding resolves against the page's data-source results.
+- Child state is keyed by the captured node ID (`composite:<nodeId>`); duplicate placements of the same composite on one page share that child state.
+- Composition preview substitutes composites (and other preview-unsupported types) with an informational alert. Deployed Application runtimes render them if they pass the release allowlist.
+- Unsupported inline child types are removed at publish with `COMPOSITE_WIDGET_UNAVAILABLE`. Nested composites are rejected at capture.
+- Composite outputs are not automatic event emitters. Use an **Emit Application Event** action in a child and a subscriber on the page.
+
+For capture workflow, typed inputs, versioning, library publishing, and limitations, see [Snippets & Composites](../applications/snippets-and-composites.md).
+
+**Section snippets** are a separate editing feature: `layout-snippet` widgets store a captured layout tree and appear under **Section snippets** in the Widgets palette. Inserting one copies the structure and remaps widget instance keys; it does not mount as a regular page widget.
+
+* * *
+
 <a id="widget-properties-styling"></a>
 
 ### Widget Properties (Styling)
@@ -640,15 +818,65 @@ Widgets emit **events** that can trigger one or more sequenced **actions**. Even
 
 Each event can have one or more actions executed in sequence:
 
-| Action Type | Description | Configuration |
-| --- | --- | --- |
-| **Set Page Variable** | Updates a page variable to a new value. | **Variable Key**: expression referencing the variable (e.g. `{{ state.variables.selectedId }}`). **Value Expression**: new value expression. |
-| **Execute Data Source** | Re-executes a page-level data source (query, workflow, or listener). | **Data Source**: select from the page's configured data sources by alias. Optionally override input argument values with expressions. |
-| **Trigger Workflow** | Directly triggers a specific workflow (not necessarily one bound as a page data source). | **Workflow**: select from all accessible workflows. Optionally supply input argument values. |
-| **Trigger Query** | Directly triggers a specific data query. | **Data Query**: select from all accessible queries. Optionally supply input argument values. |
-| **Show Toast** | Displays a brief notification to the user. | **Message**: text or expression. **Variant**: Success (green) or Error (red). |
+| Action Type | Editor label | Description | Configuration |
+| --- | --- | --- | --- |
+| `SET_VARIABLE` | **Set Page Variable** | Updates a page variable. | **Variable Key**: bare key or expression (e.g. `{{ state.variables.selectedId }}`). **Value Expression**: new value. |
+| `SET_APPLICATION_VARIABLE` | **Set Application Variable** | Updates a declared release-scoped application variable. Only runs inside an Application. | **Application Variable Key**: bare declared key. **Value Expression**. The key must exist in `state.application` at publish time. |
+| `RESET_APPLICATION_STATE` | **Reset Application State** | Restores every application variable to its declared default and clears the current persisted snapshot. Only runs inside an Application. | No configuration. |
+| `EMIT_APPLICATION_EVENT` | **Emit Application Event** | Broadcasts a transient event to mounted widgets/pages. Only runs inside an Application. | **Event Name** and optional safe-JSON **Payload** (max 64 KiB). |
+| `EXECUTE_QUERY` | **Execute Data Source** | Re-executes a page-level data source by alias (query, workflow, or listener). | **Data Source** alias; optional input-value overrides. This is the safe execution primitive in a deployed Application. |
+| `TRIGGER_WORKFLOW` | **Trigger Workflow** | Directly triggers a workflow that may not be bound as a page data source. | **Workflow** plus optional inputs and success/error toasts. Page capture rewrites it to a page data-source alias when possible. |
+| `TRIGGER_QUERY` | **Trigger Query** | Directly triggers a data query that may not be bound as a page data source. | **Data Query** plus optional inputs. Page capture rewrites it to a page data-source alias when possible. |
+| `NAVIGATE` | **Navigate** | Navigates to another Application route. Only runs inside an Application. | **Route ID**, path **params**, **query**, and optional **replace**. The route and params are validated against the release. |
+| `SHOW_TOAST` | **Show Toast** | Displays a brief notification. | **Message** (text/expression) and **Variant**: Success or Error. |
+| `CALL_WIDGET_METHOD` | *not selectable in the editor* | Invokes a registered method on another widget instance. Defined in the runtime contract but commented out of the action dropdown. | Target widget/instance, method name, arguments. |
 
-Event context values (e.g. `event.row`, `event.formData`) are accessible inside action expressions using `{{ event.{key} }}`.
+Event context values (e.g. `event.row`, `event.formData`, `event.value`) are accessible inside action expressions using `{{ event.{key} }}`. `state.event.*` is normalized to `event.*` for older saved pages.
+
+A typical Application action chain:
+
+```json
+{
+  "events": {
+    "onRowSelect": [
+      {
+        "actionType": "SET_VARIABLE",
+        "config": {
+          "key": "selectedOrderID",
+          "value": "{{ event.row.id }}"
+        }
+      },
+      {
+        "actionType": "SET_APPLICATION_VARIABLE",
+        "config": {
+          "key": "selectedCustomerID",
+          "value": "{{ event.row.customer_id }}"
+        }
+      },
+      {
+        "actionType": "EMIT_APPLICATION_EVENT",
+        "config": {
+          "name": "customer:selected",
+          "payload": { "customerID": "{{ event.row.customer_id }}" }
+        }
+      },
+      {
+        "actionType": "NAVIGATE",
+        "config": {
+          "routeID": "order-detail",
+          "params": { "orderID": "{{ event.row.id }}" },
+          "query": { "tab": "items" },
+          "replace": false
+        }
+      }
+    ]
+  }
+}
+```
+
+A `NAVIGATE` action ends the chain; later actions would belong to the page being left. Failed actions are reported individually and do not automatically stop the remaining steps.
+
+**Availability differs by host.** Standalone App Pages can execute direct triggers and page-variable actions, but have no application state bus. Deployed Applications admit only `SET_VARIABLE`, `SET_APPLICATION_VARIABLE`, `RESET_APPLICATION_STATE`, `EMIT_APPLICATION_EVENT`, `NAVIGATE`, `SHOW_TOAST`, `CALL_WIDGET_METHOD`, and `EXECUTE_QUERY`. Unsupported actions are removed at publish with a warning. See [Applications — Publish](../applications/applications.md#publish-and-the-release-compiler).
 
 * * *
 
@@ -656,7 +884,7 @@ Event context values (e.g. `event.row`, `event.formData`) are accessible inside 
 
 ### Widget Methods
 
-Some widget types expose programmatic methods that can be called from another widget's event handler via the **Call Widget Method** action (available but currently not shown in the action list — accessible for future use).
+Some widget types expose programmatic methods that can be called from another widget's event handler via the **Call Widget Method** action. The action type remains part of the runtime contract and the deployed Application action allowlist, but it is not currently shown in the event editor dropdown.
 
 | Widget Type | Method | Description |
 | --- | --- | --- |
@@ -689,9 +917,19 @@ Widgets and data source inputs use `{{ }}` **expressions** to bind dynamic value
 | `{{ state.workflows.{alias}.isLoading }}` | Boolean — true while the workflow is running. |
 | `{{ state.listeners.{alias}.data }}` | The latest payload received from a listener. |
 | `{{ state.variables.{key} }}` | The current value of a page variable. |
+| `{{ state.application.variables.{key} }}` | A declared application variable (Application runtime only). |
+| `{{ state.route.id }}` / `.path` | The active Application route ID and path. |
+| `{{ state.route.params.{name} }}` | Path parameters for the matched route. |
+| `{{ state.route.query.{name} }}` | Typed query values for the matched route. |
+| `{{ state.composite.inputs.{key} }}` | A resolved composite input inside a composite widget. |
+| `{{ state.composite.outputs }}` | Declared composite output metadata. |
 | `{{ state.widgets.{widgetKey}.selectedRow }}` | The currently selected row object in a Table widget. |
 | `{{ state.widgets.{widgetKey}.selectedRowIndex }}` | The index of the selected row. |
 | `{{ state.widgets.{widgetKey}.value }}` | The current value in a Date Picker or other input widget. |
+
+Widget state is keyed by the runtime **instance key** (the placement key; repeat-qualified inside repeats). A legacy resource-ID alias is exposed only when exactly one instance of that widget resource is live; ambiguous resources are listed under `state.widgetDiagnostics.ambiguousWidgetResources` instead of resolving to an arbitrary placement.
+
+When an Application uses `expressionMode: "safe-path"`, widget config/value bindings and visibility use the path-only resolver: only `state.*` path traversal is supported, JavaScript is not evaluated, and visibility fails closed. The default `trusted-js` mode supports the JavaScript expressions below. See [Navigation & Shell](../applications/navigation-and-shell.md#home-not-found-and-expression-mode).
 
 <a id="expression-syntax"></a>
 
@@ -717,7 +955,96 @@ The expression editor provides live autocomplete when typing inside `{{ }}`. Sug
 
 * * *
 
-<a id="real-time-async-behaviour"></a>
+## Applications & App Studio Integration {#applications-app-studio-integration}
+
+An Application composes existing App Pages into a routed, versioned surface. The page builder remains the place where layout, widgets, variables, and page data sources are authored; Application Studio owns routing, the shell, application state, releases, and deployment.
+
+![Application Studio linking pages and previewing the shell](/img/screenshots/applications-studio.png)
+
+### Page linking and ownership
+
+In **Applications → Application Studio → Linked pages**, a page is linked under an `assetKey`:
+
+| Mode | Behavior |
+| --- | --- |
+| **Referenced shared page** | The route points at the shared App Page. Page edits affect every application that references it. |
+| **Managed copy** | The application receives a copied page (`Title · assetKey`) whose page edits are isolated. Widgets, queries, listeners, and datasource bindings remain shared. |
+
+A managed copy is retained once it has asset versions, even if unlinked, so release history stays inspectable. A page used by a route cannot be unlinked.
+
+### Page versions and widget versions
+
+Publishing an Application captures immutable page versions. Each page version stores:
+
+- the page layout/config;
+- `sourceVersions` for each page data source (query/workflow/listener);
+- `widgetVersions` for every placed widget;
+- trigger bindings for direct query/workflow actions.
+
+Application Studio can pin a page version or use **Capture latest at publish**. Within the page editor, the **Widget versions** tab can set each widget to **Latest at capture** or a **Specific version** (`widgetVersionSelections`). The page editor's data-source cards expose the equivalent latest/specific choice for query, workflow, and listener versions.
+
+Application releases keep those exact version IDs. Editing a page or widget later does not change an existing release; publish a new page/release to capture it.
+
+### What changes at runtime
+
+When the page is reached through an Application route:
+
+| Area | Standalone App Page | Application runtime |
+| --- | --- | --- |
+| Shell/navigation | Page header only (or embedding host) | Shared application shell with routes |
+| Page data sources | Live queries/workflows/listeners | Captured versions only, executed through release-scoped endpoints |
+| Widget-level data sources | Captured in the widget definition; page widgets bind through page data-source results | Stripped by the release compiler; only page data sources execute |
+| Direct `TRIGGER_QUERY` / `TRIGGER_WORKFLOW` | Executes directly | Resolved to a page data-source alias at page capture; unbound actions are removed |
+| HTML / iframe widgets | Render in the standalone page | Excluded from deployed applications; publishing fails with `UNSUPPORTED_WIDGET_TYPE` |
+| Listeners | Socket channel subscription | Saved-buffer observation with an HMAC cursor; the integration is never started by the runtime |
+| Workflows | Socket streaming in the standalone page | Release-scoped start + 2-second status observation |
+| Application state/events | Not available | `state.application.variables`, set/reset actions, and the transient event bus |
+| URL/state | Page-variable URL sync | Route query/param validation, optional page-variable sync, typed `state.route`, keep-alive |
+| Actions | Full editor action set | Release allowlist only |
+
+A page placed inside an Application also receives the route's `state.route` and the application's `state.application.variables`. Input arguments can bind to both. Page variables remain page-scoped; application variables are shared across routes.
+
+### Composition preview
+
+Application Studio's **Preview composition** renders the saved draft's real shell, routes, guards, page layout, and application variable values. It is intentionally limited:
+
+- data sources are stripped;
+- widget events are removed and actions are disabled;
+- widget bindings are resolved with a path-only resolver, not JavaScript;
+- only a safe widget subset is rendered; unsupported types become an informational alert;
+- application state persistence is disabled;
+- the artifact is capped at 2 MiB and 500 widgets per page/application.
+
+![Composition preview of an Application route](/img/screenshots/application-preview.png)
+
+Use the deployed runtime (not preview) to test real queries, workflows, buffered listeners, action chains, and permissions. Full details: [Applications](../applications/applications.md).
+
+### Page-editor context from Studio
+
+Opening a linked page from Studio appends an `applicationId` query parameter. The page editor uses that context to:
+
+- list declared application variables in the reactive **Refresh When Variable Changes** picker;
+- keep page editing scoped to the application you came from.
+
+The application context is not a security boundary; server permissions still apply. Reactive refresh caveats for application variables are described in [Page Data Sources](#page-data-sources).
+
+### Keep-alive and URL state
+
+Routes can retain a bounded page snapshot (`keepAlive`) of page variables, query results, and widget state, up to 20 snapshots per runtime session. Path-parameter changes still reset the page. Routes can also sync selected or all page variables to the URL; declared route query parameters are typed and validated, while undeclared query keys remain strings. See [Applications — Routes](../applications/applications.md#routes).
+
+### Release constraints that affect page design
+
+Design pages with the deployed contract in mind:
+
+- Keep executable work in **page data sources**, not widget-level data sources.
+- Bind direct query/workflow buttons to a page data source alias, or ensure the same asset is a page data source so capture can rewrite the action.
+- Avoid HTML/iframe widgets on pages that will be routed through an Application.
+- Declare every application variable before referencing it in `SET_APPLICATION_VARIABLE`.
+- Use supported action types; unsupported actions are removed with release warnings.
+- Prefer composites for self-contained reusable sections; snippets reference live widget definitions and are tenant-bound.
+- Check release warnings after publishing; stale page/dependency versions are warnings, not automatic upgrades.
+
+* * *
 
 ## Real-Time & Async Behaviour {#real-time-async-behaviour}
 
@@ -725,23 +1052,31 @@ The expression editor provides live autocomplete when typing inside `{{ }}`. Sug
 
 ### Listener Data Sources
 
-When a page data source is of type **Listener**, the Page Runtime subscribes to the specified socket channel at mount time. Incoming events are pushed into `state.listeners.{alias}`. The widget that consumes this state updates reactively each time a new event arrives. No polling is involved.
+In a **standalone App Page**, a Listener data source subscribes to the specified socket channel at mount time. Incoming events are pushed into `state.listeners.{alias}`. The widget that consumes this state updates reactively each time a new event arrives. The editor's **Refresh** button re-subscribes after a connection disruption.
 
-To refresh the socket connection (for example after a connection disruption), pressing the **Refresh** button on a listener data source in the editor re-subscribes.
+In a **deployed Application**, listeners do not start integrations or join the live channel. The runtime observes the listener's saved buffer through a cursor-based endpoint, polling every 2 seconds:
+
+- the initial read returns the latest retained 100 events, then advances strictly by HMAC cursor;
+- events are scoped to the tenant, application, environment, release, page, alias, and caller;
+- the listener must still be active and its definition hash must match the captured version;
+- `mode` and `limit` come from the listener's `push_to_app_page` action;
+- an evicted cursor returns `APPLICATION_CURSOR_EXPIRED` (410), and the subscription must reopen.
+
+The release compiler requires an enabled **Save to buffer** action with the configured buffer name. Without it, publishing fails with `APPLICATION_LISTENER_BUFFER_REQUIRED`.
 
 <a id="workflow-streaming"></a>
 
 ### Workflow Streaming
 
-When a **Workflow** data source is triggered — either automatically on load, reactively, or from an event — the runtime establishes a streaming connection that receives live workflow context updates as each node completes. The state tree is updated incrementally, so widgets bound to intermediate workflow outputs update in real time as execution progresses.
+When a **Workflow** data source is triggered in a standalone page — automatically, reactively, or from an event — the runtime starts it and observes live workflow context updates over Socket.IO. The state tree is updated incrementally, so widgets bound to intermediate workflow outputs update as each node completes.
 
-A running workflow data source shows a **Stop** button in the editor's Data panel, which terminates the workflow execution and disconnects the stream.
+In a **deployed Application**, the runtime starts the captured workflow version through release-scoped endpoints and observes status by polling every 2 seconds. It exposes declared workflow outputs, the final output, and pending data-collection requests; raw logs, SQL, internal context, and input values are not sent to the client. A running workflow data source shows a **Stop** button in the editor's Data panel, which terminates the editor's execution/stream. The Studio run-history dialog is read-only; cancellation is available through the runtime workflow-cancel API, not from that dialog.
 
 <a id="auto-refresh"></a>
 
 ### Auto-Refresh
 
-Both page-level data sources and individual widgets support a **Refetch Interval** setting. When set, the data source or widget's data fetch is re-triggered at the configured interval in milliseconds. The minimum meaningful value is typically 1000 ms (1 second). Setting this to 0 disables polling.
+Both page-level data sources and individual widgets support an **Auto-refresh / Refetch Interval** setting. Page data-source polling uses milliseconds; set 0 or leave it empty to disable it. Widget auto-refresh uses the interval configured in the widget's display properties and shows that interval in the widget header. Page data-source polling skips ticks while the document is hidden.
 
 <a id="layout-state-persistence"></a>
 
@@ -759,10 +1094,12 @@ The layout editor automatically saves layout changes into the page config form. 
 | --- | --- |
 | **Data Queries** | Pages bind to Data Queries via data sources. Query results populate the state tree and feed table, chart, and stat widgets. |
 | **Workflows** | Pages bind to Workflows via data sources. Workflow results stream into the state tree in real time. Event handlers can also trigger workflows directly without a pre-configured data source binding. |
-| **Listeners** | Pages bind to Listeners to receive real-time push data over WebSockets, populating the state tree reactively. |
+| **Listeners** | Standalone pages subscribe over WebSockets; deployed Applications observe a saved listener buffer by cursor without starting the integration. |
+| **Applications** | Applications link pages, add routes/shell/state, pin page and widget versions, publish immutable releases, and deploy environments. See [Applications](../applications/applications.md). |
+| **Application State & Events** | Application runtimes add cross-route state and a transient event bus to the page runtime. See [Application State](../applications/application-state.md) and [Application Events](../applications/application-events.md). |
 | **File Storage** | Image widgets and the HTML widget support file uploads. Uploaded files are stored via the platform's file storage service and referenced by URL. |
-| **Access Control (Casbin)** | When an App Page or Widget is created, the creator is automatically granted full creator-level access. This determines who can read, update, delete, or clone the resource. Page-level data source binding also checks that the user has execute permission on each referenced Query, Workflow, Listener, and Widget. |
-| **WebSocket /** Socket.IO | The Page Runtime uses the platform's Socket.IO connection for listener subscriptions and workflow streaming. The same socket connection is used by the widget-workflow bridge for real-time context updates. |
+| **Access Control (Casbin)** | When an App Page or Widget is created, the creator is automatically granted full creator-level access. This determines who can read, update, delete, or clone the resource. Page-level data source binding also checks that the user has execute permission on each referenced Query, Workflow, Listener, and Widget. Application runtime additionally requires `appPage.execute` and the captured source's execute/observe permission. |
+| **WebSocket / Socket.IO** | The standalone Page Runtime uses the platform's Socket.IO connection for listener subscriptions and workflow streaming. Application runtimes use release-scoped polling for workflows and buffered listeners instead. The same socket connection is used by the widget-workflow bridge for real-time context updates in standalone pages. |
 
 * * *
 
@@ -773,6 +1110,8 @@ The layout editor automatically saves layout changes into the page config form. 
 Creating an App Page or Widget automatically grants the creating user (or API key) **creator access**, which includes read, update, delete, and clone permissions.
 
 When saving a page that references data sources (queries, workflows, listeners) or places widgets, the system verifies that the saving user has **execute permission** on each referenced asset. If any permission check fails, the save is rejected.
+
+Application runtime execution requires the application `execute` permission plus `appPage:execute` on the captured page and `execute`/`observe` on each captured query, workflow, or listener. Consumer policy can further restrict routes and page data-source aliases.
 
 Sharing access with other users or roles is managed through the platform's Role-Based Access Control module.
 
@@ -793,6 +1132,12 @@ Sharing access with other users or roles is managed through the platform's Role-
 | **Layout migration from V1 to V2** | Pages with the old react-grid-layout format are automatically converted to the V2 layout tree on first load. The old layout is preserved in `_legacyLayouts` as a backup. The migration is non-destructive. |
 | **Switching from Raw spec to Visual Builder** | If the raw Vega-Lite spec contains features the visual builder cannot parse (transforms, layers, multi-view), a warning dialog is shown before switching. The user can choose to proceed and overwrite or cancel. |
 | **A widget's data query is loading at widget slot render time** | A loading spinner overlay is shown over the widget slot. The widget's previously rendered state (if any) remains visible beneath the overlay. |
+| **An application action is unavailable in the deployed release** | The action is removed at publish with a warning and does not execute. Check release diagnostics for `ACTION_TYPE_UNAVAILABLE`, `ACTION_TARGET_NOT_ALIASED`, `ACTION_APPLICATION_VARIABLE_INVALID`, `ACTION_EVENT_INVALID`, or `ACTION_ROUTE_NOT_FOUND`. |
+| **Application state/event action runs in a standalone page** | The action fails with `APPLICATION_STATE_UNAVAILABLE` or `APPLICATION_EVENTS_UNAVAILABLE`. Use page variables/toasts, or open the page through an Application runtime. |
+| **Composite is rendered in composition preview** | It is replaced by a "Preview unavailable" info alert because composite (and several rich widgets) are outside the preview allowlist. Deploy a runtime to inspect it. |
+| **An application page manifest cannot be loaded** | The route content shows a spinner while loading, then a page-load error or empty state. Reload, verify the deployed page version still exists, and check permissions. |
+| **Production changes while a runtime tab is open** | New executions fail with `APPLICATION_RELEASE_CHANGED`; reload the runtime to resolve the current release and page manifests. |
+| **A list of application workflow runs does not include a direct trigger** | Direct workflow actions are rewritten to page data-source aliases at capture; runs are listed by release provenance (`pageAssetKey.alias`). Unbound actions are removed. |
 
 * * *
 
@@ -804,7 +1149,7 @@ Sharing access with other users or roles is managed through the platform's Role-
 
 **Variable Naming:** Name page variables after the state they hold (`selected_row_id`, `date_filter_start`) rather than after the widget that sets them. This makes expressions more readable and decouples widget configuration from variable wiring.
 
-**Trigger Mode Selection:** Use `auto` trigger mode only for data sources that should always be fetched. Use `reactive` for data sources that depend on filter variables — this avoids unnecessary fetches on page load before the user has set any filter value. Use `manual` for expensive or side-effecting operations that should only run in response to explicit user actions.
+**Trigger Mode Selection:** `auto` and `reactive` both fetch on mount; `reactive` additionally re-fetches when a tracked `refreshOn` path changes. Use `reactive` for filter-driven data, but remember the initial fetch. Use `manual` for expensive or side-effecting operations that should only run in response to an explicit user action. Application-variable-only changes are not currently part of the reactive diff; chain an `EXECUTE_QUERY` action for a guaranteed refetch.
 
 **Widget Reuse:** Configure a widget's data binding using expressions that reference page-level state tree paths rather than hardcoding data. This makes a single widget reusable across multiple pages simply by ensuring each page defines the expected aliases.
 
@@ -815,6 +1160,19 @@ Sharing access with other users or roles is managed through the platform's Role-
 **Custom CSS Scoping:** Custom CSS entered in the Widget Properties tab is automatically scoped to that specific widget. Use this for per-widget overrides. For global page styling, use Container or Row style settings in the layout editor instead.
 
 **Loading States:** Always configure **Is Loading Template** on widgets that display asynchronously loaded data. Binding it to `{{ state.queries.{alias}.isLoading }}` provides visual feedback and prevents users from interacting with stale or empty states.
+
+* * *
+
+## Common Use Cases
+
+| Page pattern | Composition |
+| --- | --- |
+| **KPI dashboard** | Grid of Stat widgets and Vega-Lite charts fed by auto queries; a Date Range Picker writes page variables; reactive data sources refetch on change. |
+| **Record browser + detail** | Table with `onRowSelect` sets a selected ID variable; a Key-Value/JSON Viewer detail panel reads it; a Form updates the record through a manual workflow data source. |
+| **Data entry workflow** | Form widget collects values; `onSubmit` action chain executes a workflow data source, shows a toast, then navigates to a detail route in an Application. |
+| **Live operations monitor** | Listener data source or Application buffered listener feeds a Table/List; conditions highlight state; an auto-refresh Stat shows freshness. |
+| **Guided multi-step tool** | Page variable `step`; containers with visibility conditions; buttons update `step`; an Application route with `keepAlive` preserves progress. |
+| **Reusable summary card** | Composite widget with a text heading, Stat/Table children, and typed inputs; place it on dashboards or publish it as a self-contained widget. |
 
 * * *
 
@@ -830,11 +1188,16 @@ Sharing access with other users or roles is managed through the platform's Role-
 | **Vega Visual Builder** | Only supported for Vega-Lite specs. Full Vega specs must be authored in Raw mode. |
 | **Vega Visual Builder spec parsing** | Specs with `layer`, `hconcat`, `vconcat`, `concat`, `repeat`, or `transform` clauses cannot be parsed back into the visual builder. Switching to visual mode in these cases will lose those features. |
 | **Layout undo depth** | Undo is limited to changes made within the current editing session. Navigating away and returning resets the undo history. |
-| **Listener subscriptions** | Listeners connect via the platform's shared Socket.IO connection. Each listener data source subscribes to one channel. Multiple listeners on the same page each maintain their own subscription. |
-| **Widget method calling** | The `Call Widget Method` action type is defined in the system but is not currently exposed as a selectable option in the event editor UI. |
+| **Listener subscriptions** | In standalone pages, listeners use the platform's shared Socket.IO connection; each data source subscribes to one channel. In deployed Applications, listeners are observed from the saved buffer by cursor and polled every 2 seconds; the runtime never starts the integration. |
+| **Widget method calling** | The `Call Widget Method` action type is defined in the system and admitted by the deployed runtime allowlist, but is not currently exposed as a selectable option in the event editor UI. |
 | **HTML Widget browser globals** | The HTML Widget's iframe sandbox does not grant `allow-same-origin`. Scripts running inside cannot access the parent page's DOM, cookies, or local storage by design. |
-| **Expression globals** | Only a curated set of JavaScript globals are available inside expressions: `JSON`, `Math`, `Array`, `Object`, `String`, `Number`, `Boolean`, `Date`, `RegExp`, `Map`, `Set`, `parseInt`, `parseFloat`, `isNaN`, `isFinite`, encode/decode URI functions. Browser APIs (`fetch`, `window`, `document`, `localStorage`, etc.) are not accessible. |
-| **Workflow streaming horizontal scaling** | The widget-workflow bridge for real-time context updates uses in-memory maps. In a horizontally scaled deployment (multiple backend instances), streaming may not work correctly without a shared pub/sub layer (e.g. Redis). |
+| **Application widget allowlist** | Deployed Applications exclude HTML and iframe widgets and strip widget-level data sources. Publishing fails on an unsupported page widget; composite inline children outside the allowlist are removed with a warning. |
+| **Application state** | Maximum 100 declared variables; values are client-side, type-checked, and not encrypted. Application-variable-only changes are not currently tracked by the reactive data-source diff. |
+| **Application events** | Payloads are capped at 64 KiB and are transient; no queue, replay, cross-tab, or server delivery. |
+| **Snippet/composite capture** | Exactly one non-root section, up to 500 layout nodes. Nested composites are not supported. Composite inputs/state are widget-level, not per placement. |
+| **Composition preview** | 2 MiB artifact, 500 widgets per page/application, safe widget subset, no data execution, no actions, and path-only binding resolution. |
+| **Expression globals** | Only a curated set of JavaScript globals are available inside expressions: `JSON`, `Math`, `Array`, `Object`, `String`, `Number`, `Boolean`, `Date`, `RegExp`, `Map`, `Set`, `parseInt`, `parseFloat`, `isNaN`, `isFinite`, encode/decode URI functions. Browser APIs (`fetch`, `window`, `document`, `localStorage`, etc.) are not accessible. In an Application with `expressionMode: "safe-path"`, widget config/value bindings and visibility are path-only. |
+| **Workflow streaming horizontal scaling** | In standalone pages, the widget-workflow bridge for real-time context updates uses in-memory maps; horizontally scaled deployments may need a shared pub/sub layer (e.g. Redis). Deployed Applications observe workflow status through the runtime API and do not depend on that in-memory socket bridge. |
 
 * * *
 
@@ -844,7 +1207,12 @@ Sharing access with other users or roles is managed through the platform's Role-
 
 - **Data Queries** — Define the parameterised database or API queries that App Pages bind to as data sources.
 - **Workflows** — Define the DAG-based automation pipelines that pages can execute and stream results from.
-- **Listeners** — Define real-time event channels that push data to pages over WebSockets.
+- **Listeners** — Define real-time event channels that push data to standalone pages over WebSockets and can be observed from saved buffers by Applications.
+- **Applications** — Compose pages into routed, versioned applications with releases, environments, shared state, and application events. See [Applications](../applications/applications.md).
+- **Application State** — Release-scoped variables shared across routes. See [Application State](../applications/application-state.md).
+- **Application Events** — Transient widget/page broadcasts. See [Application Events](../applications/application-events.md).
+- **Navigation & Shell** — Application shell presets and navigation configuration. See [Navigation & Shell](../applications/navigation-and-shell.md).
+- **Snippets & Composites** — Saved sections and self-contained composite widgets. See [Snippets & Composites](../applications/snippets-and-composites.md).
 - **Access Control / RBAC** — Manages user and role permissions for reading, editing, and executing App Pages and Widgets.
 - **File Storage** — Handles file uploads from Image widgets and the Widget IDE file uploader.
 - **Expression Engine** — The shared `{{ }}` template evaluation layer used by both App Pages (for data binding) and the backend Query Engine (for input mapping). Documented separately under the Expression Engine module.

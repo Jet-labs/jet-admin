@@ -1,443 +1,373 @@
 ---
 title: Identity & Access Management
-description: Authentication (Firebase, API keys, operators), Casbin RBAC, tenants, roles, permissions, and delegated execution identity.
+description: Authentication, tenant membership, custom roles, permissions, API keys, and delegated execution.
 sidebar_position: 8
 ---
 
 # Identity & Access Management
 
-<a id="identity-access-management"></a>
+IAM answers three questions for every tenant-scoped request:
+
+1. **Who is calling?** A human via a Firebase identity token, or an integration via an API key.
+2. **Which tenant domain?** The `tenantID` in the route.
+3. **What may they do?** A Casbin policy check on the requested resource and action.
+
+![Roles and permissions](/img/screenshots/iam-roles.png)
+
+## Core concepts
+
+| Concept | Meaning |
+|---|---|
+| Platform user | A `tblUsers` row identified by `firebaseID` + email. A user can belong to multiple tenants. |
+| Tenant membership | A `tblUsersTenantsRelationship` row with `role: "ADMIN"` or `"MEMBER"`. |
+| Membership tier | `ADMIN` gets a tenant-wide Casbin wildcard (`*`, `*`). `MEMBER` gets only the policies from assigned custom roles. |
+| Custom role | A tenant-owned `tblRoles` row plus permission mappings. Roles are reusable across members and API keys. |
+| Global role | A role with `tenantID = NULL`, seeded deployment-wide. It can be assigned, but tenant routes cannot update or delete it. |
+| General permission | A category-wide capability such as `tenant:workflow:execute`, stored as a `tblPermissions` row and mapped to Casbin `<resource>:*`. |
+| Asset permission | A capability scoped to one resource, stored as `tenant:asset:<resourceType>:<resourceID>:<action>` and mapped to `<resource>:<id>`. |
+| API key | A tenant-scoped machine credential with `api_key <raw>` authentication. It is authorized as its own subject and can hold roles. |
+| Execution context | The caller/origin object passed through internal execution (`authorizedExecuteDataQuery`, `authorizedExecuteWorkflow`). Enables delegated authorization and traceability. |
+| Delegated authorization | A caller without direct permission on a query/workflow can still execute it if they have execute permission on the **originating** workflow or app page. |
+| Policy sync | Role create/update/delete immediately rewrites Casbin rules from the database. `POST /roles/sync-policies` is the manual repair path. |
+
+```mermaid
+flowchart TB
+    ID[Firebase token or API key] --> AUTH[authProvider]
+    AUTH --> CTX[Execution context: caller + tenant]
+    CTX --> CASBIN{Casbin: subject, tenant domain, resource, action}
+    CASBIN -->|allow| SVC[Module service]
+    CASBIN -->|deny| E403[403 PERMISSION_DENIED]
+    SVC -->|nested query/workflow| DEL{Direct permission?}
+    DEL -->|no| ORIGIN{Execute on originating resource?}
+    ORIGIN -->|yes| RUN[Run]
+    ORIGIN -->|no| E403
+```
+
+## Authentication methods
+
+A tenant route under `/api/v1/tenants/:tenantID/...` authenticates with one of these headers:
 
-*Covers: Authentication, Tenants, Tenant Roles & Permissions, and Tenant User Management*
+| Method | Header | Subject used by Casbin | Notes |
+|---|---|---|---|
+| Firebase ID token | `Authorization: Bearer <firebase-id-token>` | `userID` | Token verified with Firebase Admin on each request. |
+| API key | `Authorization: api_key <raw-api-key>` | `apiKeyID` | Raw key is 64 hex chars; only the first 8-char prefix and a SHA-256 hash are stored. |
+
+Requests with neither credential, or with an invalid/disabled key, are rejected with `401`. The platform-admin **operator** console uses a separate auth realm (`/api/v1/operator/...`) and is outside tenant IAM.
+
+:::warning
+**Provisioning caveat.** `authController.getUserInfo` contains a create-if-missing branch, but `authMiddleware.authProvider` looks up an existing `tblUsers` row and returns `INVALID_USER` before the controller runs. As shipped, a brand-new Firebase account may not be auto-provisioned by `/api/v1/auth`; verify the first-sign-in flow in your deployment and pre-provision the user row if needed.
+:::
+
+## Tenant roles and membership
+
+### Membership model
+
+| Tier | Stored as | Effective access |
+|---|---|---|
+| Admin | `tblUsersTenantsRelationship.role = "ADMIN"` | Tenant-wide wildcard policy; roles are not needed and the UI hides role assignment. |
+| Member | `role = "MEMBER"` | Only permissions granted through assigned custom/global roles plus creator-asset grants. |
 
-* * *
+Custom roles are linked to members through `tblUserTenantRoleMappings` and to API keys through `tblAPIKeyRoleMappings`. Both are synchronized to Casbin `g` rules (`role:<roleID>`).
+
+### Seeded global roles
 
-<a id="table-of-contents"></a>
+The current seed includes job-function roles such as:
 
-## Table of Contents
+`ADMIN`, `TenantManager`, `TenantViewer`, `RoleManager`, `RoleViewer`, `UserManager`, `UserViewer`, `QueryCreator`, `QueryEditor`, `QueryRunner`, `WorkflowManager`, `WidgetManager`, `DatasourceManager`, `AppPageManager`, `ListenerManager`, `CronJobManager`, `FolderManager`, `ApiKeyManager`, `AuditViewer`, `AIManager`.
 
-1. [Overview](#1-overview)
-2. [Key Concepts](#2-key-concepts)
-3. [How It Works — End-to-End Flows](#3-how-it-works-end-to-end-flows)
-  - 3.1 [User Sign-In and Account Provisioning](#31-user-sign-in-and-account-provisioning)
-  - 3.2 [Tenant Creation](#32-tenant-creation)
-  - 3.3 [Authorization Check on Every Request](#33-authorization-check-on-every-request)
-  - 3.4 [Inviting and Managing Tenant Members](#34-inviting-and-managing-tenant-members)
-  - 3.5 [Creating and Assigning Custom Roles](#35-creating-and-assigning-custom-roles)
-4. [Authentication Methods](#4-authentication-methods)
-5. [Configurable Entities](#5-configurable-entities)
-  - 5.1 [Tenant](#51-tenant)
-  - 5.2 [Tenant Role](#52-tenant-role)
-  - 5.3 [General Permission](#53-general-permission)
-  - 5.4 [Asset (Granular) Permission](#54-asset-granular-permission)
-  - 5.5 [Tenant User (Membership)](#55-tenant-user-membership)
-  - 5.6 [User-Level Tenant Configuration](#56-user-level-tenant-configuration)
-6. [Supported Permission Types](#6-supported-permission-types)
-7. [Input/Output Contracts](#7-inputoutput-contracts)
-8. [Integration Points](#8-integration-points)
-9. [Real-Time and Asynchronous Behaviour](#9-real-time-and-asynchronous-behaviour)
-10. [Error States and Edge Cases](#10-error-states-and-edge-cases)
-11. [Best Practices](#11-best-practices)
-12. [Limitations and Constraints](#12-limitations-and-constraints)
-13. [Related Modules](#13-related-modules)
+They are templates. Global roles are shown in the tenant role list but cannot be edited/deleted through the tenant API.
 
-* * *
+## Create and assign a custom role
 
-<a id="1-overview"></a>
+1. Open **Roles** in tenant settings.
+2. Choose **Add role**.
+3. Enter a title (max 255) and a description.
+4. Select **General Permissions** from the catalog. The picker shows human descriptions and hides `tenant:asset:*` rows.
+5. Optionally add **Asset Permissions**:
+   - choose an asset type (`appPage`, `dataquery`, `workflow`, `datasource`, `listener`, `cronjob`, `widget`);
+   - search/select one asset in the tenant;
+   - choose an action (`read`/`update`/`delete`, plus `run` for queries and `execute` for workflows).
+6. Save. Casbin policies are rewritten immediately.
+7. Open **Users**, select a Member, choose **Manage roles**, select the role(s), and save.
 
-## 1\. Overview
+Roles do not require unique titles. Use job-function names, not personal names.
 
-The Identity & Access Management (IAM) module is the security foundation of Jet Admin. It governs **who can sign in**, **which organisation ("tenant") they are acting within**, and **what they are permitted to do** inside that organisation.
+### Role request example
 
-The module is made up of four closely related pieces:
+```http
+POST /api/v1/tenants/:tenantID/roles HTTP/1.1
+Authorization: Bearer <firebase-id-token>
+Content-Type: application/json
 
-- **Authentication** — verifies that a request genuinely comes from a known user (via a Firebase identity token) or an automated integration (via an API key), and provisions a platform user record automatically on first sign-in.
-- **Tenants** — Jet Admin is multi-tenant: every workspace (a company, team, or project) is represented as a tenant. All build-time and run-time resources (datasources, queries, workflows, app pages, widgets, cron jobs, listeners, API keys) belong to exactly one tenant.
-- **Tenant Roles & Permissions** — a policy engine that determines what an authenticated identity (a user or an API key) may do within a given tenant, down to the level of individual resources.
-- **User Management** — the administrative surface for adding people to a tenant, assigning them roles, promoting or demoting admins, and removing them.
+{
+  "roleTitle": "Ops dashboard editor",
+  "roleDescription": "Can edit pages and run the fulfilment workflow",
+  "permissionIDs": [
+    "3f5c2a10-1d2e-4f3a-9b8c-7d6e5f4a3b2c",
+    "8a7b6c5d-4e3f-4a2b-9c1d-0e9f8a7b6c5d"
+  ],
+  "assetPermissions": [
+    {
+      "resourceType": "workflow",
+      "resourceID": "f0e1d2c3-b4a5-4968-8778-695a4b3c2d1e",
+      "action": "execute"
+    }
+  ]
+}
+```
 
-Every other module in the platform (datasources, data queries, workflows, app pages, widgets, cron jobs, listeners, API keys) depends on this module for two things: knowing **whose request this is** and knowing **whether they're allowed to do it**.
+`permissionIDs` are **permission UUIDs**, not titles. Get them from `GET /roles/permissions`.
 
-* * *
+### Asset permission semantics
 
-<a id="2-key-concepts"></a>
-
-## 2\. Key Concepts
-
-**User** — A person who has signed in to Jet Admin at least once. A user account is created automatically the first time someone successfully authenticates; there is no separate manual "sign up" step in the platform itself. A user can belong to multiple tenants at once.
-
-**Tenant** — An isolated workspace. Each tenant has its own datasources, queries, workflows, pages, widgets, roles, members, and API keys. A user's access to a tenant's resources is entirely separate from their access to any other tenant's resources.
-
-**Tenant Membership** — The relationship between a user and a tenant. Every member has exactly one **Membership Tier** (Admin or Member, described below) plus, optionally, one or more **Custom Roles** that grant additional fine-grained permissions.
-
-**Membership Tier (Primary Role)** — A coarse-grained designation attached directly to a user's membership in a tenant:
-
-- **Admin** — full control over the tenant, including the ability to manage other members, roles, and tenant settings.
-- **Member** — a standard, non-administrative participant. A Member's actual capabilities are determined entirely by the Custom Roles assigned to them.
-
-**Custom Role** — A named, reusable bundle of permissions that an Admin defines for a tenant (e.g., "Analyst," "Workflow Editor"). Roles are assigned to Members to grant them specific capabilities. Custom Roles are only meaningful for users with the Member tier — Admins implicitly have full access and do not need roles assigned.
-
-**Global Role** — A role that is not tied to any specific tenant and is available platform-wide as a reference/template. Global roles are shown alongside a tenant's own custom roles when listing available roles, but they cannot be edited or deleted through the tenant's role management screens.
-
-**Permission** — A single, named capability (e.g., "create a data query," "execute a workflow"). Permissions are combined into Custom Roles.
-
-**General Permission** — A permission that applies to an entire category of resource within the tenant (e.g., "can list all data queries"). This is the default, broad form of permission.
-
-**Asset (Granular) Permission** — A permission scoped to one specific resource instance rather than an entire category (e.g., "can execute *this one* workflow, not all workflows"). Asset permissions let an Admin hand out narrowly-scoped access without granting blanket category-wide rights.
-
-**API Key** — A credential that lets external systems or automations call the platform without a human signing in interactively. An API key acts on behalf of the user who created it for resource-ownership purposes, but is evaluated as its own distinct identity for authorization decisions.
-
-**Authorization Check** — Every protected action in the platform is evaluated against the policy engine before it is allowed to proceed. The check asks: "Does this identity (user or API key), within this tenant, have permission to perform this action on this resource (or resource category)?"
-
-**Delegated / Originating Resource Authorization** — Some actions are triggered indirectly — for example, a workflow step that runs a data query, or an app page that triggers a workflow. If the caller doesn't have direct permission on the inner resource (the query) but does have permission on the resource that triggered it (the workflow or page), the action is still allowed. This prevents administrators from having to grant access to every internal building block individually.
-
-* * *
-
-<a id="3-how-it-works-end-to-end-flows"></a>
-
-## 3\. How It Works — End-to-End Flows {#3-how-it-works-end-to-end-flows}
-
-<a id="31-user-sign-in-and-account-provisioning"></a>
-
-### 3.1 User Sign-In and Account Provisioning
-
-A user signs in through the platform's identity provider (Firebase). On their first successful sign-in, Jet Admin automatically creates a corresponding platform user record using the email address and identity-provider ID from that sign-in — there is no separate registration form. On every subsequent sign-in, the existing user record is found and reused. The user's outstanding notifications are attached to their profile at this point as well, so the user always sees their current notification state immediately after signing in.
-
-<a id="32-tenant-creation"></a>
-
-### 3.2 Tenant Creation
-
-Any signed-in user can create a new tenant, subject to a maximum number of tenants they're allowed to own (see [Limitations](#12-limitations-and-constraints)). When a tenant is created:
-
-1. The tenant record itself is created with a title and optional logo.
-2. An empty configuration entry is created for the creator within that tenant.
-3. The creator is automatically added as a member of the new tenant with the **Admin** membership tier.
-
-From this point on, the creator can invite other users, define custom roles, and configure every other module (datasources, queries, workflows, etc.) within that tenant.
-
-![image-20260619-085107.png](./attachments/image-20260619-085107.png)
-
-![image-20260619-085210.png](./attachments/image-20260619-085210.png)
-
-<a id="33-authorization-check-on-every-request"></a>
-
-### 3.3 Authorization Check on Every Request
-
-Whenever a request is made against a tenant-scoped resource, the following sequence happens:
-
-1. **Identity verification** — the request's credentials (Firebase token or API key) are validated and the corresponding user/API key identity is attached to the request.
-2. **Resource resolution** — the system determines which resource (and resource type) the action targets, based on the URL or submitted data. If the action affects a list/category rather than one item (e.g., listing all workflows), the check is performed against the whole category.
-3. **Policy evaluation** — the policy engine checks whether the identity has been granted the requested action on that resource (or category) within that tenant.
-4. **Delegated fallback** — if the direct check fails and the action was triggered by a parent resource (e.g., a query running inside a workflow), the system re-checks permission against that parent resource before finally denying access.
-5. **Outcome** — if allowed, the request proceeds and an execution context (identifying the actor and, where relevant, the resource that triggered the action) is made available to the rest of the system for traceability. If denied, the request is rejected and the user sees a permission error.
-
-<a id="34-inviting-and-managing-tenant-members"></a>
-
-### 3.4 Inviting and Managing Tenant Members
-
-An Admin adds a new member by submitting the **email address of an existing platform user** (the person must have signed in to Jet Admin at least once already; this flow does not send an email invitation or create a new account). The system:
-
-1. Looks up the user by email.
-2. Confirms the user isn't already a member of the tenant (duplicate membership is rejected).
-3. Creates the membership record with the **Member** tier by default.
-4. Sends the new member an in-app notification informing them they've been added to the tenant.
-
-Once added, an Admin can:
-
-- Assign or change the member's **Custom Roles**.
-- Promote the member to **Admin**, or demote an existing Admin back to **Member**.
-- Remove the member from the tenant entirely.
-
-<a id="35-creating-and-assigning-custom-roles"></a>
-
-### 3.5 Creating and Assigning Custom Roles
-
-When an Admin creates a Custom Role, they give it a title and description and attach:
-
-- Zero or more **General Permissions** selected from the platform's permission catalogue.
-- Zero or more **Asset Permissions**, each naming a specific resource, its type, and the allowed action on that resource.
-
-Behind the scenes, every permission attached to the role is translated into a policy rule. Asset permissions that reference a resource/action combination not seen before automatically create the underlying permission record on the fly, so Admins never need to pre-register asset permissions before using them. Whenever a role's permissions are created, updated, or removed, the platform's policy engine is automatically resynchronized so that the change takes effect immediately for every member holding that role — no manual "publish" or cache-refresh step is required.
-
-* * *
-
-<a id="4-authentication-methods"></a>
-
-## 4\. Authentication Methods
-
-The platform supports two ways for a request to authenticate itself. Both are evaluated based on the format of the credential supplied.
-
-| Method | Who Uses It | How It Identifies the Caller | Notes |
-| --- | --- | --- | --- |
-| **Firebase Identity Token** | Human users via the web app | A signed identity token issued at sign-in, verified against the identity provider on every request | A new platform user is auto-provisioned on first successful verification if one doesn't already exist |
-| **API Key** | External systems, scripts, automations | A secret key string; only the portion needed to look up candidate keys is stored in readable form, with the full key validated by comparing a one-way hash | The key carries its own tenant scope and title, and acts as a distinct identity from its creator for authorization purposes, while still being attributed to the human who created it for resource-ownership and audit purposes |
-
-A request that supplies neither credential — or an invalid one — is rejected before reaching any business logic.
-
-* * *
-
-<a id="5-configurable-entities"></a>
-
-## 5\. Configurable Entities
-
-<a id="51-tenant"></a>
-
-### 5.1 Tenant
-
-| Field | Description | Type | Required | Default |
-| --- | --- | --- | --- | --- |
-| Tenant Title | Display name of the workspace | Text | Yes (on creation) | —   |
-| Tenant Logo URL | URL of an image used as the tenant's logo/avatar | Text (URL) | No  | None |
-| Disabled State | Whether the tenant has been deactivated platform-wide | Boolean | System-managed | Not disabled |
-| Disable Reason | Free-text explanation recorded when a tenant is disabled | Text | System-managed | None |
-
-A tenant cannot be renamed by itself — title and logo are updated together via the same update action. Both fields are optional on update, so an Admin can change just the title or just the logo in a single call.
-
-<a id="52-tenant-role"></a>
-
-### 5.2 Tenant Role
-
-| Field | Description | Type | Required | Default |
-| --- | --- | --- | --- | --- |
-| Role Title | Display name of the role | Text (max 255 characters) | Yes | —   |
-| Role Description | Explanation of what the role is for | Text | No  | None |
-| General Permission IDs | List of catalogue permissions to grant | List of Permission references | No  | Empty list |
-| Asset Permissions | List of resource-specific grants (see [5.4](#54-asset-granular-permission)) | List of Asset Permission objects | No  | Empty list |
-
-A role belongs to exactly one tenant (a "Custom Role") or to no tenant at all (a "Global Role," read-only from the tenant's perspective). Attempting to update or delete a Global Role, or a role that belongs to a different tenant than the one being managed, is rejected.
-
-<a id="53-general-permission"></a>
-
-### 5.3 General Permission
-
-| Field | Description | Type |
-| --- | --- | --- |
-| Permission Title | A unique, system-defined identifier for the permission (e.g., `tenant:query:execute`) | Text |
-| Permission Description | Human-readable explanation of the permission | Text |
-
-General permissions are read from a fixed platform catalogue (see [Section 6](#6-supported-permission-types)) — Admins choose from this catalogue when building a role rather than creating arbitrary new general permissions.
-
-<a id="54-asset-granular-permission"></a>
-
-### 5.4 Asset (Granular) Permission
-
-Each entry in a role's asset permission list is an object with the following fields:
-
-| Field | Description | Type | Required | Allowed Values |
-| --- | --- | --- | --- | --- |
-| Resource Type | The category of resource being scoped | Text | Yes | `appPage`, `dataquery`, `workflow`, `datasource`, `widget`, `listener` (any resource type recognised by the platform's authorization model) |
-| Resource ID | The specific resource instance this grant applies to | Text (resource identifier) | Yes | Must reference an existing resource of the given type |
-| Action | The operation allowed on that specific resource | Text | Yes | Varies by resource type — see table below |
-
-**Actions available per resource type (as exposed in the role-builder UI):**
-
-| Resource Type | Available Actions |
-| --- | --- |
-| Data Query | Read, Update, Delete, Run |
-| Workflow | Read, Update, Delete, Execute |
-| App Page, Datasource, Listener, Cron Job, Widget | Read, Update, Delete |
-
-If any of Resource Type, Resource ID, or Action is missing from an entry, that entry is silently skipped rather than causing the whole role save to fail.
-
-<a id="55-tenant-user-membership"></a>
-
-### 5.5 Tenant User (Membership)
-
-| Field | Description | Type | Editable By |
-| --- | --- | --- | --- |
-| User Email | Identifies which existing platform user to add | Text (email) | Set once, at invitation time |
-| Membership Tier | Admin or Member | Selection | Admin |
-| Assigned Custom Roles | List of roles granting fine-grained permissions | List of Role references | Admin (Members only — Admins don't need roles) |
-
-<a id="56-user-level-tenant-configuration"></a>
-
-### 5.6 User-Level Tenant Configuration
-
-A small, free-form configuration object that each user can hold per tenant, intended for personal preferences scoped to that workspace (e.g., UI state). It is stored as an open JSON object with no fixed schema — the platform does not validate its internal structure beyond requiring it to be a JSON object.
-
-| Field | Description | Type | Required |
-| --- | --- | --- | --- |
-| Config | Arbitrary JSON object of user preferences for the tenant | JSON Object | Yes (an object, may be empty) |
-
-* * *
-
-<a id="6-supported-permission-types"></a>
-
-## 6\. Supported Permission Types
-
-The platform ships with a fixed catalogue of general permissions, grouped by the resource category they govern. Custom Roles are built by selecting from this catalogue (plus any Asset Permissions needed for narrower scoping).
-
-| Category | Permissions Available |
-| --- | --- |
-| **Data Queries** | List, Create, Read, Update, Delete, Test, Clone, Bulk Create |
-| **Workflows** | List, Create, Read, Update, Delete, Execute |
-| **App Pages** | List, Create, Read, Update, Delete, Clone |
-| **Datasources** | List, Create, Read, Update, Delete, Test |
-| **Widgets** | List, Create, Read, Update, Delete, Clone |
-| **Listeners** | List, Create, Read, Update, Delete |
-| **Tenant Users** | List, Create, Read, Update, Delete |
-| **Roles & Permissions** | List Roles, Create Role, Read Role, Update Role, Delete Role, List Permissions |
-| **Tenant (general)** | Read, Update, Delete |
-
-In addition to these general, category-wide permissions, **Asset Permissions** (see [5.4](#54-asset-granular-permission)) allow a permission to be scoped down to one specific resource instead of the whole category.
-
-* * *
-
-<a id="7-input-output-contracts"></a>
-
-## 7\. Input/Output Contracts
-
-This section describes, conceptually, what each part of the module expects as input and what it returns — without reference to specific endpoints.
-
-**Authentication**
-
-- *Input:* A credential — either an identity token from sign-in, or an API key string.
-- *Output:* The caller's user profile (including any pending notifications), or — on first sign-in — a newly created user profile.
-
-**Get/Update User's Tenant Configuration**
-
-- *Input (read):* The tenant to read configuration for.
-- *Output (read):* The stored configuration object for that user/tenant pair, or nothing if none has been set.
-- *Input (write):* The tenant, and the new configuration object to store.
-- *Output (write):* Confirmation that the configuration was saved.
-
-**Create Tenant**
-
-- *Input:* A title and, optionally, a logo URL.
-- *Output:* The newly created tenant record, with the requesting user already attached as Admin.
-
-**Get Tenant Details**
-
-- *Input:* A tenant identifier.
-- *Output:* The tenant's profile information together with summary counts (number of roles, app pages, data queries, widgets, cron jobs, API keys) and the list of all current member relationships — giving a single-screen overview of the tenant's size and configuration.
-
-**List My Tenants**
-
-- *Input:* None beyond the authenticated identity.
-- *Output:* Every tenant the caller belongs to, each annotated with the caller's membership tier(s) in that tenant. Disabled tenants are excluded.
-
-**Update / Delete Tenant**
-
-- *Input (update):* Tenant identifier and any of title/logo to change.
-- *Output (update):* The updated tenant record.
-- *Input (delete):* Tenant identifier.
-- *Output (delete):* Confirmation of removal. Deleting a tenant is destructive and cascades to the tenant's roles, members, API keys, app pages, data queries, and widgets.
-
-**Create / Update / Delete Custom Role**
-
-- *Input:* Role title, description, general permission selections, and/or asset permission entries.
-- *Output:* Confirmation that the role (and its underlying policy rules) has been created, updated, or removed.
-
-**List Roles / List Permissions**
-
-- *Input:* The tenant to list for.
-- *Output:* All roles visible to the tenant (its own custom roles plus global roles), or the full catalogue of general permissions.
-
-**Add Tenant Member**
-
-- *Input:* The email of an existing platform user.
-- *Output:* Confirmation of the new membership; the invited user receives an in-app notification.
-
-**Update Member Roles / Tier**
-
-- *Input:* The target member, the desired membership tier (Admin/Member), and/or the list of custom role IDs to assign.
-- *Output:* Confirmation that the membership was updated. If the requested change is a tier transition (Member→Admin or Admin→Member), that transition is applied; otherwise the supplied role list replaces the member's current custom roles.
-
-**Remove Tenant Member**
-
-- *Input:* The member to remove.
-- *Output:* Confirmation of removal, **unless** removing this member would leave the tenant with zero Admins, in which case the action is rejected (see [Error States](#10-error-states-and-edge-cases)).
-
-**List Tenant Members**
-
-- *Input:* The tenant, with optional pagination controls (page number, page size).
-- *Output:* A page of members, each with their profile, membership tier, join date, and assigned custom roles.
-
-* * *
-
-<a id="8-integration-points"></a>
-
-## 8\. Integration Points
-
-The IAM module is a dependency of nearly every other module in the platform. Specifically:
-
-- **Datasources, Data Queries, Workflows, App Pages, Widgets, Cron Jobs, Listeners, API Keys** — every one of these resources is created within a tenant and is subject to the same authorization checks described in [Section 3.3](#33-authorization-check-on-every-request). Each of these modules' create actions also records which identity (user or API key) created the resource, for ownership and audit purposes.
-- **Workflow Engine** — when a workflow executes a step that itself runs a data query, the engine passes along the original caller's identity plus a reference to the workflow as the "originating resource," enabling the delegated authorization fallback described in [Section 2](#2-key-concepts).
-- **Cron Jobs and Listeners** — these are system-triggered rather than user-triggered. When they execute a workflow or query, they are trusted automatically (no policy check is performed), but their actions are still logged with their origin (which cron job or listener triggered them) for traceability.
-- **Notifications** — new-member additions generate an in-app notification to the invited user, and a user's outstanding notifications are surfaced as part of their profile on sign-in.
-- **Audit Logging** — most authentication and tenant-management actions are recorded to the audit trail, capturing who performed the action, whether it succeeded, and relevant metadata.
-- **API Key Management** — API keys are themselves scoped to a tenant and can be assigned roles in the same way a human member can, governing what the key is permitted to do on the platform's behalf.
-
-* * *
-
-<a id="9-real-time-and-asynchronous-behaviour"></a>
-
-## 9\. Real-Time and Asynchronous Behaviour
-
-Most actions in this module are immediate and synchronous from the user's perspective — creating a tenant, inviting a member, or saving a role all complete and reflect their result right away.
-
-The one asynchronous-feeling behaviour is **policy propagation**: whenever a role's permissions change (create, update, or delete), the platform recalculates and republishes the underlying policy rules as part of that same save operation. This means a permission change takes effect for all affected members essentially immediately — there is no separate background job or delay before the new permissions apply.
-
-Membership changes (adding a member, changing roles, promoting/demoting) similarly take effect immediately; the next request made by the affected user is evaluated under the new permissions.
-
-* * *
-
-<a id="10-error-states-and-edge-cases"></a>
-
-## 10\. Error States and Edge Cases
-
-| Situation | What Happens | User-Facing Outcome |
-| --- | --- | --- |
-| No credentials supplied, or credentials invalid/expired | Request is rejected before reaching business logic | Authentication error; user is prompted to sign in again |
-| API key doesn't match any active key, or has been disabled | Request is rejected | "Invalid API key" error |
-| Action attempted without the required permission | Policy check fails, including the delegated/originating-resource fallback | Permission-denied error |
-| Authorization check is missing the tenant or caller identity (malformed request) | Rejected immediately, before a policy lookup is attempted | "Missing subject or tenant" error |
-| Inviting a user who hasn't signed in to the platform before | Lookup fails, since the system only invites existing platform users | Member-not-found error |
-| Inviting a user who is already a member of the tenant | Rejected to prevent duplicate membership | "User already a member of this tenant" error |
-| Removing or demoting the **last remaining Admin** of a tenant | Rejected to prevent a tenant from being left without any administrator | "Only one admin in tenant" error — another member must be promoted first |
-| Attempting to update or delete a **Global Role** | Rejected — global roles are platform-wide references, not tenant-owned | "Role is a global role and cannot be updated" error |
-| Attempting to update or delete a role that **belongs to a different tenant** | Rejected | "Role does not belong to this tenant" error |
-| Creating a tenant beyond the account's tenant-creation limit | Blocked before tenant creation | Limit-exceeded error |
-| Adding a member beyond the tenant's member-limit | Blocked before the membership is created | Limit-exceeded error |
-| Asset permission entry missing resource type, resource ID, or action | That single entry is skipped; the rest of the role save proceeds normally | No error shown, but the incomplete entry is silently dropped |
-| Promoting an Admin to Admin again (no-op tier change) | Explicitly rejected rather than silently ignored | "User is already an admin of this tenant" error |
-
-* * *
-
-<a id="11-best-practices"></a>
-
-## 11\. Best Practices
-
-**Prefer Custom Roles over Asset Permissions for anything broad.** Asset Permissions are powerful for one-off exceptions ("this analyst can run *only* this one sensitive workflow") but become hard to maintain at scale. For anything that applies to a whole category of resources, use a General Permission instead.
-
-**Keep the number of Admins intentional.** Because the platform refuses to let the last Admin be removed or demoted, always promote a trusted second Admin before offboarding the current one, rather than discovering the restriction mid-process.
-
-**Name roles by job function, not by person.** Since roles are reusable and reassignable, naming them after a function (e.g., "Dashboard Viewer," "Workflow Builder") rather than an individual keeps them useful as the team changes.
-
-**Use API keys with their own scoped roles, not a human's full access.** Because an API key is authorized as a distinct identity (even though it's attributed to its creator for ownership), give automation API keys the narrowest role that lets them do their job, rather than relying on the creator's personal permissions.
-
-**Review tenant member counts before bulk invites.** Tenants have a maximum member count; if you plan to onboard a large team, check the current count before running an invite workflow so it doesn't fail partway through.
-
-**Treat the per-tenant user configuration as ephemeral preference storage, not business data.** It has no schema enforcement, so it's well suited to UI state but shouldn't be relied on for anything that needs validation or auditing.
-
-* * *
-
-<a id="12-limitations-and-constraints"></a>
-
-## 12\. Limitations and Constraints
-
-- **Invitations require an existing account.** There is no email-invitation flow that creates an account for someone who has never signed in; the invited person must authenticate with the platform's identity provider at least once first.
-- **A tenant cannot exist without at least one Admin.** The platform actively blocks both removal and demotion of the last Admin.
-- **Global Roles are read-only at the tenant level.** They can be assigned and viewed, but not modified or deleted through tenant role management.
-- **Tenant and member counts are capped.** Both the number of tenants a single user can create and the number of members a single tenant can hold are limited by the account's plan; both limits are enforced before the respective creation action completes.
-- **Asset Permission actions are fixed per resource type** — you cannot define a custom action name; you choose from the platform-defined set documented in [5.4](#54-asset-granular-permission).
-- **Role names are not required to be unique** within a tenant — the platform does not currently enforce uniqueness on role titles.
-- **Deleting a tenant is irreversible** and cascades through its dependent resources (roles, memberships, API keys, app pages, data queries, widgets); there is no soft-delete/recovery path for the tenant's resources beyond the tenant-level disable mechanism used for administrative deactivation.
-
-* * *
-
-<a id="13-related-modules"></a>
-
-## 13\. Related Modules
-
-This document focuses on identity, tenancy, roles, and membership. For the resources these permissions actually govern, see the documentation for the **Data Query**, **Workflow**, **App Page**, **Datasource**, **Widget**, **Listener**, and **Cron Job** modules. For how automated, non-interactive access is issued and scoped, see the **API Key Management** module. For how individual actions are recorded for compliance and troubleshooting, see the **Audit Log** module.
+- The permission row is created on demand with title `tenant:asset:<resourceType>:<resourceID>:<action>`.
+- `resourceType` is lower-case in the title, but the sync remaps `apppage` to Casbin's `appPage` resource.
+- Entries missing `resourceType`, `resourceID`, or `action` are **silently skipped**. Validate client-side.
+- Asset actions are fixed: queries `read/update/delete/run`, workflows `read/update/delete/execute`, other UI asset types `read/update/delete`.
+- A role editor with `role:update` can grant any catalog permission. Treat role management as an administrative capability.
+
+## Add and update members
+
+### Add a member
+
+`POST /api/v1/tenants/:tenantID/users` with:
+
+```json
+{
+  "tenantUserEmail": "analyst@example.com",
+  "roleIDs": ["3f5c2a10-1d2e-4f3a-9b8c-7d6e5f4a3b2c"]
+}
+```
+
+The email must already belong to a platform user; there is no email invitation that creates an account. The user is added with tier `MEMBER` and an in-app notification. Duplicate membership is rejected with `USER_ALREADY_MEMBER_OF_TENANT`. The tenant UI's add-member dialog sends only the email; roles are assigned afterward from the member page.
+
+### Update roles or tier
+
+`PATCH /api/v1/tenants/:tenantID/users/:tenantUserID/roles`
+
+```json
+{
+  "roleIDs": ["8a7b6c5d-4e3f-4a2b-9c1d-0e9f8a7b6c5d"],
+  "userTenantRelationship": "MEMBER"
+}
+```
+
+| Field | Notes |
+|---|---|
+| `roleIDs` | Required array by the validator (may be empty). Replaces custom role assignments for Members. |
+| `userTenantRelationship` | `ADMIN` or `MEMBER`. Optional; omitted keeps the current tier. The validator passes it through. |
+
+Behaviour:
+
+- **Member → Admin:** sets tier `ADMIN`, adds the tenant wildcard policy, and removes role `g` links.
+- **Admin → Member:** sets tier `MEMBER`, removes the wildcard, and adds Casbin role links for supplied `roleIDs`. The current service does not persist those role mappings in `tblUserTenantRoleMappings` on this branch; verify role visibility after demotion.
+- **Member (no tier change):** replaces DB role mappings and Casbin links.
+- **Admin (no tier change):** rejected as `USER_ALREADY_ADMIN_OF_TENANT`. Admins do not need roles.
+
+`tenantUserID` is the target **userID**, not a membership row ID.
+
+:::warning
+Only the member-removal path checks "last Admin." The demotion path does not currently enforce it, so a tenant can be left with no Admin if the last Admin is demoted. Promote a replacement first.
+:::
+
+### Remove a member
+
+`DELETE /api/v1/tenants/:tenantID/users/:tenantUserID` removes the membership and role mappings, and removes Casbin wildcard/role links. Removing the last Admin is rejected with `ONLY_ONE_ADMIN_IN_TENANT`.
+
+## API keys
+
+Create an API key in the tenant's **API keys** screen or API:
+
+```http
+POST /api/v1/tenants/:tenantID/apikeys HTTP/1.1
+Authorization: Bearer <firebase-id-token>
+Content-Type: application/json
+
+{
+  "apiKeyTitle": "CI deploy",
+  "roleIDs": ["8a7b6c5d-4e3f-4a2b-9c1d-0e9f8a7b6c5d"]
+}
+```
+
+The response contains the raw key **once**. Store it in your secret manager; it cannot be recovered. Use it as:
+
+```http
+GET /api/v1/tenants/:tenantID/workflows HTTP/1.1
+Authorization: api_key <raw-api-key>
+```
+
+Rules:
+
+- Keys are scoped to one tenant. Create separate keys per tenant.
+- Keys are authorized as `apiKeyID`, not as the creator's `userID`. Assign the narrowest role that does the job.
+- Disabling a key (`isDisabled`) or deleting it takes effect on the next request.
+- `apiKeyExpiry` is accepted by the validator but the service does not store or enforce it. Use manual disable/delete rotation.
+- `PATCH` can change title, `roleIDs`, and `isDisabled`; it cannot reveal the raw key.
+- `POST /:apiKeyID/clone` creates a new key and returns a new raw value. The clone is created **disabled**; enable it after storing the key.
+
+## Permission catalog
+
+General permissions are defined in `apps/backend/config/permissions.json`. Most titles follow `tenant:<resource>:<action>`; tenant-wide actions are shorter (`tenant:read`, `tenant:update`, `tenant:delete`) and the permission-list action is `tenant:permissions:list`.
+
+| Resource group | Actions |
+|---|---|
+| AI | `chat`, `read`, `delete` |
+| API keys | `list`, `create`, `read`, `update`, `delete` |
+| App pages | `list`, `create`, `read`, `update`, `delete`, `execute`, `export` |
+| Applications | `list`, `create`, `read`, `update`, `archive`, `publish`, `deploy`, `execute` |
+| Audit | `list` |
+| Bundles | `preview`, `execute` |
+| Cron jobs | `list`, `create`, `read`, `update`, `delete` |
+| Data queries | `list`, `create`, `read`, `update`, `delete`, `test`, `execute`, `export` |
+| Datasources | `list`, `create`, `read`, `update`, `delete`, `test`, `export` |
+| Folders | `list`, `create`, `update`, `delete` |
+| Listeners | `list`, `create`, `read`, `update`, `delete`, `execute`, `observe`, `export` |
+| Marketplace | `list`, `preview`, `install`, `verify`, `unpublish` |
+| Permissions | `list` |
+| Roles | `list`, `create`, `read`, `update`, `delete` |
+| Tenant | `read`, `update`, `delete` |
+| Tenant users | `list`, `create`, `read`, `update`, `delete` |
+| Widgets | `list`, `create`, `read`, `update`, `delete`, `execute`, `export` |
+| Widget library | `list`, `publish`, `unpublish`, `install` |
+| Workflows | `list`, `create`, `read`, `update`, `delete`, `execute`, `test`, `export` |
+
+`GET /roles/permissions` returns unique core permissions (excluding asset permissions) ordered by title. Route checks import the same catalog via `P`, so a permission exists only if it is used by a route (or added deliberately).
+
+## Authorization and delegated execution
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant API as Express authorize()
+    participant Casbin
+    participant WF as Workflow
+    participant Q as Query proxy
+    User->>API: POST /workflows/:id/execute
+    API->>Casbin: enforce(user, tenant, workflow:id, execute)
+    Casbin-->>API: allow
+    API->>WF: start run (user execution ctx)
+    WF->>Q: execute query (derived ctx, origin=workflow)
+    Q->>Casbin: enforce(user, tenant, dataquery:id, execute)
+    alt no direct permission
+        Q->>Casbin: enforce(user, tenant, workflow:id, execute)
+    end
+    Q-->>WF: result
+```
+
+- **Route checks:** `authMiddleware.authorize(P.resource.action)` builds `<resource>:<id>` (`*` for list/category routes) and checks Casbin in the tenant domain. Resource IDs come from params, body keys, or extracted request keys (`reqKey`).
+- **Direct execution proxies:** `authorizedExecuteDataQuery` and `authorizedExecuteWorkflow` require an execution context. User/API-key callers are checked; system callers (listeners, cron) are trusted but logged.
+- **Delegated fallback:** if direct execute is denied and `originatingResource` exists, the proxy checks execute on the origin (`workflow:<id>` or `appPage:<id>`). This is why a user can run a workflow that internally uses a query they cannot run directly.
+- **Socket authorization:** joins are limited to `listener_test:<listenerID>` and `listener:app_page:<appPageID>`; the socket must have a verified Firebase identity, tenant membership, and a matching resource policy.
+- **Policy sync:** `syncRolePolicies` deletes/re-adds rules for `role:<roleID>` in the tenant domain, then reloads the enforcer. Global roles are synced per tenant at tenant creation and on full sync.
+
+## Configurable entities
+
+### Role
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `roleTitle` | String, 1–255 | Yes | Not unique. |
+| `roleDescription` | String | No | UI marks it required; API accepts omission. |
+| `permissionIDs` | UUID array | No | General permission IDs. |
+| `assetPermissions` | Object array | No | `{ resourceType, resourceID, action }`. |
+
+### Member / API key assignment
+
+| Entity | Field | Notes |
+|---|---|---|
+| Member | `tenantUserEmail` | Must be an existing platform user. |
+| Member | `roleIDs` | Custom/global role UUIDs. |
+| Member | `userTenantRelationship` | `ADMIN`/`MEMBER`; only meaningful on member update. |
+| API key | `apiKeyTitle` | Display name. |
+| API key | `roleIDs` | Roles assigned to the key subject. |
+| API key | `isDisabled` | Disable without deleting. |
+
+### Per-user tenant config
+
+`GET/POST /api/v1/auth/config/:tenantID` reads/writes an arbitrary JSON object for the caller. The body must be `{ "config": { ... } }`; the config must be an object. `checkTenantMembership` is enforced. It is suitable for UI preferences, not validated business data.
+
+## API endpoints
+
+| Method | Path | Permission |
+|---|---|---|
+| `GET` | `/:tenantID/users` | `tenant:user:list` |
+| `POST` | `/:tenantID/users` | `tenant:user:create` |
+| `GET` | `/:tenantID/users/:tenantUserID` | `tenant:user:read` |
+| `PATCH` | `/:tenantID/users/:tenantUserID/roles` | `tenant:user:update` |
+| `DELETE` | `/:tenantID/users/:tenantUserID` | `tenant:user:delete` |
+| `GET` | `/:tenantID/roles` | `tenant:role:list` |
+| `POST` | `/:tenantID/roles` | `tenant:role:create` |
+| `GET` | `/:tenantID/roles/permissions` | `tenant:permissions:list` |
+| `GET` | `/:tenantID/roles/:roleID` | `tenant:role:read` |
+| `PATCH` | `/:tenantID/roles/:roleID` | `tenant:role:update` |
+| `DELETE` | `/:tenantID/roles/:roleID` | `tenant:role:delete` |
+| `POST` | `/:tenantID/roles/sync-policies` | `tenant:role:update` |
+| `GET` | `/:tenantID/apikeys` | `tenant:apikey:list` |
+| `POST` | `/:tenantID/apikeys` | `tenant:apikey:create` |
+| `GET` | `/:tenantID/apikeys/:apiKeyID` | `tenant:apikey:read` |
+| `PATCH` | `/:tenantID/apikeys/:apiKeyID` | `tenant:apikey:update` |
+| `DELETE` | `/:tenantID/apikeys/:apiKeyID` | `tenant:apikey:delete` |
+| `POST` | `/:tenantID/apikeys/:apiKeyID/clone` | `tenant:apikey:create` + read |
+| `GET` | `/api/v1/auth` | authenticated user |
+| `GET/POST` | `/api/v1/auth/config/:tenantID` | tenant membership |
+
+## Use cases
+
+| Scenario | Role design |
+|---|---|
+| Dashboard viewer | General `apppage:read`, `widget:read`, `dataquery:execute`; no update/delete. |
+| Workflow builder | `workflow:list/create/read/update/test`, `dataquery:list/read`, plus asset `execute` on queries the workflow needs. |
+| Support agent | Asset grants to specific pages/workflows; avoid tenant-wide delete. |
+| CI automation | API key with `workflow:execute` on one workflow (asset permission) and no human-tier access. |
+| Auditor | `audit:list`, read-only asset grants; no execute. |
+| Tenant administrator | `ADMIN` tier; do not also assign roles. |
+
+## Limitations and failure modes
+
+| Situation | Behaviour |
+|---|---|
+| Unknown Firebase account | `INVALID_USER`; see provisioning caveat above. |
+| No membership | Tenant route policy check fails or tenant list omits the tenant. |
+| Invalid/disabled API key | `401 INVALID_API_KEY`. |
+| No direct permission, no origin | `403 PERMISSION_DENIED`, or execution proxy error. |
+| Origin permission only | Delegated fallback allows query/workflow execution. |
+| Global role edit/delete through tenant route | Rejected because `tenantID` does not match (`role does not belong to this tenant`); the UI may still show controls. |
+| Incomplete asset permission row | Silently skipped; no error, no grant. |
+| Last Admin removal | Rejected. Last Admin **demotion** is not blocked. |
+| Admin role update with no tier change | `USER_ALREADY_ADMIN_OF_TENANT`; Admins already have wildcard access. |
+| API key expiry | Not enforced; `apiKeyExpiry` is ignored. |
+| Role title duplicates | Allowed; identify roles by `roleID`. |
+| Member/tenant plan limits | The middleware exists, but the shipped `SAMPLE_PLAN` uses `Infinity` for both tenant and member counts; do not assume a cap without changing deployment config. |
+| Policy drift after manual DB edits | Run `POST /roles/sync-policies`; a restart reloads `casbin_rule`, so it does not repair drift between role mappings and the rule table. |
+| Cache/role change delay | Role sync reloads Casbin immediately; a stale external cache is not part of the current backend. |
+
+## Security notes
+
+- Treat `ADMIN`, `role:create/update`, `apikey:create/update`, and `user:update` as privileged capabilities: they can escalate access.
+- API keys are distinct subjects. Do not assume a key inherits its creator's wildcard; assign roles explicitly.
+- The delegated fallback intentionally lets a workflow/page execute embedded queries. Grant execute on the parent only when you trust every embedded resource.
+- Listener and cron executions are trusted system calls; protect listener/cron edit permissions.
+- Never put raw keys, tokens, or passwords in role titles/descriptions, bundle JSON, or workflow context.
+- Audit policy changes and membership changes. The audit middleware records authenticated actions, but it is not a tamper-proof ledger.
+
+## Troubleshooting
+
+| Symptom | Check |
+|---|---|
+| `403` after assigning a role | Role mappings were saved, `syncRolePolicies` succeeded, and the user has the role in the same tenant domain. Try `POST /roles/sync-policies` as an Admin. |
+| Role picker empty | `GET /roles/permissions` requires `permission:list`; the user's role may lack it. |
+| Cannot see a member | `GET /users` requires `user:list`; pagination defaults may hide later pages. |
+| API key works for one tenant only | Keys are tenant-scoped by design. |
+| `Only one admin` error | Promote another member before removing/demoting the last Admin. |
+| Asset permission has no effect | Confirm the resource type/action match the route's check, and the resource ID is in the same tenant. |
+| Policies seem stale after a DB restore | Run the sync endpoint, then retry; Casbin loads from `casbin_rule`. |
+
+## Related pages
+
+- [Tenants](../tenants/tenants.md) — tenant creation, membership, deletion.
+- [Data Source](../data-source/data-source.md) — datasource permissions and secrets.
+- [Data Query](../data-query/data-query.md) — query execute/test permissions.
+- [Listeners](../listeners/listeners.md) — listener execute/observe permissions.
+- [Workflows](../workflows/workflows.md) — workflow execute/test and approval authorization.
+- [Export & Import Bundles](../platform/export-import-bundles.md) — roles and assets in bundles.
+- [Security](../operations/security.md) — deployment hardening and audit.

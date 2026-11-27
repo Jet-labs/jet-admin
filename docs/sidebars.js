@@ -15,6 +15,8 @@ const sidebars = {
       items: [
         'introduction/introduction',
         'getting-started/local-setup',
+        'getting-started/quickstart',
+        'getting-started/visual-tour',
       ],
     },
     {
@@ -28,6 +30,18 @@ const sidebars = {
         'listeners/listeners',
         'workflows/workflows',
         'app-pages-widgets/app-pages-widgets',
+        {
+          type: 'category',
+          label: 'Applications',
+          collapsed: false,
+          items: [
+            'applications/applications',
+            'applications/navigation-and-shell',
+            'applications/application-state',
+            'applications/application-events',
+            'applications/snippets-and-composites',
+          ],
+        },
         'identity-access-management/identity-access-management',
       ],
     },
@@ -36,10 +50,15 @@ const sidebars = {
       label: 'Platform',
       collapsed: false,
       items: [
+        'platform/concepts',
         'platform/architecture',
+        'platform/modules',
+        'platform/feature-list',
+        'platform/asset-versioning',
         'platform/folders',
         'platform/export-import-bundles',
         'platform/widget-library',
+        'platform/limitations',
       ],
     },
     {
@@ -59,6 +78,18 @@ const sidebars = {
       collapsed: false,
       items: [
         'developers/api-reference',
+        'developers/mcp-server',
+        'developers/extending-widgets',
+        'developers/contributing',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Evaluate',
+      collapsed: false,
+      items: [
+        'use-cases/use-cases',
+        'comparisons/market-comparison',
       ],
     },
   ],

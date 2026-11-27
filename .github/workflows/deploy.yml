@@ -1,27 +1,25 @@
-name: Deploy Docusaurus to GitHub Pages
+name: Deploy Docs to GitHub Pages
 
 on:
   push:
     branches:
-      - dev  # Matches the editUrl in your config
+      - master
+  workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: docs-pages
+  cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build Docusaurus
+  build-and-deploy:
+    name: Build and deploy Docusaurus
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./docs # <--- Crucial: points to your Docusaurus folder
-
+        working-directory: ./docs
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,26 +29,16 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Build Site
-        # This will compile your Tailwind CSS and React code
+      - name: Build documentation
         run: npm run build
 
-      - name: Upload Artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: ./docs/build # Docusaurus defaults to 'build'
-
-  deploy:
-    name: Deploy to GitHub Pages
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/build
+          publish_branch: gh-pages
+          force_orphan: false

@@ -54,7 +54,7 @@ Unlike traditional BI tools, Jet Admin is designed around a **workflow execution
 
 ### 🔌 Data Source Integration
 
-Jet Admin supports 35+ datasource connectors through its package-driven plugin system.
+Jet Admin supports 45 datasource connectors through its package-driven plugin system.
 
 **Databases**
 - PostgreSQL · MySQL · MongoDB · SQLite · SQL Server · Redis · Neo4j · Oracle · CockroachDB
@@ -337,7 +337,7 @@ packages/
 │   ├── mysql/
 │   ├── restapi/
 │   ├── graphql/
-│   └── ... (35+ datasources)
+│   └── ... (45 datasources)
 ├── workflow-nodes/src/nodes/
 │   ├── dataQueryNode/
 │   ├── loopNode/
@@ -699,14 +699,17 @@ test: add workflow engine unit tests
 
 ## 📚 Documentation
 
+Full documentation: **<https://jet-labs.github.io/jet-admin/>**
+
 | Document | Description |
 |---|---|
-| [Workflow Engine](docs/workflow-engine.md) | Execution lifecycle, context model, design decisions |
-| [Node Spec](docs/node-spec.md) | Node definition contract, worker patterns |
-| [Plugin Development](docs/plugin-development.md) | Building datasource connectors and widget plugins |
-| [Execution Context](docs/execution-context.md) | Context model, template resolution, immutability rules |
-| [Worker Design](docs/worker-design.md) | Worker architecture, strategy patterns, scaling |
-| [Contribution Rules](docs/contribution-rules.md) | Coding standards, PR process, anti-patterns |
+| [Introduction](https://jet-labs.github.io/jet-admin/docs/introduction) | Platform scope, personas and mental model |
+| [Quickstart](https://jet-labs.github.io/jet-admin/docs/getting-started/quickstart) | End-to-end first application in one session |
+| [Architecture](https://jet-labs.github.io/jet-admin/docs/platform/architecture) | Runtime topology, modules, data flow and release model |
+| [Applications](https://jet-labs.github.io/jet-admin/docs/applications) | Routed applications, navigation, releases and deployment |
+| [Feature list](https://jet-labs.github.io/jet-admin/docs/platform/feature-list) | Exhaustive functionality inventory |
+| [Market comparison](https://jet-labs.github.io/jet-admin/docs/comparisons/market-comparison) | Jet Admin vs Retool, Appsmith, ToolJet, Metabase and others |
+| [Limitations](https://jet-labs.github.io/jet-admin/docs/platform/limitations) | Honest constraints and unsupported behavior |
 
 ---
 

@@ -11,7 +11,7 @@ const projectName = "jet-admin";
 const config = {
   title: "Jet Admin",
   tagline:
-    "Welcome to Jet Admin, a web-based PostgreSQL tables manager and admin dashboard for your operations! Edit data, build graphs, and create dashboards using queries.",
+    "The self-hosted application platform for data, automation, internal tools and versioned releases.",
   favicon: "img/logo.png",
 
   // Set the production url of your site here
@@ -28,7 +28,6 @@ const config = {
   projectName, // Usually your repo name.
 
   onBrokenLinks: "warn",
-  onBrokenMarkdownLinks: "warn",
   trailingSlash: false,
 
   // Even if you don't use internationalization, you can use this field to set
@@ -47,7 +46,7 @@ const config = {
       ({
         docs: {
           sidebarPath: "./sidebars.js",
-          editUrl: `https://github.com/${organizationName}/${projectName}/tree/main/`,
+          editUrl: `https://github.com/${organizationName}/${projectName}/tree/master/docs/`,
         },
         theme: {
           customCss: "./src/css/custom.css",
@@ -57,6 +56,9 @@ const config = {
   ],
   markdown: {
     mermaid: true,
+    hooks: {
+      onBrokenMarkdownLinks: "warn",
+    },
   },
   themes: ["@docusaurus/theme-mermaid"],
 
@@ -84,6 +86,21 @@ const config = {
             label: "Documentation",
           },
           {
+            to: "/docs/getting-started/quickstart",
+            label: "Quickstart",
+            position: "left",
+          },
+          {
+            to: "/docs/use-cases",
+            label: "Use cases",
+            position: "left",
+          },
+          {
+            to: "/docs/comparisons/market-comparison",
+            label: "Compare",
+            position: "left",
+          },
+          {
             href: "https://github.com/Jet-labs/Jet-admin",
             label: "GitHub",
             position: "right",
@@ -99,6 +116,18 @@ const config = {
               {
                 label: "Documentation",
                 to: "/docs/introduction",
+              },
+              {
+                label: "Quickstart",
+                to: "/docs/getting-started/quickstart",
+              },
+              {
+                label: "Use cases",
+                to: "/docs/use-cases",
+              },
+              {
+                label: "Market comparison",
+                to: "/docs/comparisons/market-comparison",
               },
             ],
           },

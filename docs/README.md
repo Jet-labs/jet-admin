@@ -1,41 +1,44 @@
-# Website
+# Jet Admin Docs
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+Docusaurus site for the Jet Admin platform documentation.
 
-### Installation
+## Local development
 
-```
-$ yarn
-```
-
-### Local Development
-
-```
-$ yarn start
+```bash
+cd docs
+npm install --legacy-peer-deps
+npm start
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+## Production build
 
-### Build
-
-```
-$ yarn build
-```
-
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
-
-### Deployment
-
-Using SSH:
-
-```
-$ USE_SSH=true yarn deploy
+```bash
+cd docs
+npm run build
+npm run serve
 ```
 
-Not using SSH:
+The build output is written to `docs/build`.
 
-```
-$ GIT_USER=<Your GitHub username> yarn deploy
+## Deploy to GitHub Pages
+
+The site uses the `gh-pages` branch:
+
+```bash
+cd docs
+npm run build
+npm run deploy
 ```
 
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+The GitHub Actions workflow in `.github/workflows/deploy.yml` also builds and
+publishes `docs/build` to the `gh-pages` branch on every push to `master`.
+
+Production URL: <https://jet-labs.github.io/jet-admin/>
+
+## Structure
+
+- `docs/` — Markdown/MDX documentation, grouped by build order.
+- `src/pages/index.js` — landing page.
+- `static/img/screenshots/` — current product screenshots.
+- `sidebars.js` — navigation structure.
+- `docusaurus.config.js` — site metadata, base URL and navbar/footer.
