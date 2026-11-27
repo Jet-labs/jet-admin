@@ -48,6 +48,7 @@ const config = {
           sidebarPath: "./sidebars.js",
           editUrl: `https://github.com/${organizationName}/${projectName}/tree/master/docs/`,
         },
+        blog: false,
         theme: {
           customCss: "./src/css/custom.css",
         },
