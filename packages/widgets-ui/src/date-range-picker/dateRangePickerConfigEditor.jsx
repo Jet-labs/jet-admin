@@ -1,174 +1,168 @@
-import React, { useMemo, useState } from 'react';
-import PropTypes from 'prop-types';
-import { Input, Label, Checkbox, Button, Textarea } from '@jet-admin/ui';
-import { TemplateAutocompleteInput } from "@jet-admin/ui";
+import React, { useMemo } from "react";
+import PropTypes from "prop-types";
+import { Input, Switch } from "@jet-admin/ui";
+import { Plus, Trash2 } from "lucide-react";
+import { Button } from "@jet-admin/ui";
+import {
+  ConfigSection,
+  ConfigField,
+  BindableInput,
+  BindableSwitch,
+  SegmentedControl,
+  useConfigValue,
+} from "../config";
 
-export const DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
-  const config = widgetEditorForm.values.widgetConfig || {};
+const DEFAULT_PRESETS = [
+  { label: "Today", startOffset: 0, endOffset: 0 },
+  { label: "Last 7 days", startOffset: -7, endOffset: 0 },
+  { label: "This month", startOffset: "startOfMonth", endOffset: "endOfMonth" },
+];
+
+export const DateRangePickerConfigEditor = ({ stateTree }) => {
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
-  const [presetsText, setPresetsText] = useState(null);
-
-  const presetsValue = presetsText !== null ? presetsText : JSON.stringify(config.presets || [
-    { label: "Today", startOffset: 0, endOffset: 0 },
-    { label: "Last 7 days", startOffset: -7, endOffset: 0 },
-    { label: "This month", startOffset: "startOfMonth", endOffset: "endOfMonth" },
-  ], null, 2);
-
-  const savePresets = (text) => {
-    setPresetsText(text);
-    try {
-      const parsed = JSON.parse(text);
-      if (Array.isArray(parsed)) widgetEditorForm.setFieldValue('widgetConfig.presets', parsed);
-    } catch { /* keep editing, validate on blur */ }
-  };
+  const [label, setLabel] = useConfigValue("label", "");
+  const [help, setHelp] = useConfigValue("help", "");
+  const [placeholderStart, setPlaceholderStart] = useConfigValue("placeholderStart", "Start date");
+  const [placeholderEnd, setPlaceholderEnd] = useConfigValue("placeholderEnd", "End date");
+  const [defaultStart, setDefaultStart] = useConfigValue("defaultStart", "");
+  const [defaultEnd, setDefaultEnd] = useConfigValue("defaultEnd", "");
+  const [enableTime, setEnableTime] = useConfigValue("enableTime", false);
+  const [requireApply, setRequireApply] = useConfigValue("requireApply", false);
+  const [comparePrevious, setComparePrevious] = useConfigValue("comparePrevious", false);
+  const [minDate, setMinDate] = useConfigValue("minDate", "");
+  const [maxDate, setMaxDate] = useConfigValue("maxDate", "");
+  const [disabledDates, setDisabledDates] = useConfigValue("disabledDates", []);
+  const [presets, setPresets] = useConfigValue("presets", DEFAULT_PRESETS);
+  const [size, setSize] = useConfigValue("size", "default");
+  const [required, setRequired] = useConfigValue("required", false);
+  const [disabled, setDisabled] = useConfigValue("disabled", false);
+  const [readOnly, setReadOnly] = useConfigValue("readOnly", false);
+  const [isLoading, setIsLoading] = useConfigValue("isLoading", "");
+  const rows = Array.isArray(presets) ? presets : [];
+  const updatePreset = (index, patch) => setPresets(rows.map((preset, presetIndex) => (presetIndex === index ? { ...preset, ...patch } : preset)));
 
   return (
-    <div className="space-y-2">
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Label</Label>
-        <Input
-          type="text"
-          className="text-sm h-8"
-          value={config.label || ''}
-          onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.label', e.target.value)}
-          placeholder="e.g. Select date range"
-        />
-      </div>
-
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Help text (optional)</Label>
-        <Input type="text" className="text-sm h-8" value={config.help || ''} onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.help', e.target.value)} placeholder="Shown under the field" />
-      </div>
-
-      <div className="grid grid-cols-2 gap-2">
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-foreground">Start Placeholder <span className="text-muted-foreground font-normal">(canonical)</span></Label>
+    <>
+      <ConfigSection id="date-range-content" title="Date range" tab="content">
+        <ConfigField label="Label" path="label" htmlFor="date-range-label">
+          <BindableInput id="date-range-label" value={label} onChange={setLabel} liveStateTree={liveStateTree} placeholder="e.g. Select a period" />
+        </ConfigField>
+        <ConfigField label="Help text" path="help">
+          <BindableInput value={help} onChange={setHelp} liveStateTree={liveStateTree} placeholder="Shown under the field" />
+        </ConfigField>
+        <div className="grid grid-cols-2 gap-2">
+          <ConfigField label="Start placeholder" path="placeholderStart" defaultValue="Start date" htmlFor="date-range-start-placeholder">
+            <Input id="date-range-start-placeholder" value={placeholderStart ?? ""} onChange={(event) => setPlaceholderStart(event.target.value)} className="h-8 text-xs" />
+          </ConfigField>
+          <ConfigField label="End placeholder" path="placeholderEnd" defaultValue="End date" htmlFor="date-range-end-placeholder">
+            <Input id="date-range-end-placeholder" value={placeholderEnd ?? ""} onChange={(event) => setPlaceholderEnd(event.target.value)} className="h-8 text-xs" />
+          </ConfigField>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <ConfigField label="Default start" path="defaultStart">
+            <BindableInput value={defaultStart} onChange={setDefaultStart} liveStateTree={liveStateTree} placeholder="e.g. {{ state.variables.start }}" />
+          </ConfigField>
+          <ConfigField label="Default end" path="defaultEnd">
+            <BindableInput value={defaultEnd} onChange={setDefaultEnd} liveStateTree={liveStateTree} placeholder="e.g. {{ state.variables.end }}" />
+          </ConfigField>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <ConfigField label="Min date" path="minDate" htmlFor="range-min">
+            <Input id="range-min" value={minDate ?? ""} onChange={(event) => setMinDate(event.target.value)} placeholder="YYYY-MM-DD" className="h-8 font-mono text-xs" />
+          </ConfigField>
+          <ConfigField label="Max date" path="maxDate" htmlFor="range-max">
+            <Input id="range-max" value={maxDate ?? ""} onChange={(event) => setMaxDate(event.target.value)} placeholder="YYYY-MM-DD" className="h-8 font-mono text-xs" />
+          </ConfigField>
+        </div>
+        <ConfigField label="Disabled dates" path="disabledDates" helper="Comma-separated YYYY-MM-DD values.">
           <Input
-            type="text"
-            className="text-sm h-8"
-            value={config.placeholderStart ?? config.startPlaceholder ?? ''}
-            onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.placeholderStart', e.target.value)}
-            placeholder="Start date"
+            value={(disabledDates || []).join(", ")}
+            onChange={(event) => setDisabledDates(event.target.value.split(",").map((item) => item.trim()).filter(Boolean))}
+            placeholder="2026-12-25, 2026-01-01"
+            className="h-8 font-mono text-xs"
           />
+        </ConfigField>
+        <ConfigField label="Presets" path="presets" helper="Offsets accept numbers or startOfMonth/endOfMonth/startOfYear/endOfYear.">
+          <div className="space-y-1.5">
+            {rows.map((preset, index) => (
+              <div key={index} className="flex items-end gap-1.5">
+                <div className="min-w-0 flex-1 space-y-0.5">
+                  <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Label</label>
+                  <Input value={preset.label ?? ""} onChange={(event) => updatePreset(index, { label: event.target.value })} className="h-7 text-[11px]" />
+                </div>
+                <div className="w-20 space-y-0.5">
+                  <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Start</label>
+                  <Input value={preset.startOffset ?? ""} onChange={(event) => updatePreset(index, { startOffset: event.target.value })} className="h-7 font-mono text-[11px]" />
+                </div>
+                <div className="w-20 space-y-0.5">
+                  <label className="text-[9px] uppercase tracking-wider text-muted-foreground">End</label>
+                  <Input value={preset.endOffset ?? ""} onChange={(event) => updatePreset(index, { endOffset: event.target.value })} className="h-7 font-mono text-[11px]" />
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                  onClick={() => setPresets(rows.filter((_, presetIndex) => presetIndex !== index))}
+                  aria-label="Remove preset"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              </div>
+            ))}
+            <Button type="button" variant="outline" size="sm" className="h-7 w-full text-[11px]" onClick={() => setPresets([...rows, { label: "New preset", startOffset: 0, endOffset: 0 }])}>
+              <Plus className="mr-1 h-3 w-3" /> Add preset
+            </Button>
+          </div>
+        </ConfigField>
+      </ConfigSection>
+
+      <ConfigSection id="date-range-style" title="Presentation" tab="style">
+        <div className="grid grid-cols-2 gap-2">
+          <ConfigField label="Size" path="size" defaultValue="default">
+            <SegmentedControl
+              ariaLabel="Date range size"
+              value={size || "default"}
+              onChange={setSize}
+              options={[
+                { value: "sm", label: "S" },
+                { value: "default", label: "M" },
+                { value: "lg", label: "L" },
+              ]}
+            />
+          </ConfigField>
+          <ConfigField label="Apply/Cancel" path="requireApply" defaultValue={false} inline helper="Edit a draft and commit explicitly.">
+            <BindableSwitch value={requireApply} onChange={setRequireApply} liveStateTree={liveStateTree} ariaLabel="Require Apply" />
+          </ConfigField>
         </div>
+        <ConfigField label="Compare previous period" path="comparePrevious" defaultValue={false} inline helper="Shows and includes the equally sized prior range.">
+          <Switch checked={!!comparePrevious} onCheckedChange={setComparePrevious} aria-label="Compare previous period" />
+        </ConfigField>
+        <ConfigField label="Enable time" path="enableTime" defaultValue={false} inline>
+          <BindableSwitch value={enableTime} onChange={setEnableTime} liveStateTree={liveStateTree} ariaLabel="Enable time" />
+        </ConfigField>
+      </ConfigSection>
 
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-foreground">End Placeholder <span className="text-muted-foreground font-normal">(canonical)</span></Label>
-          <Input
-            type="text"
-            className="text-sm h-8"
-            value={config.placeholderEnd ?? config.endPlaceholder ?? ''}
-            onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.placeholderEnd', e.target.value)}
-            placeholder="End date"
-          />
+      <ConfigSection id="date-range-behavior" title="State" tab="behavior">
+        <div className="grid grid-cols-3 gap-3">
+          <ConfigField label="Required" path="required" defaultValue={false} inline>
+            <BindableSwitch value={required} onChange={setRequired} liveStateTree={liveStateTree} ariaLabel="Required" />
+          </ConfigField>
+          <ConfigField label="Disabled" path="disabled" defaultValue={false} inline>
+            <BindableSwitch value={disabled} onChange={setDisabled} liveStateTree={liveStateTree} ariaLabel="Disabled" />
+          </ConfigField>
+          <ConfigField label="Read-only" path="readOnly" defaultValue={false} inline>
+            <BindableSwitch value={readOnly} onChange={setReadOnly} liveStateTree={liveStateTree} ariaLabel="Read-only" />
+          </ConfigField>
         </div>
-      </div>
-      <p className="text-[11px] text-muted-foreground">Legacy startPlaceholder/endPlaceholder still render; canonical placeholderStart/placeholderEnd win.</p>
-
-      <div className="flex items-center gap-2 pt-1">
-        <Checkbox
-          id="date-range-enable-time"
-          checked={!!config.enableTime}
-          onCheckedChange={(checked) => widgetEditorForm.setFieldValue('widgetConfig.enableTime', !!checked)}
-        />
-        <Label htmlFor="date-range-enable-time" className="text-xs text-muted-foreground cursor-pointer">
-          Enable Time picking (granularity to hours, minutes, seconds)
-        </Label>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <Checkbox
-          id="date-range-require-apply"
-          checked={!!config.requireApply}
-          onCheckedChange={(checked) => widgetEditorForm.setFieldValue('widgetConfig.requireApply', !!checked)}
-        />
-        <Label htmlFor="date-range-require-apply" className="text-xs text-muted-foreground cursor-pointer">
-          Require Apply/Cancel (edit draft, commit explicitly)
-        </Label>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2">
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-foreground">Default Start</Label>
-          <TemplateAutocompleteInput
-            value={config.defaultStart || ''}
-            onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.defaultStart', val)}
-            placeholder="e.g. {{state.variables.startDate}}"
-            liveStateTree={liveStateTree}
-          />
-        </div>
-
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-foreground">Default End</Label>
-          <TemplateAutocompleteInput
-            value={config.defaultEnd || ''}
-            onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.defaultEnd', val)}
-            placeholder="e.g. {{state.variables.endDate}}"
-            liveStateTree={liveStateTree}
-          />
-        </div>
-      </div>
-      <p className="text-[11px] text-muted-foreground">Defaults apply once. Clearing stays empty; Reset re-applies.</p>
-
-      <div className="grid grid-cols-2 gap-2">
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-foreground">Min date (ISO)</Label>
-          <Input type="text" className="text-sm h-8" value={config.minDate || ''} onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.minDate', e.target.value)} placeholder="YYYY-MM-DD" />
-        </div>
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-foreground">Max date (ISO)</Label>
-          <Input type="text" className="text-sm h-8" value={config.maxDate || ''} onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.maxDate', e.target.value)} placeholder="YYYY-MM-DD" />
-        </div>
-      </div>
-
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Disabled dates <span className="text-muted-foreground font-normal">(comma-separated YYYY-MM-DD)</span></Label>
-        <Input type="text" className="text-sm h-8" value={(config.disabledDates || []).join(", ")} onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.disabledDates', e.target.value.split(",").map((s) => s.trim()).filter(Boolean))} placeholder="2026-12-25, 2026-01-01" />
-      </div>
-
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Presets (JSON)</Label>
-        <Textarea
-          className="text-xs font-mono min-h-[90px]"
-          value={presetsValue}
-          onChange={(e) => savePresets(e.target.value)}
-          placeholder='[{"label":"Today","startOffset":0,"endOffset":0}]'
-        />
-        <p className="text-[11px] text-muted-foreground">Canonical: {"{"}label, start, end{"}"} ISO. Legacy offsets (startOffset/endOffset numbers or startOfMonth/endOfMonth/startOfYear/endOfYear) still work.</p>
-      </div>
-
-      <div className="flex flex-wrap gap-4 pt-1">
-        <div className="flex items-center gap-2">
-          <Checkbox id="date-range-required" checked={!!config.required} onCheckedChange={(c) => widgetEditorForm.setFieldValue('widgetConfig.required', !!c)} />
-          <Label htmlFor="date-range-required" className="text-xs text-muted-foreground cursor-pointer">Required</Label>
-        </div>
-        <div className="flex items-center gap-2">
-          <Checkbox id="date-range-disabled" checked={!!config.disabled} onCheckedChange={(c) => widgetEditorForm.setFieldValue('widgetConfig.disabled', !!c)} />
-          <Label htmlFor="date-range-disabled" className="text-xs text-muted-foreground cursor-pointer">Disabled</Label>
-        </div>
-        <div className="flex items-center gap-2">
-          <Checkbox id="date-range-readonly" checked={!!config.readOnly} onCheckedChange={(c) => widgetEditorForm.setFieldValue('widgetConfig.readOnly', !!c)} />
-          <Label htmlFor="date-range-readonly" className="text-xs text-muted-foreground cursor-pointer">Read-only</Label>
-        </div>
-      </div>
-
-      {/* Is Loading Template */}
-      <div className="space-y-1 mt-2">
-        <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
-        <TemplateAutocompleteInput
-          value={config.isLoading || ""}
-          onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.isLoading', val)}
-          placeholder="e.g. {{ state.queries.myQuery.isLoading }}"
-          liveStateTree={liveStateTree}
-        />
-      </div>
-    </div>
+        <ConfigField label="Loading template" path="isLoading">
+          <BindableInput value={isLoading} onChange={setIsLoading} liveStateTree={liveStateTree} placeholder="e.g. {{ state.queries.q.isLoading }}" />
+        </ConfigField>
+      </ConfigSection>
+    </>
   );
 };
 
-DateRangePickerConfigEditor.propTypes = {
-  widgetEditorForm: PropTypes.object.isRequired,
-  stateTree: PropTypes.object,
-};
-
+DateRangePickerConfigEditor.propTypes = { widgetEditorForm: PropTypes.object, stateTree: PropTypes.object };
+DateRangePickerConfigEditor.usesConfigKit = true;
 export default DateRangePickerConfigEditor;

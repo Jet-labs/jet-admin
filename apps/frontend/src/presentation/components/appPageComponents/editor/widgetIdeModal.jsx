@@ -1,8 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import { useFormik } from "formik";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import {
+import { useQuery, useQueryClient } from "@tanstack/react-query";import {
   Dialog,
   DialogContent,
   DialogFooter,
@@ -32,6 +31,7 @@ import { CONSTANTS } from "../../../../constants";
 import { WIDGET_TYPES } from "@jet-admin/widget-types";
 import { resolveConfig } from "../../../../logic/evaluationEngine";
 import { useAppPageStateTree } from "../../../../logic/appPageRuntime";
+import { useWidgetDraftStore } from "../../../../logic/stores/widgetDraftStore";
 
 const defaultWidgetType = WIDGET_TYPES.VEGA_LITE.value;
 const EMPTY_INITIAL_VALUES = {
@@ -96,6 +96,7 @@ export const WidgetIdeModal = ({
           queryClient.invalidateQueries({
             queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID)],
           });
+          if (widgetID) clearDraft(widgetID);
         } else {
           const newWidget = await createWidgetAPI({
             tenantID,
@@ -121,6 +122,29 @@ export const WidgetIdeModal = ({
   });
 
   const previewStateTree = useAppPageStateTree();
+  const setDraft = useWidgetDraftStore((state) => state.setDraft);
+  const clearDraft = useWidgetDraftStore((state) => state.clearDraft);
+
+  useEffect(() => {
+    if (!widgetID) return;
+    setDraft(widgetID, {
+      title: widgetForm.values.widgetTitle,
+      widgetType: widgetForm.values.widgetType,
+      config: widgetForm.values.widgetConfig,
+    });
+  }, [widgetID, widgetForm.values.widgetTitle, widgetForm.values.widgetType, widgetForm.values.widgetConfig, setDraft]);
+
+  const handleClose = React.useCallback(() => {
+    if (widgetID) clearDraft(widgetID);
+    onClose();
+  }, [widgetID, clearDraft, onClose]);
+
+  useEffect(
+    () => () => {
+      if (widgetID) clearDraft(widgetID);
+    },
+    [widgetID, clearDraft]
+  );
 
   const resolvedWidgetConfig = useMemo(() => {
     if (!widgetForm.values.widgetConfig) return {};
@@ -136,7 +160,7 @@ export const WidgetIdeModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
-      if (!open && !isSaving) onClose();
+      if (!open && !isSaving) handleClose();
     }}>
       <DialogContent hideCloseIcon={true} className="max-w-7xl w-[95vw] ">
         <DialogHeader>
@@ -167,6 +191,7 @@ export const WidgetIdeModal = ({
                     dataSourceResults={previewStateTree}
                     onDataSourceResults={() => { }}
                     appPageEditorForm={appPageEditorForm}
+                    widgetID={widgetID}
                   />
                 </div>
               </ResizablePanel>
@@ -201,7 +226,7 @@ export const WidgetIdeModal = ({
             variant="outline"
             size="sm"
             disabled={isSaving}
-            onClick={onClose}
+            onClick={handleClose}
           >
             Cancel
           </Button>

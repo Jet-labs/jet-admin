@@ -42,6 +42,7 @@ const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { auditLogMiddleware } = require("../audit/audit.middleware");
 const { P } = require("../../config/permissions");
+const applicationRouter = require("../application/application.v1.routes");
 
 if (isModuleEnabled(constants.MODULES.DATASOURCE)) {
   Logger.log("success", {
@@ -81,6 +82,7 @@ if (isModuleEnabled(constants.MODULES.APP_PAGE)) {
   });
   appPageRouter = require("../appPage/appPage.v1.routes");
 }
+const assetVersionRouter = require("../assetVersion/assetVersion.v1.routes");
 if (isModuleEnabled(constants.MODULES.USERMANAGEMENT)) {
   Logger.log("success", {
     message: `${constants.MODULES.USERMANAGEMENT} module imported`,
@@ -293,6 +295,15 @@ if (isModuleEnabled(constants.MODULES.APP_PAGE)) {
   );
 }
 
+// Immutable asset definition versions (shared by pages, applications and
+// version-aware standalone consumers).
+router.use(
+  "/:tenantID/asset-versions",
+  validate(tenantIdParamSchema, "params"),
+  authMiddleware.attachExecutionContext,
+  assetVersionRouter
+);
+
 // Nested bundle (export/import) routes
 router.use(
   "/:tenantID/import",
@@ -326,6 +337,13 @@ router.use(
   "/:tenantID/templates",
   validate(tenantIdParamSchema, "params"),
   templateTenantRouter
+);
+
+// Nested audit log routes
+router.use(
+  "/:tenantID/applications",
+  validate(tenantIdParamSchema, "params"),
+  applicationRouter
 );
 
 // Nested audit log routes

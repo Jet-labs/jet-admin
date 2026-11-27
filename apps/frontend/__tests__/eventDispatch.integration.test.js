@@ -22,14 +22,15 @@ import {
 } from "../src/logic/appPageRuntime/useWidgetEventHandlers";
 
 global.IS_REACT_ACT_ENVIRONMENT = true;
+jest.mock("../src/logic/appPageRuntime/executeWorkflowWithStreaming", () => ({ executeWorkflowWithStreaming: jest.fn() }));
 
-const mountPage = (children, pageConfig = {}) => {
+const mountPage = (children, pageConfig = {}, providerProps = {}) => {
   let renderer;
   act(() => {
     renderer = TestRenderer.create(
       React.createElement(
         AppPageRuntimeProvider,
-        { pageID: "p1", tenantID: "t1", pageConfig },
+        { pageID: "p1", tenantID: "t1", pageConfig, ...providerProps },
         children
       )
     );
@@ -185,6 +186,67 @@ describe("changed event configs are honored dynamically", () => {
       await holders.fires.w1("onTest", {});
     });
     expect(holders.tree.variables.v).toBe("new");
+    act(() => renderer.unmount());
+  });
+});
+
+describe("application state and navigation actions", () => {
+  test("writes application state, exposes it to later actions, and stops after navigation", async () => {
+    const holders = { fires: {}, tree: null };
+    const setApplicationVariable = jest.fn();
+    const navigateToRoute = jest.fn(() => ({ path: "/tenants/t1/applications/a1/run/production/next" }));
+    const widgetConfig = {
+      events: {
+        onClick: [
+          {
+            actionType: "SET_APPLICATION_VARIABLE",
+            config: { key: "picked", value: "{{ event.row.id }}" },
+          },
+          {
+            actionType: "SET_VARIABLE",
+            config: { key: "copy", value: "{{ state.application.variables.picked }}" },
+          },
+          {
+            actionType: "NAVIGATE",
+            config: {
+              routeID: "next",
+              params: { id: "{{ event.row.id }}" },
+              query: { tab: "items" },
+            },
+          },
+          {
+            actionType: "SET_VARIABLE",
+            config: { key: "after", value: "should-not-run" },
+          },
+        ],
+      },
+    };
+    const renderer = mountPage(
+      [eventProbe(holders, "btn1", widgetConfig), treeProbe(holders)],
+      pageConfigWith([
+        { key: "copy", defaultValue: "" },
+        { key: "after", defaultValue: "" },
+      ]),
+      { setApplicationVariable, navigateToRoute }
+    );
+    let results;
+    await act(async () => {
+      results = await holders.fires.btn1("onClick", { row: { id: "A1" } });
+    });
+    expect(setApplicationVariable).toHaveBeenCalledWith("picked", "A1");
+    expect(holders.tree.variables.copy).toBe("A1");
+    expect(holders.tree.variables.after).toBe("");
+    expect(navigateToRoute).toHaveBeenCalledWith({
+      routeID: "next",
+      params: { id: "A1" },
+      query: { tab: "items" },
+      replace: false,
+    });
+    expect(results.map((item) => item.actionType)).toEqual([
+      "SET_APPLICATION_VARIABLE",
+      "SET_VARIABLE",
+      "NAVIGATE",
+    ]);
     act(() => renderer.unmount());
   });
 });

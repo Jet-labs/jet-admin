@@ -1,32 +1,50 @@
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
-import { JsonViewer } from "@jet-admin/ui";
+import { JsonViewer, Skeleton, WidgetSurface } from "@jet-admin/ui";
+import { normalizeFieldBoolean } from "../_shared/fieldContracts";
 
 export const JsonViewerWidget = ({ widgetConfig, fireWidgetEvent }) => {
-  const isLoading = widgetConfig?.isLoading === true || widgetConfig?.isLoading === "true";
+  const isLoading = normalizeFieldBoolean(widgetConfig?.isLoading, false);
   const collapsed = !!widgetConfig?.collapsed;
   const maxHeight = Number(widgetConfig?.maxHeight || 0);
+  const density = widgetConfig?.properties?.density || "comfortable";
 
   const data = useMemo(() => {
-    const t = widgetConfig?.dataTemplate;
-    if (t === undefined || t === "") return { message: "Bind dataTemplate to inspect a value" };
-    return t;
+    const template = widgetConfig?.dataTemplate;
+    if (template === undefined || template === "") return { message: "Bind dataTemplate to inspect a value" };
+    return template;
   }, [widgetConfig?.dataTemplate]);
 
+  if (isLoading) {
+    return (
+      <WidgetSurface density={density} className="flex h-full w-full flex-col gap-1.5">
+        <Skeleton className="h-7 w-40" />
+        <Skeleton className="h-3 w-full" />
+        <Skeleton className="h-3 w-4/5" />
+        <Skeleton className="h-3 w-3/5" />
+      </WidgetSurface>
+    );
+  }
+
   return (
-    <div className="w-full h-full overflow-auto p-2 relative bg-background" onClick={() => fireWidgetEvent?.("onClick", {})}>
-      {isLoading && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px] rounded">
-          <div className="flex items-center gap-2 rounded bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
-            <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
-            Updating...
-          </div>
-        </div>
-      )}
-      <div className="rounded border border-border bg-card overflow-hidden" style={maxHeight > 0 ? { maxHeight, overflow: "auto" } : undefined}>
-        <JsonViewer data={data} collapsed={collapsed} />
+    <WidgetSurface
+      density={density}
+      className="relative flex h-full w-full flex-col overflow-hidden"
+      onClick={() => fireWidgetEvent?.("onClick", {})}
+    >
+      <div
+        className="min-h-0 flex-1 rounded-card border border-border bg-card p-1"
+        style={maxHeight > 0 ? { maxHeight, overflow: "auto" } : { overflow: "auto" }}
+      >
+        <JsonViewer
+          data={data}
+          collapsed={collapsed}
+          searchable={widgetConfig?.searchable !== false}
+          wrap={widgetConfig?.wrap !== false}
+          maxDepth={Number(widgetConfig?.maxDepth) || 8}
+        />
       </div>
-    </div>
+    </WidgetSurface>
   );
 };
 

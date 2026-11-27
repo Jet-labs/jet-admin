@@ -75,6 +75,7 @@ const CodeEditor = React.forwardRef(({
   showFormatButton = true,
   showExpandButton = true,
   showLineNumbers = true,
+  lineWrapping = false,
   headerExtra,
   headerLeft,
   status,
@@ -326,6 +327,9 @@ const CodeEditor = React.forwardRef(({
     
     // Add foldGutter after lineNumbers so it appears to the right of line numbers
     baseExtensions.push(foldGutter());
+    if (lineWrapping) {
+      baseExtensions.push(EditorView.lineWrapping);
+    }
 
     const state = EditorState.create({
       doc: value !== undefined ? value : (defaultValue || ''),

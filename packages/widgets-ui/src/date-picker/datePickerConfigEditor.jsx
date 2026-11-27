@@ -1,131 +1,121 @@
-import React, { useMemo } from 'react';
-import PropTypes from 'prop-types';
-import { Input, Label, Checkbox, Textarea } from '@jet-admin/ui';
-import { TemplateAutocompleteInput } from "@jet-admin/ui";
+import React, { useMemo } from "react";
+import PropTypes from "prop-types";
+import { Input } from "@jet-admin/ui";
+import {
+  ConfigSection,
+  ConfigField,
+  BindableInput,
+  BindableSwitch,
+  SegmentedControl,
+  useConfigValue,
+} from "../config";
 
-export const DatePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
-  const config = widgetEditorForm.values.widgetConfig || {};
+export const DatePickerConfigEditor = ({ stateTree }) => {
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
+  const [label, setLabel] = useConfigValue("label", "");
+  const [help, setHelp] = useConfigValue("help", "");
+  const [placeholder, setPlaceholder] = useConfigValue("placeholder", "");
+  const [defaultValue, setDefaultValue] = useConfigValue("defaultValue", "");
+  const [enableTime, setEnableTime] = useConfigValue("enableTime", false);
+  const [minDate, setMinDate] = useConfigValue("minDate", "");
+  const [maxDate, setMaxDate] = useConfigValue("maxDate", "");
+  const [disabledDates, setDisabledDates] = useConfigValue("disabledDates", []);
+  const [dateFormat, setDateFormat] = useConfigValue("dateFormat", "");
+  const [size, setSize] = useConfigValue("size", "default");
+  const [labelPosition, setLabelPosition] = useConfigValue("labelPosition", "top");
+  const [required, setRequired] = useConfigValue("required", false);
+  const [disabled, setDisabled] = useConfigValue("disabled", false);
+  const [readOnly, setReadOnly] = useConfigValue("readOnly", false);
+  const [isLoading, setIsLoading] = useConfigValue("isLoading", "");
 
   return (
-    <div className="space-y-2">
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Label</Label>
-        <Input
-          type="text"
-          className="text-sm h-8"
-          value={config.label || ''}
-          onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.label', e.target.value)}
-          placeholder="e.g. Select date"
-        />
-      </div>
-
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Help text (optional)</Label>
-        <Input
-          type="text"
-          className="text-sm h-8"
-          value={config.help || ''}
-          onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.help', e.target.value)}
-          placeholder="Shown under the field"
-        />
-      </div>
-
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Placeholder</Label>
-        <Input
-          type="text"
-          className="text-sm h-8"
-          value={config.placeholder || ''}
-          onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.placeholder', e.target.value)}
-          placeholder="Pick a date..."
-        />
-      </div>
-
-      <div className="flex items-center gap-2 pt-1">
-        <Checkbox
-          id="date-picker-enable-time"
-          checked={!!config.enableTime}
-          onCheckedChange={(checked) => widgetEditorForm.setFieldValue('widgetConfig.enableTime', !!checked)}
-        />
-        <Label htmlFor="date-picker-enable-time" className="text-xs text-muted-foreground cursor-pointer">
-          Enable Time picking (granularity to hours, minutes, seconds)
-        </Label>
-      </div>
-      <p className="text-[11px] text-muted-foreground leading-snug">
-        Date-only values stay calendar dates (YYYY-MM-DD, no timezone). Datetime values are local wall time (YYYY-MM-DDTHH:mm:ss, no Z).
-      </p>
-
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Default Value</Label>
-        <TemplateAutocompleteInput
-          value={config.defaultValue || ''}
-          onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.defaultValue', val)}
-          placeholder="e.g. {{state.variables.myDate}} or ISO string"
-          liveStateTree={liveStateTree}
-        />
-        <p className="text-[11px] text-muted-foreground">Applies once on first load. Clearing stays empty; use Reset to re-apply.</p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2">
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-foreground">Min date (ISO)</Label>
-          <Input type="text" className="text-sm h-8" value={config.minDate || ''} onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.minDate', e.target.value)} placeholder="YYYY-MM-DD" />
+    <>
+      <ConfigSection id="date-picker-content" title="Date field" tab="content">
+        <ConfigField label="Label" path="label" htmlFor="date-picker-label">
+          <BindableInput id="date-picker-label" value={label} onChange={setLabel} liveStateTree={liveStateTree} placeholder="e.g. Start date" />
+        </ConfigField>
+        <ConfigField label="Help text" path="help">
+          <BindableInput value={help} onChange={setHelp} liveStateTree={liveStateTree} placeholder="Shown under the field" />
+        </ConfigField>
+        <ConfigField label="Placeholder" path="placeholder" htmlFor="date-picker-placeholder">
+          <BindableInput id="date-picker-placeholder" value={placeholder} onChange={setPlaceholder} liveStateTree={liveStateTree} placeholder="Pick a date…" />
+        </ConfigField>
+        <ConfigField label="Default value" path="defaultValue" helper="Applies once on first load. Clearing stays empty.">
+          <BindableInput value={defaultValue} onChange={setDefaultValue} liveStateTree={liveStateTree} placeholder="e.g. {{ state.variables.date }}" />
+        </ConfigField>
+        <ConfigField label="Enable time" path="enableTime" defaultValue={false} inline helper="Hour, minute and second precision.">
+          <BindableSwitch value={enableTime} onChange={setEnableTime} liveStateTree={liveStateTree} ariaLabel="Enable time" />
+        </ConfigField>
+        <div className="grid grid-cols-2 gap-2">
+          <ConfigField label="Min date" path="minDate" htmlFor="date-min">
+            <Input id="date-min" value={minDate ?? ""} onChange={(event) => setMinDate(event.target.value)} placeholder="YYYY-MM-DD" className="h-8 font-mono text-xs" />
+          </ConfigField>
+          <ConfigField label="Max date" path="maxDate" htmlFor="date-max">
+            <Input id="date-max" value={maxDate ?? ""} onChange={(event) => setMaxDate(event.target.value)} placeholder="YYYY-MM-DD" className="h-8 font-mono text-xs" />
+          </ConfigField>
         </div>
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-foreground">Max date (ISO)</Label>
-          <Input type="text" className="text-sm h-8" value={config.maxDate || ''} onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.maxDate', e.target.value)} placeholder="YYYY-MM-DD" />
-        </div>
-      </div>
+        <ConfigField label="Disabled dates" path="disabledDates" helper="Comma-separated YYYY-MM-DD values.">
+          <Input
+            value={(disabledDates || []).join(", ")}
+            onChange={(event) => setDisabledDates(event.target.value.split(",").map((item) => item.trim()).filter(Boolean))}
+            placeholder="2026-12-25, 2026-01-01"
+            className="h-8 font-mono text-xs"
+          />
+        </ConfigField>
+        <ConfigField label="Display format" path="dateFormat" htmlFor="date-format" helper="Optional display hint; typed entry still accepts YYYY-MM-DD.">
+          <Input id="date-format" value={dateFormat ?? ""} onChange={(event) => setDateFormat(event.target.value)} placeholder="YYYY-MM-DD" className="h-8 font-mono text-xs" />
+        </ConfigField>
+      </ConfigSection>
 
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Disabled dates <span className="text-muted-foreground font-normal">(comma-separated YYYY-MM-DD)</span></Label>
-        <Input
-          type="text"
-          className="text-sm h-8"
-          value={(config.disabledDates || []).join(", ")}
-          onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.disabledDates', e.target.value.split(",").map((s) => s.trim()).filter(Boolean))}
-          placeholder="2026-12-25, 2026-01-01"
-        />
-      </div>
-
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Display format <span className="text-muted-foreground font-normal">(documented, rendered via locale)</span></Label>
-        <Input type="text" className="text-sm h-8" value={config.dateFormat || ''} onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.dateFormat', e.target.value)} placeholder="YYYY-MM-DD" />
-      </div>
-
-      <div className="flex flex-wrap gap-4 pt-1">
-        <div className="flex items-center gap-2">
-          <Checkbox id="date-picker-required" checked={!!config.required} onCheckedChange={(c) => widgetEditorForm.setFieldValue('widgetConfig.required', !!c)} />
-          <Label htmlFor="date-picker-required" className="text-xs text-muted-foreground cursor-pointer">Required</Label>
+      <ConfigSection id="date-picker-style" title="Presentation" tab="style">
+        <div className="grid grid-cols-2 gap-2">
+          <ConfigField label="Size" path="size" defaultValue="default">
+            <SegmentedControl
+              ariaLabel="Date picker size"
+              value={size || "default"}
+              onChange={setSize}
+              options={[
+                { value: "sm", label: "S" },
+                { value: "default", label: "M" },
+                { value: "lg", label: "L" },
+              ]}
+            />
+          </ConfigField>
+          <ConfigField label="Label position" path="labelPosition" defaultValue="top">
+            <SegmentedControl
+              ariaLabel="Label position"
+              value={labelPosition || "top"}
+              onChange={setLabelPosition}
+              options={[
+                { value: "top", label: "Top" },
+                { value: "left", label: "Left" },
+                { value: "hidden", label: "Hidden" },
+              ]}
+            />
+          </ConfigField>
         </div>
-        <div className="flex items-center gap-2">
-          <Checkbox id="date-picker-disabled" checked={!!config.disabled} onCheckedChange={(c) => widgetEditorForm.setFieldValue('widgetConfig.disabled', !!c)} />
-          <Label htmlFor="date-picker-disabled" className="text-xs text-muted-foreground cursor-pointer">Disabled</Label>
-        </div>
-        <div className="flex items-center gap-2">
-          <Checkbox id="date-picker-readonly" checked={!!config.readOnly} onCheckedChange={(c) => widgetEditorForm.setFieldValue('widgetConfig.readOnly', !!c)} />
-          <Label htmlFor="date-picker-readonly" className="text-xs text-muted-foreground cursor-pointer">Read-only</Label>
-        </div>
-      </div>
+      </ConfigSection>
 
-      {/* Is Loading Template */}
-      <div className="space-y-1 mt-2">
-        <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
-        <TemplateAutocompleteInput
-          value={config.isLoading || ""}
-          onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.isLoading', val)}
-          placeholder="e.g. {{ state.queries.myQuery.isLoading }}"
-          liveStateTree={liveStateTree}
-        />
-      </div>
-    </div>
+      <ConfigSection id="date-picker-behavior" title="State" tab="behavior">
+        <div className="grid grid-cols-3 gap-3">
+          <ConfigField label="Required" path="required" defaultValue={false} inline>
+            <BindableSwitch value={required} onChange={setRequired} liveStateTree={liveStateTree} ariaLabel="Required" />
+          </ConfigField>
+          <ConfigField label="Disabled" path="disabled" defaultValue={false} inline>
+            <BindableSwitch value={disabled} onChange={setDisabled} liveStateTree={liveStateTree} ariaLabel="Disabled" />
+          </ConfigField>
+          <ConfigField label="Read-only" path="readOnly" defaultValue={false} inline>
+            <BindableSwitch value={readOnly} onChange={setReadOnly} liveStateTree={liveStateTree} ariaLabel="Read-only" />
+          </ConfigField>
+        </div>
+        <ConfigField label="Loading template" path="isLoading">
+          <BindableInput value={isLoading} onChange={setIsLoading} liveStateTree={liveStateTree} placeholder="e.g. {{ state.queries.q.isLoading }}" />
+        </ConfigField>
+      </ConfigSection>
+    </>
   );
 };
 
-DatePickerConfigEditor.propTypes = {
-  widgetEditorForm: PropTypes.object.isRequired,
-  stateTree: PropTypes.object,
-};
-
+DatePickerConfigEditor.propTypes = { widgetEditorForm: PropTypes.object, stateTree: PropTypes.object };
+DatePickerConfigEditor.usesConfigKit = true;
 export default DatePickerConfigEditor;

@@ -23,10 +23,10 @@ const EXPECTED_TYPES = [
   'text-input', 'select', 'multi-select', 'checkbox', 'radio-group', 'switch',
   'slider', 'search-input', 'file-upload', 'divider', 'tabs',
   'key-value', 'json-viewer', 'list', 'badge', 'progress', 'timeline',
-  'video', 'code-block',
+  'video', 'code-block', 'kanban', 'calendar',
 ];
 
-describe('canonical descriptors cover all 32 types', () => {
+describe('canonical descriptors cover all 34 types', () => {
   test('every registered type has a versioned descriptor with metadata', () => {
     expect(Object.keys(WIDGET_DESCRIPTORS).sort()).toEqual([...EXPECTED_TYPES].sort());
     for (const type of EXPECTED_TYPES) {

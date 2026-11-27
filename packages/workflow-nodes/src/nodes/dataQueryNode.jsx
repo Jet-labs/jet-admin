@@ -28,11 +28,14 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
     hasNextQueriesPage,
     isFetchingNextQueriesPage,
     isLoadingDataQueries,
+    getAssetVersions,
   } = useWorkflowNodes();
   const [formData, setFormData] = useState({
     title: data?.title || '',
     description: data?.description || '',
     dataQueryID: data?.dataQueryID || '',
+    versionMode: data?.versionMode || (data?.queryVersionID ? 'specific' : 'latest-at-capture'),
+    queryVersionID: data?.queryVersionID || '',
     inputValues: data?.inputValues || {},
     outputVariable: data?.outputVariable || 'queryResult',
     timeoutSeconds: data?.timeoutSeconds ?? 300,
@@ -48,6 +51,8 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         title: data.title || '',
         description: data.description || '',
         dataQueryID: data.dataQueryID || '',
+        versionMode: data.versionMode || (data.queryVersionID ? 'specific' : 'latest-at-capture'),
+        queryVersionID: data.queryVersionID || '',
         inputValues: data.inputValues || {},
         outputVariable: data.outputVariable || 'queryResult',
         timeoutSeconds: data.timeoutSeconds ?? 300,
@@ -63,11 +68,36 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
     return dataQueries?.find(q => q.dataQueryID == formData.dataQueryID) || null;
   }, [dataQueries, formData.dataQueryID]);
 
+  const [queryVersions, setQueryVersions] = useState([]);
+  const [isLoadingQueryVersions, setIsLoadingQueryVersions] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    if (!getAssetVersions || !formData.dataQueryID) {
+      setQueryVersions([]);
+      setIsLoadingQueryVersions(false);
+      return () => { cancelled = true; };
+    }
+    setIsLoadingQueryVersions(true);
+    Promise.resolve(getAssetVersions({ assetType: 'query', assetID: formData.dataQueryID }))
+      .then((result) => {
+        if (!cancelled) setQueryVersions(result?.versions || []);
+      })
+      .catch(() => {
+        if (!cancelled) setQueryVersions([]);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingQueryVersions(false);
+      });
+    return () => { cancelled = true; };
+  }, [getAssetVersions, formData.dataQueryID]);
+
   const schema = useMemo(() => {
     return {
       type: 'object',
       properties: {
         dataQueryID: { type: 'string', title: 'Data Query' },
+        versionMode: { type: 'string', title: 'Version at workflow capture', enum: ['latest-at-capture', 'specific'], default: 'latest-at-capture' },
+        queryVersionID: { type: 'string', title: 'Query Version' },
         title: { type: 'string', title: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_LABEL || 'Node Title' },
         description: { type: 'string', title: strings.WORKFLOW_EDITOR_NODE_DESCRIPTION_LABEL || 'Description' },
         inputValues: { type: 'object', title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_ARGUMENTS_LABEL || 'Inputs' },
@@ -178,9 +208,13 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleFormChange = useCallback(({ data: newData }) => {
     setFormData(prev => {
       if (prev.dataQueryID !== newData.dataQueryID) {
-        return { ...newData, inputValues: {} };
+        return { ...newData, inputValues: {}, versionMode: 'latest-at-capture', queryVersionID: '' };
       }
-      return newData;
+      return {
+        ...newData,
+        versionMode: newData.versionMode ?? prev.versionMode,
+        queryVersionID: newData.queryVersionID ?? prev.queryVersionID,
+      };
     });
   }, []);
   const handleSave = useCallback(() => { onChange(formData); }, [onChange, formData]);
@@ -192,6 +226,58 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
     <div className="w-full">
 
       <JsonForms schema={schema} uischema={uischema} data={formData} renderers={workflowNodeRenderers} onChange={handleFormChange} />
+
+      <div className="px-2 pt-2">
+        <div className="rounded border border-border bg-muted/30 p-2 space-y-2">
+          <div className="flex flex-col gap-1">
+            <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Version at workflow capture
+            </Label>
+            <select
+              className="h-8 w-full rounded border border-border bg-background px-2 text-xs"
+              value={formData.versionMode || 'latest-at-capture'}
+              onChange={(event) => {
+                const versionMode = event.target.value;
+                setFormData((prev) => ({
+                  ...prev,
+                  versionMode,
+                  queryVersionID: versionMode === 'latest-at-capture' ? '' : prev.queryVersionID,
+                }));
+              }}
+            >
+              <option value="latest-at-capture">Latest at capture</option>
+              <option value="specific">Specific version</option>
+            </select>
+            <p className="text-[10px] text-muted-foreground">
+              Resolved when this workflow version is created, never at runtime.
+            </p>
+          </div>
+          {(formData.versionMode === 'specific' || formData.queryVersionID) && (
+            <div className="flex flex-col gap-1">
+              <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Query version
+              </Label>
+              <select
+                className="h-8 w-full rounded border border-border bg-background px-2 text-xs"
+                value={formData.queryVersionID || ''}
+                disabled={isLoadingQueryVersions}
+                onChange={(event) => setFormData((prev) => ({ ...prev, queryVersionID: event.target.value }))}
+              >
+                <option value="">Choose a version…</option>
+                {queryVersions.map((version) => (
+                  <option key={version.assetVersionID} value={version.assetVersionID}>
+                    v{version.versionNumber}
+                    {version.createdAt ? ` · ${new Date(version.createdAt).toLocaleString()}` : ''}
+                  </option>
+                ))}
+              </select>
+              {!isLoadingQueryVersions && queryVersions.length === 0 && (
+                <p className="text-[10px] text-destructive">No versions exist for this query yet.</p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Help callout */}
       <div className='px-2'>

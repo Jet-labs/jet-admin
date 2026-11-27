@@ -1,46 +1,110 @@
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
+import { format, formatDistanceToNow, isValid, parseISO } from "date-fns";
+import { Skeleton, WidgetEmpty, WidgetSurface, cn } from "@jet-admin/ui";
+import { getIconComponent } from "../config/IconPicker";
+import { normalizeFieldBoolean } from "../_shared/fieldContracts";
+
+const toDate = (value) => {
+  if (!value) return null;
+  if (value instanceof Date) return isValid(value) ? value : null;
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(String(value)) ? new Date(`${value}T00:00:00`) : parseISO(String(value));
+  return isValid(date) ? date : null;
+};
+
+const STATUS_DOT = { success: "bg-success", warning: "bg-warning", error: "bg-destructive", danger: "bg-destructive", info: "bg-info", neutral: "bg-muted-foreground" };
 
 export const TimelineWidget = ({ widgetConfig, fireWidgetEvent }) => {
   const emptyText = widgetConfig?.emptyText || "No activity yet";
   const titleKey = widgetConfig?.titleKey || "title";
   const timeKey = widgetConfig?.timeKey || "time";
   const descKey = widgetConfig?.descriptionKey || "description";
-  const isLoading = widgetConfig?.isLoading === true || widgetConfig?.isLoading === "true";
+  const iconKey = widgetConfig?.iconKey || "";
+  const colorKey = widgetConfig?.colorKey || "";
+  const statusKey = widgetConfig?.statusKey || "";
+  const relativeTime = normalizeFieldBoolean(widgetConfig?.relativeTime, false);
+  const groupByDay = normalizeFieldBoolean(widgetConfig?.groupByDay, false);
+  const compact = widgetConfig?.variant === "compact";
+  const isLoading = normalizeFieldBoolean(widgetConfig?.isLoading, false);
+  const density = widgetConfig?.properties?.density || "comfortable";
 
-  const events = useMemo(() => {
-    const t = widgetConfig?.dataTemplate;
-    if (Array.isArray(t)) return t;
-    return [];
-  }, [widgetConfig?.dataTemplate]);
+  const events = useMemo(() => (Array.isArray(widgetConfig?.dataTemplate) ? widgetConfig.dataTemplate : []), [widgetConfig?.dataTemplate]);
+  const groups = useMemo(() => {
+    if (!groupByDay) return [["", events]];
+    const map = new Map();
+    for (const event of events) {
+      const date = toDate(event?.[timeKey]);
+      const key = date ? format(date, "PPP") : "Unknown date";
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(event);
+    }
+    return Array.from(map.entries());
+  }, [events, groupByDay, timeKey]);
+
+  if (isLoading) {
+    return (
+      <WidgetSurface density={density} className="flex h-full w-full flex-col gap-2">
+        <Skeleton className="h-3 w-1/4" />
+        <Skeleton className="h-9 w-full" />
+        <Skeleton className="h-9 w-full" />
+        <Skeleton className="h-9 w-4/5" />
+      </WidgetSurface>
+    );
+  }
 
   return (
-    <div className="w-full h-full overflow-auto p-3 relative">
-      {isLoading && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px] rounded">
-          <div className="flex items-center gap-2 rounded bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
-            <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
-            Updating...
-          </div>
+    <WidgetSurface density={density} className="flex h-full w-full flex-col overflow-auto">
+      {events.length === 0 ? (
+        <WidgetEmpty title={emptyText} />
+      ) : (
+        <div className="space-y-2">
+          {groups.map(([group, groupEvents]) => (
+            <div key={group || "__all"}>
+              {group && <p className="mb-1 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">{group}</p>}
+              <ol className={cn("relative ml-1.5 border-l border-border", compact ? "space-y-1.5" : "space-y-2.5")}>
+                {groupEvents.map((event, index) => {
+                  const date = toDate(event?.[timeKey]);
+                  const timeLabel = date ? (relativeTime ? formatDistanceToNow(date, { addSuffix: true }) : format(date, "MMM d, yyyy · HH:mm")) : String(event?.[timeKey] ?? "");
+                  const Icon = getIconComponent(event?.[iconKey]);
+                  const color = event?.[colorKey];
+                  const status = event?.[statusKey];
+                  return (
+                    <li key={`${event?.id ?? index}`} className="relative ml-3">
+                      <span className={cn("absolute -left-[19px] top-2 h-2 w-2 rounded-full border border-background", STATUS_DOT[status] || "bg-primary")} aria-hidden="true" />
+                      <button
+                        type="button"
+                        onClick={() => fireWidgetEvent?.("onItemClick", { item: event, index })}
+                        className={cn(
+                          "w-full rounded-control border border-border bg-card text-left transition-colors hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30",
+                          compact ? "px-2 py-1" : "p-2"
+                        )}
+                      >
+                        <div className="flex items-start gap-2">
+                          {Icon && (
+                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-control border border-border bg-muted/40" style={color ? { color } : undefined}>
+                              <Icon className="h-3 w-3" aria-hidden="true" />
+                            </span>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-baseline justify-between gap-x-2">
+                              <span className="text-xs font-semibold text-foreground">{String(event?.[titleKey] ?? event?.title ?? `Event ${index + 1}`)}</span>
+                              {timeLabel && <time className="text-[10px] tabular-nums text-muted-foreground">{timeLabel}</time>}
+                            </div>
+                            {(event?.[descKey] || event?.body) && !compact && (
+                              <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">{String(event?.[descKey] ?? event?.body)}</p>
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          ))}
         </div>
       )}
-      {events.length === 0 ? (
-        <div className="flex items-center justify-center h-20 text-xs text-muted-foreground">{emptyText}</div>
-      ) : (
-        <ol className="relative border-l border-border ml-1.5 space-y-3">
-          {events.map((ev, i) => (
-            <li key={i} className="ml-4 relative">
-              <span className="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full bg-primary border border-background" />
-              <button type="button" onClick={() => fireWidgetEvent?.("onItemClick", { item: ev, index: i })} className="text-left w-full rounded border border-border bg-card p-2 hover:bg-muted/50 transition-colors">
-                <div className="text-xs font-semibold text-foreground leading-snug">{String(ev?.[titleKey] ?? ev?.title ?? `Event ${i + 1}`)}</div>
-                {(ev?.[timeKey] || ev?.created_at || ev?.timestamp) && <div className="text-[11px] text-muted-foreground font-mono mt-0.5">{String(ev?.[timeKey] ?? ev?.created_at ?? ev?.timestamp)}</div>}
-                {(ev?.[descKey] || ev?.body) && <div className="text-xs text-muted-foreground mt-1 leading-relaxed">{String(ev?.[descKey] ?? ev?.body)}</div>}
-              </button>
-            </li>
-          ))}
-        </ol>
-      )}
-    </div>
+    </WidgetSurface>
   );
 };
 

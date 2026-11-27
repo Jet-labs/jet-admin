@@ -24,6 +24,31 @@ export const VegaWidget = ({
   const viewRef = useRef(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showTable, setShowTable] = useState(!!widgetConfig?.showDataTable);
+
+  const tableRows = useMemo(() => {
+    if (!data) return [];
+    if (Array.isArray(data.data?.values)) return data.data.values;
+    if (data.datasets && typeof data.datasets === "object") {
+      for (const value of Object.values(data.datasets)) {
+        if (Array.isArray(value) && value.length && typeof value[0] === "object") return value;
+      }
+    }
+    if (Array.isArray(data.data)) return data.data;
+    return [];
+  }, [data]);
+  const tableColumns = useMemo(() => {
+    if (!tableRows.length || typeof tableRows[0] !== "object" || !tableRows[0]) return [];
+    return Object.keys(tableRows[0]).slice(0, 8);
+  }, [tableRows]);
+  const annotations = Array.isArray(widgetConfig?.annotations) ? widgetConfig.annotations.filter((item) => item && item.text) : [];
+  const annotationTone = {
+    info: "border-info/40 bg-info/10 text-info",
+    success: "border-success/40 bg-success/10 text-success",
+    warning: "border-warning/40 bg-warning/10 text-warning",
+    danger: "border-destructive/40 bg-destructive/10 text-destructive",
+    neutral: "border-border bg-background/95 text-foreground",
+  };
 
   // Store callbacks in refs to avoid triggering the render effect
   const onSignalRef = useRef(onSignal);
@@ -142,7 +167,13 @@ export const VegaWidget = ({
   const showLoading = loading || isLoadingWorkflows || isConfigLoading;
 
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+    <div
+      style={{ width: '100%', height: '100%', position: 'relative' }}
+      role="img"
+      aria-label={widgetConfig?.ariaDescription || "Data visualization"}
+      className="flex flex-col"
+    >
+      <div className="relative min-h-0 flex-1">
       {showLoading && !error && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px]">
           <div className="flex items-center gap-2 rounded bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
@@ -154,9 +185,9 @@ export const VegaWidget = ({
 
       {error && !isLoadingWorkflows && (
         <div className="absolute inset-0 z-20 flex items-center justify-center p-4 text-center pointer-events-none">
-          <div className="flex items-center gap-1.5 rounded  bg-muted/30 px-4 py-2 text-xs font-medium text-foreground shadow-sm">
+          <div className="flex max-w-full items-center gap-1.5 rounded bg-muted/30 px-4 py-2 text-xs font-medium text-foreground shadow-sm">
             <span className="text-muted-foreground">⚠</span>
-            <span className="text-muted-foreground">{error}</span>
+            <span className="text-muted-foreground break-words">{error}</span>
           </div>
         </div>
       )}
@@ -169,6 +200,59 @@ export const VegaWidget = ({
           visibility: (error || isLoadingWorkflows) ? 'hidden' : 'visible'
         }}
       />
+      {annotations.map((annotation, index) => (
+        <span
+          key={`${annotation.text}-${index}`}
+          className={`pointer-events-none absolute z-10 max-w-[60%] -translate-x-1/2 -translate-y-1/2 truncate rounded-control border px-1.5 py-0.5 text-[10px] font-medium shadow-sm ${annotationTone[annotation.tone] || annotationTone.info}`}
+          style={{
+            left: `${Math.min(100, Math.max(0, Number(annotation.x) || 50))}%`,
+            top: `${Math.min(100, Math.max(0, Number(annotation.y) || 20))}%`,
+          }}
+          title={annotation.text}
+        >
+          {annotation.text}
+        </span>
+      ))}
+      </div>
+
+      {widgetConfig?.showDataTable && tableRows.length > 0 && (
+        <div className="shrink-0 border-t border-border bg-background/95">
+          <button
+            type="button"
+            onClick={() => setShowTable((current) => !current)}
+            className="flex w-full items-center justify-between px-2 py-1 text-[10px] font-medium text-muted-foreground hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+            aria-expanded={showTable}
+          >
+            <span>Data table · {tableRows.length} row{tableRows.length === 1 ? "" : "s"}</span>
+            <span>{showTable ? "Hide" : "Show"}</span>
+          </button>
+          {showTable && (
+            <div className="max-h-40 overflow-auto px-2 pb-2">
+              <table className="w-full border-collapse text-[10px]">
+                <thead className="sticky top-0 bg-background">
+                  <tr>
+                    {tableColumns.map((column) => (
+                      <th key={column} className="border-b border-border px-1.5 py-1 text-left font-medium text-muted-foreground">{column}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {tableRows.slice(0, 100).map((row, index) => (
+                    <tr key={index} className="border-b border-border/40 last:border-b-0">
+                      {tableColumns.map((column) => (
+                        <td key={column} className="max-w-[180px] truncate px-1.5 py-0.5 tabular-nums text-foreground">
+                          {row?.[column] === null || row?.[column] === undefined ? "—" : typeof row[column] === "object" ? JSON.stringify(row[column]) : String(row[column])}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {tableRows.length > 100 && <p className="px-1 pt-1 text-[9px] text-muted-foreground">Showing first 100 rows.</p>}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

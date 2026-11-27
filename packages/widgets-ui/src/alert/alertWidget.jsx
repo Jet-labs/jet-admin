@@ -1,97 +1,121 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
-import { AlertCircle, CheckCircle, Info, X, AlertTriangle } from "lucide-react";
-import { Button } from "@jet-admin/ui";
+import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from "lucide-react";
+import { Button, WidgetSurface, cn } from "@jet-admin/ui";
+import { getIconComponent } from "../config/IconPicker";
+import { resolveConditionalStyle } from "../config/conditionalStyle";
+import { normalizeFieldBoolean } from "../_shared/fieldContracts";
 
-/**
- * AlertWidget
- *
- * Displays styled banner notices (info, success, warning, error)
- * that can be dismissed. Dismisall triggers an optional onDismiss event.
- */
-export const AlertWidget = ({
-  widgetConfig,
-  fireWidgetEvent,
-}) => {
-  const [dismissed, setDismissed] = useState(false);
+const DEFAULT_ICONS = { info: Info, success: CheckCircle, warning: AlertTriangle, error: AlertCircle, neutral: Info };
+const STATUS_CLASS = { info: "status-info", success: "status-success", warning: "status-warning", error: "status-danger", neutral: "status-neutral" };
 
+const dismissKey = (widgetID, title, message) => `jet.alert.dismissed.${widgetID || "alert"}.${encodeURIComponent(`${title}|${message}`).slice(0, 180)}`;
+
+export const AlertWidget = ({ widgetID, widgetConfig, fireWidgetEvent }) => {
   const message = widgetConfig?.message || "Something requires your attention.";
   const title = widgetConfig?.title || "";
-  const variant = widgetConfig?.variant || "info"; // "info" | "success" | "warning" | "error"
-  const dismissible = widgetConfig?.dismissible ?? true;
-
-  if (dismissed) return null;
-
-  const handleDismiss = () => {
-    setDismissed(true);
-    if (fireWidgetEvent) {
-      fireWidgetEvent("onDismiss");
+  const variant = widgetConfig?.variant || "info";
+  const dismissible = widgetConfig?.dismissible !== false;
+  const persistDismissal = normalizeFieldBoolean(widgetConfig?.persistDismissal, false);
+  const layout = widgetConfig?.layout || "inline";
+  const autoDismissMs = Number(widgetConfig?.autoDismissMs || 0);
+  const isLoading = normalizeFieldBoolean(widgetConfig?.isLoading, false);
+  const density = widgetConfig?.properties?.density || "comfortable";
+  const actions = Array.isArray(widgetConfig?.actions) ? widgetConfig.actions : [];
+  const IconOverride = getIconComponent(widgetConfig?.icon);
+  const conditional = resolveConditionalStyle(widgetConfig?.styleRules, { value: message, message, title, ...widgetConfig });
+  const effectiveVariant = conditional?.tone && conditional.tone !== "neutral" ? conditional.tone : variant;
+  const Icon = IconOverride || DEFAULT_ICONS[effectiveVariant] || Info;
+  const key = useMemo(() => dismissKey(widgetID, title, message), [widgetID, title, message]);
+  const [dismissed, setDismissed] = useState(() => {
+    if (!persistDismissal || typeof window === "undefined") return false;
+    try {
+      return window.sessionStorage.getItem(key) === "1";
+    } catch {
+      return false;
     }
+  });
+  const [mounted, setMounted] = useState(true);
+
+  const dismiss = (source = "user") => {
+    setDismissed(true);
+    setMounted(false);
+    if (persistDismissal && typeof window !== "undefined") {
+      try {
+        window.sessionStorage.setItem(key, "1");
+      } catch {
+        /* ignore */
+      }
+    }
+    fireWidgetEvent?.("onDismiss", { title, message, source });
   };
 
-  // Icon mapping
-  const IconMap = {
-    info: Info,
-    success: CheckCircle,
-    warning: AlertTriangle,
-    error: AlertCircle,
-  };
+  useEffect(() => {
+    setDismissed(false);
+    setMounted(true);
+  }, [title, message]);
 
-  const Icon = IconMap[variant] || Info;
+  useEffect(() => {
+    if (!autoDismissMs || dismissed) return undefined;
+    const timer = setTimeout(() => dismiss("timeout"), autoDismissMs);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoDismissMs, dismissed]);
 
-  // Visual style configurations
-  const styles = {
-    info: "bg-blue-500/10 border-blue-500/20 text-blue-400",
-    success: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
-    warning: "bg-amber-500/10 border-amber-500/20 text-amber-400",
-    error: "bg-rose-500/10 border-rose-500/20 text-rose-400",
-  }[variant] || "bg-blue-500/10 border-blue-500/20 text-blue-400";
+  if (dismissed || !mounted) return null;
 
-  const isLoading = widgetConfig?.isLoading === true || widgetConfig?.isLoading === "true";
+  const role = effectiveVariant === "warning" || effectiveVariant === "error" || effectiveVariant === "danger" ? "alert" : "status";
 
   return (
-    <div
-      className={`flex items-start gap-3 p-3.5 border rounded-none w-full h-full min-h-0 overflow-auto relative ${styles}`}
+    <WidgetSurface
+      density={density}
+      className={cn(
+        "relative flex h-full w-full min-h-0 items-start gap-2 overflow-auto border p-2",
+        STATUS_CLASS[effectiveVariant] || STATUS_CLASS.info,
+        layout === "banner" ? "rounded-none border-x-0" : "rounded-card"
+      )}
+      role={role}
+      aria-live={role === "alert" ? "assertive" : "polite"}
+      aria-busy={isLoading || undefined}
     >
-      {/* Loading overlay */}
-      {isLoading && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px]">
-          <div className="flex items-center gap-2 rounded bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
-            <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
-            Updating...
+      <Icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+      <div className="min-w-0 flex-1">
+        {title && <p className="mb-0.5 text-xs font-semibold leading-snug text-current">{title}</p>}
+        <p className="text-xs leading-relaxed text-current/85">{message}</p>
+        {actions.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {actions.map((action, index) => (
+              <Button
+                key={`${action.actionKey || action.label}-${index}`}
+                type="button"
+                variant={action.variant === "destructive" ? "destructive" : action.variant === "default" ? "default" : "outline"}
+                size="sm"
+                className="h-7 text-[11px]"
+                onClick={() => fireWidgetEvent?.("onAction", { actionKey: action.actionKey, label: action.label })}
+              >
+                {action.label}
+              </Button>
+            ))}
           </div>
-        </div>
-      )}
-
-      <Icon className="h-5 w-5 shrink-0 mt-0.5" />
-      
-      <div className="flex-1 min-w-0">
-        {title && (
-          <h5 className="text-sm font-semibold mb-1 leading-none text-current">
-            {title}
-          </h5>
         )}
-        <p className="text-xs leading-relaxed text-current/80">
-          {message}
-        </p>
       </div>
-
       {dismissible && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6 shrink-0 text-current hover:bg-current/10 -mt-1 -mr-1"
-          onClick={handleDismiss}
+        <button
+          type="button"
+          onClick={() => dismiss("user")}
+          className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-control text-current/70 hover:bg-foreground/10 hover:text-current focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
           aria-label="Dismiss alert"
+          title="Dismiss"
         >
-          <X className="h-4 w-4" />
-        </Button>
+          <X className="h-3.5 w-3.5" />
+        </button>
       )}
-    </div>
+    </WidgetSurface>
   );
 };
 
 AlertWidget.propTypes = {
+  widgetID: PropTypes.string,
   widgetConfig: PropTypes.object,
   fireWidgetEvent: PropTypes.func,
 };

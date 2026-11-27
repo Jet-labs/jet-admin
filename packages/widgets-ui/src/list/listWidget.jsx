@@ -1,79 +1,126 @@
 import React, { useMemo, useState } from "react";
 import PropTypes from "prop-types";
-import { Input } from "@jet-admin/ui";
-import { Search, ChevronRight } from "lucide-react";
+import { ChevronRight, Search } from "lucide-react";
+import { Input, Skeleton, WidgetEmpty, WidgetSurface, cn } from "@jet-admin/ui";
+import { normalizeFieldBoolean } from "../_shared/fieldContracts";
 
 export const ListWidget = ({ widgetConfig, fireWidgetEvent, widgetState, setWidgetState }) => {
   const emptyText = widgetConfig?.emptyText || "No items";
+  const noResultsText = widgetConfig?.noResultsText || "No matching items";
   const layout = widgetConfig?.layout || "rows";
-  const searchable = !!widgetConfig?.searchable;
+  const searchable = normalizeFieldBoolean(widgetConfig?.searchable, false);
+  const dividers = widgetConfig?.dividers !== false;
   const titleKey = widgetConfig?.titleKey || "title";
   const subtitleKey = widgetConfig?.subtitleKey || "subtitle";
+  const avatarKey = widgetConfig?.avatarKey || "";
+  const itemKey = widgetConfig?.itemKey || "id";
+  const groupKey = widgetConfig?.groupKey || "";
   const metaKeys = Array.isArray(widgetConfig?.metaKeys) ? widgetConfig.metaKeys : [];
-  const isLoading = widgetConfig?.isLoading === true || widgetConfig?.isLoading === "true";
+  const isLoading = normalizeFieldBoolean(widgetConfig?.isLoading, false);
+  const density = widgetConfig?.properties?.density || "comfortable";
   const [filter, setFilter] = useState("");
 
   const items = useMemo(() => {
-    const t = widgetConfig?.dataTemplate;
-    if (Array.isArray(t)) return t;
+    const template = widgetConfig?.dataTemplate;
+    if (Array.isArray(template)) return template;
     if (Array.isArray(widgetConfig?.items)) return widgetConfig.items;
     return [];
   }, [widgetConfig?.dataTemplate, widgetConfig?.items]);
 
   const visible = useMemo(() => {
     if (!filter) return items;
-    const f = filter.toLowerCase();
-    return items.filter((it) => JSON.stringify(it).toLowerCase().includes(f));
+    const term = filter.toLowerCase();
+    return items.filter((item) => JSON.stringify(item).toLowerCase().includes(term));
   }, [items, filter]);
 
+  const groups = useMemo(() => {
+    if (!groupKey) return [["", visible]];
+    const map = new Map();
+    for (const item of visible) {
+      const key = String(item?.[groupKey] ?? "Ungrouped");
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(item);
+    }
+    return Array.from(map.entries());
+  }, [visible, groupKey]);
+
+  const selectedId = widgetState?.selectedItemId;
   const handleClick = (item, index) => {
-    if (setWidgetState) setWidgetState((p) => ({ ...p, selectedIndex: index, selectedItem: item }));
-    if (fireWidgetEvent) fireWidgetEvent("onItemClick", { item, index });
+    const id = item?.[itemKey] ?? index;
+    if (setWidgetState) setWidgetState((prev) => ({ ...prev, selectedItemId: id, selectedItem: item }));
+    if (fireWidgetEvent) fireWidgetEvent("onItemClick", { item, index, id });
   };
 
+  if (isLoading) {
+    return (
+      <WidgetSurface density={density} className="flex h-full w-full flex-col gap-2">
+        <Skeleton className="h-3 w-1/3" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </WidgetSurface>
+    );
+  }
+
   return (
-    <div className="flex flex-col w-full h-full min-h-0 relative">
-      {isLoading && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px] rounded">
-          <div className="flex items-center gap-2 rounded bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
-            <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
-            Updating...
-          </div>
-        </div>
-      )}
+    <WidgetSurface density={density} className="flex h-full w-full min-h-0 flex-col gap-0">
       {searchable && (
-        <div className="p-2 border-b border-border shrink-0">
+        <div className="shrink-0 border-b border-border p-2">
           <div className="relative">
-            <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-muted-foreground/50" />
-            <Input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Filter..." className="h-7 text-xs pl-8" />
+            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/60" aria-hidden="true" />
+            <Input value={filter} onChange={(event) => setFilter(event.target.value)} placeholder="Filter…" aria-label="Filter items" className="h-7 pl-8 text-xs" />
           </div>
         </div>
       )}
-      <div className={`flex-1 overflow-auto p-2 min-h-0 ${layout === "cards" ? "grid grid-cols-1 sm:grid-cols-2 gap-2 content-start" : "flex flex-col gap-1.5"}`}>
-        {visible.length === 0 && <div className="flex items-center justify-center h-20 text-xs text-muted-foreground">{emptyText}</div>}
-        {visible.map((item, i) => {
-          const title = item?.[titleKey] ?? item?.name ?? item?.title ?? `Item ${i + 1}`;
-          const subtitle = item?.[subtitleKey] ?? item?.description ?? "";
-          const selected = widgetState?.selectedIndex === i;
-          return (
-            <button key={i} type="button" onClick={() => handleClick(item, i)} className={`text-left rounded border p-2 transition-colors w-full ${selected ? "border-primary bg-primary/10" : "border-border bg-card hover:bg-muted/50"}`}>
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-sm font-medium text-foreground truncate">{String(title)}</span>
-                <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-              </div>
-              {subtitle ? <div className="text-xs text-muted-foreground truncate mt-0.5">{String(subtitle)}</div> : null}
-              {metaKeys.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-1.5">
-                  {metaKeys.map((k) => (
-                    <span key={k} className="text-[11px] text-muted-foreground bg-muted/50 border border-border rounded px-1.5 py-0.5 font-mono truncate max-w-full">{k}: {String(item?.[k] ?? "—")}</span>
-                  ))}
-                </div>
-              )}
-            </button>
-          );
-        })}
+      <div className={cn("min-h-0 flex-1 overflow-auto", layout === "cards" ? "grid grid-cols-1 content-start gap-2 sm:grid-cols-2" : "flex flex-col")}>
+        {items.length === 0 && <WidgetEmpty title={emptyText} />}
+        {items.length > 0 && visible.length === 0 && <WidgetEmpty title={noResultsText} description="Try a different filter." />}
+        {groups.map(([group, groupItems]) => (
+          <div key={group || "__ungrouped"} className="min-w-0">
+            {group && <p className="px-1 py-1 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">{group}</p>}
+            {groupItems.map((item, index) => {
+              const id = item?.[itemKey] ?? index;
+              const selected = selectedId !== undefined ? String(selectedId) === String(id) : false;
+              const title = item?.[titleKey] ?? item?.name ?? item?.title ?? `Item ${index + 1}`;
+              const subtitle = item?.[subtitleKey] ?? item?.description ?? "";
+              const avatar = avatarKey ? item?.[avatarKey] : null;
+              return (
+                <button
+                  key={String(id)}
+                  type="button"
+                  onClick={() => handleClick(item, index)}
+                  aria-pressed={selected}
+                  className={cn(
+                    "w-full min-w-0 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40",
+                    layout === "cards" ? "rounded-card border p-2" : "px-2 py-1.5",
+                    dividers && layout !== "cards" && "border-b border-border/60 last:border-b-0",
+                    selected ? "border-primary bg-primary/5" : "border-border bg-card hover:bg-muted/30"
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    {avatar && <img src={String(avatar)} alt="" className="h-7 w-7 shrink-0 rounded-full border border-border object-cover" />}
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-xs font-medium text-foreground">{String(title)}</span>
+                      {subtitle && <span className="mt-0.5 block truncate text-[11px] text-muted-foreground">{String(subtitle)}</span>}
+                    </span>
+                    <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  </div>
+                  {metaKeys.length > 0 && (
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {metaKeys.map((key) => (
+                        <span key={key} className="max-w-full truncate rounded-control border border-border bg-muted/50 px-1.5 py-0.5 font-mono text-[9px] text-muted-foreground">
+                          {key}: {String(item?.[key] ?? "—")}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        ))}
       </div>
-    </div>
+    </WidgetSurface>
   );
 };
 
@@ -83,4 +130,5 @@ ListWidget.propTypes = {
   widgetState: PropTypes.object,
   setWidgetState: PropTypes.func,
 };
+
 export default ListWidget;

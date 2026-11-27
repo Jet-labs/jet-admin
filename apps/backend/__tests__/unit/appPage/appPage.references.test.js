@@ -33,4 +33,11 @@ describe('validateAppPageReferences', () => {
       tenantID: 'tenant-1', dataQueryIDs: ['query-1'], workflowIDs: [], listenerIDs: [],
     });
   });
+
+  it('requires a widgetVersionID when a widget selection is specific', async () => {
+    await expect(validateAppPageReferences({
+      tenantID: 'tenant-1',
+      appPageConfig: { widgetVersionSelections: { 'widget-1': { versionMode: 'specific' } } },
+    })).rejects.toMatchObject({ code: 'APP_PAGE_WIDGET_VERSION_REQUIRED' });
+  });
 });

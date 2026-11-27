@@ -7,6 +7,7 @@ import { DataQueryLayout } from "../layouts/dataQueryLayout";
 import { UserManagementLayout } from "../layouts/userManagementLayout";
 import { RoleManagementLayout } from "../layouts/roleManagementLayout";
 import { AppPageLayout } from "../layouts/appPageLayout";
+import { ApplicationLayout } from "../layouts/applicationLayout";
 import { WidgetLayout } from "../layouts/widgetLayout";
 import { APIKeyLayout } from "../layouts/apiKeyLayout";
 import { CronJobLayout } from "../layouts/cronJobLayout";
@@ -15,6 +16,7 @@ import { DatasourceLayout } from "../layouts/datasourceLayout";
 const SignInPage = lazy(() => import("../../pages/signInPage"));
 const SignUpPage = lazy(() => import("../../pages/signUpPage"));
 const HomePage = lazy(() => import("../../pages/homePage"));
+const WidgetKitGalleryPage = lazy(() => import("../../pages/widgetKitGalleryPage"));
 const AccountPage = lazy(() => import("../../pages/accountPage"));
 const AddTenantPage = lazy(() => import("../../pages/addTenantPage"));
 const UpdateTenantPage = lazy(() => import("../../pages/updateTenantPage"));
@@ -64,6 +66,10 @@ const CronJobLayoutLandingPage = lazy(() =>
 );
 const ViewAuditLogsPage = lazy(() => import("../../pages/viewAuditLogsPage"));
 const MarketplacePage = lazy(() => import("../../pages/marketplacePage"));
+const ApplicationsPage = lazy(() => import("../../pages/applicationsPage"));
+const ApplicationStudioPage = lazy(() => import("../../pages/applicationStudioPage"));
+const ApplicationPreview = lazy(() => import("../applicationComponents/applicationPreview"));
+const ApplicationRuntimePage = lazy(() => import("../../pages/applicationRuntimePage"));
 
 const DatasourceLayoutLandingPage = lazy(() =>
   import("../../pages/datasourceLayoutLandingPage")
@@ -119,6 +125,15 @@ const router = createBrowserRouter([
         element: <SignUpPage />,
         handle: { title: CONSTANTS.ROUTES.SIGN_UP.title },
       },
+      ...(import.meta.env.DEV
+        ? [
+            {
+              path: "dev/widget-kit",
+              element: <WidgetKitGalleryPage />,
+              handle: { title: "Widget kit gallery" },
+            },
+          ]
+        : []),
       {
         element: <ProtectedLayout />,
         children: [
@@ -287,6 +302,31 @@ const router = createBrowserRouter([
             path: CONSTANTS.ROUTES.VIEW_MARKETPLACE.code,
             element: <MarketplacePage />,
             handle: { title: CONSTANTS.ROUTES.VIEW_MARKETPLACE.title },
+          },
+          {
+            element: <ApplicationLayout />,
+            children: [
+              {
+                path: CONSTANTS.ROUTES.VIEW_APPLICATIONS.code,
+                element: <ApplicationsPage />,
+                handle: { title: "Applications" },
+              },
+              {
+                path: CONSTANTS.ROUTES.APPLICATION_STUDIO.code,
+                element: <ApplicationStudioPage />,
+                handle: { title: "Application Studio" },
+              },
+            ],
+          },
+          {
+            path: CONSTANTS.ROUTES.APPLICATION_PREVIEW.code,
+            element: <ApplicationPreview />,
+            handle: { title: "Application Preview" },
+          },
+          {
+            path: CONSTANTS.ROUTES.APPLICATION_RUNTIME.code,
+            element: <ApplicationRuntimePage />,
+            handle: { title: "Application Runtime" },
           },
           {
             element: <AppPageLayout />,

@@ -12,6 +12,8 @@ const SEGMENT_LABELS = {
   queries: "Queries",
   widgets: "Widgets",
   "app-pages": "App pages",
+  applications: "Applications",
+  preview: "Preview",
   listeners: "Listeners",
   workflows: "Workflows",
   engines: "Engines",

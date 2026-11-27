@@ -1,5 +1,4 @@
 import { useFormik } from "formik";
-import { X } from 'lucide-react';
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import {
   getDatasourceByIDAPI,
@@ -24,6 +23,7 @@ import { DatasourceCloneForm } from "./datasourceCloneForm";
 
 import { PageHeader } from "@jet-admin/ui";
 import { BundleExportButton } from "../bundleComponents/bundleExportButton";
+import { AssetVersionsButton } from "../assetVersionComponents/assetVersionsButton";
 // --- Original Metadata (only for datasourceOptions) ---
 const datasourceOptionsMetadata =
   DATASOURCE_TYPES.POSTGRESQL.formConfig;
@@ -130,6 +130,11 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
           tenantID={tenantID}
           entityType="datasource"
           entityID={datasourceID}
+        />
+        <AssetVersionsButton
+          tenantID={tenantID}
+          assetType="datasource"
+          assetID={datasourceID}
         />
         <DatasourceTestingForm
           tenantID={tenantID}

@@ -70,7 +70,7 @@
       },
       "clearable": {
         "type": "boolean",
-        "default": true
+        "default": false
       },
       "isLoading": {
         "type": [
@@ -78,6 +78,29 @@
           "string"
         ],
         "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      },
+      "searchable": {
+        "type": "boolean",
+        "default": false,
+        "description": "Show a filter box inside the dropdown."
+      },
+      "searchPlaceholder": {
+        "type": "string",
+        "default": "Search…"
+      },
+      "emptyText": {
+        "type": "string",
+        "default": "No options"
+      },
+      "size": {
+        "type": "string",
+        "enum": ["sm", "default", "lg"],
+        "default": "default"
+      },
+      "labelPosition": {
+        "type": "string",
+        "enum": ["top", "left", "hidden"],
+        "default": "top"
       }
     }
   },

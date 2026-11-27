@@ -40,11 +40,11 @@ const EmptyPageState = () => (
  * tree and threads it (plus resolveValue for conditions/repeats) into the
  * layout renderer. Must stay inside the provider — hooks, not props.
  */
-const AppPageViewContent = ({ tenantID, pageID, migratedPageConfig, scrollerClassName }) => {
+export const AppPageViewContent = ({ tenantID, pageID, migratedPageConfig, scrollerClassName, runtimeServices }) => {
   const stateTree = useAppPageStateTree();
 
   const renderWidget = React.useCallback(
-    (widgetKey, sizing, scopedStateTree, repeatScope) => (
+    (widgetKey, sizing, scopedStateTree, repeatScope, layoutStyle) => (
       <AppPageWidgetSlot
         tenantID={tenantID}
         widgetKey={widgetKey}
@@ -52,6 +52,7 @@ const AppPageViewContent = ({ tenantID, pageID, migratedPageConfig, scrollerClas
         sizing={sizing}
         scopedStateTree={scopedStateTree}
         repeatPath={repeatScope?.repeatPath || []}
+        layoutRadius={layoutStyle?.borderRadius}
       />
     ),
     [tenantID]
@@ -59,8 +60,8 @@ const AppPageViewContent = ({ tenantID, pageID, migratedPageConfig, scrollerClas
 
   return (
     <>
-      <AppPageDataSourceBootstrapper />
-      <AppPageWorkflowInputHost />
+      {runtimeServices?.executionEnabled !== false && <AppPageDataSourceBootstrapper />}
+      {runtimeServices?.executionEnabled !== false && <AppPageWorkflowInputHost />}
       <div
         className={scrollerClassName}
         id={`printable-area-app-page-${pageID}`}
@@ -72,7 +73,8 @@ const AppPageViewContent = ({ tenantID, pageID, migratedPageConfig, scrollerClas
               renderWidget={renderWidget}
               mode="view"
               stateTree={stateTree}
-              resolveValue={resolveValue}
+              resolveValue={runtimeServices?.resolveValue || resolveValue}
+              evaluateVisibility={runtimeServices?.evaluateVisibility}
             />
           </ErrorBoundary>
         ) : (
@@ -88,6 +90,7 @@ AppPageViewContent.propTypes = {
   pageID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   migratedPageConfig: PropTypes.object.isRequired,
   scrollerClassName: PropTypes.string.isRequired,
+  runtimeServices: PropTypes.object,
 };
 
 export const AppPageView = ({
@@ -95,6 +98,20 @@ export const AppPageView = ({
   pageID,
   pageConfig,
   syncVariablesToUrl = false,
+  syncPageVariableKeys = null,
+  initialPageVariables = null,
+  onWriteVariablesToUrl = null,
+  isSyncPageVariableValueAllowed = null,
+  retainState = false,
+  stateCache = null,
+  cacheKey = null,
+  runtimeServices = null,
+  expressionContext = null,
+  setApplicationVariable = null,
+  resetApplicationState = null,
+  emitApplicationEvent = null,
+  navigateToRoute = null,
+  scopeID,
   scrollerClassName = "w-full flex-1 min-h-0 overflow-y-auto bg-muted p-2",
 }) => {
   const migratedPageConfig = React.useMemo(() => {
@@ -110,12 +127,27 @@ export const AppPageView = ({
       tenantID={tenantID}
       pageConfig={migratedPageConfig}
       syncVariablesToUrl={syncVariablesToUrl}
+      syncPageVariableKeys={syncPageVariableKeys}
+      initialPageVariables={initialPageVariables}
+      onWriteVariablesToUrl={onWriteVariablesToUrl}
+      isSyncPageVariableValueAllowed={isSyncPageVariableValueAllowed}
+      retainState={retainState}
+      stateCache={stateCache}
+      cacheKey={cacheKey}
+      runtimeServices={runtimeServices}
+      expressionContext={expressionContext}
+      setApplicationVariable={setApplicationVariable}
+      resetApplicationState={resetApplicationState}
+      emitApplicationEvent={emitApplicationEvent}
+      navigateToRoute={navigateToRoute}
+      scopeID={scopeID}
     >
       <AppPageViewContent
         tenantID={tenantID}
         pageID={pageID}
         migratedPageConfig={migratedPageConfig}
         scrollerClassName={scrollerClassName}
+        runtimeServices={runtimeServices}
       />
     </AppPageRuntimeProvider>
   );
@@ -127,6 +159,20 @@ AppPageView.propTypes = {
   /** Raw appPageConfig (V1 or V2 — migrated internally) */
   pageConfig: PropTypes.object.isRequired,
   syncVariablesToUrl: PropTypes.bool,
+  syncPageVariableKeys: PropTypes.arrayOf(PropTypes.string),
+  initialPageVariables: PropTypes.object,
+  onWriteVariablesToUrl: PropTypes.func,
+  isSyncPageVariableValueAllowed: PropTypes.func,
+  retainState: PropTypes.bool,
+  stateCache: PropTypes.object,
+  cacheKey: PropTypes.string,
+  runtimeServices: PropTypes.object,
+  expressionContext: PropTypes.object,
+  setApplicationVariable: PropTypes.func,
+  resetApplicationState: PropTypes.func,
+  emitApplicationEvent: PropTypes.func,
+  navigateToRoute: PropTypes.func,
+  scopeID: PropTypes.string,
   /** Scroll-container classes. Must constrain height (flex-1 min-h-0) + overflow-y-auto. */
   scrollerClassName: PropTypes.string,
 };

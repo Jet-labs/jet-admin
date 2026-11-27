@@ -273,6 +273,13 @@ authMiddleware.authProviderTest = async function (req, res, next) {
  * @param {string} [options.reqKey] - Dot-path into req object to extract the resource ID(s)
  * @param {boolean} [options.skipIfMissing] - If true and bodyKey/reqKey value is missing, skip authorization (useful for PATCH)
  */
+// Routes that perform their own per-asset authorization still need the
+// normalized caller/tenant context for downstream services.
+authMiddleware.attachExecutionContext = (req, res, next) => {
+  req.executionCtx = fromRequest(req);
+  return next();
+};
+
 authMiddleware.authorize = (resourceTypeOrArray, action, options = {}) => {
   let checks;
   if (Array.isArray(resourceTypeOrArray)) {

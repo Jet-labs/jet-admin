@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /**
  * CanvasStack.jsx — Craft.js User Component
  *
@@ -9,6 +10,12 @@ import { useCraftEditorContext, useConditionHidden } from "./CraftEditorContext.
 import { LogicBadges } from "./LogicBadges.jsx";
 import LayoutResizeHandle from "../editor/LayoutResizeHandle.jsx";
 import { SelectParentButton } from "./SelectParentButton.jsx";
+import { useLayoutBreakpoint } from "../engine/LayoutViewportContext.jsx";
+import {
+  isResponsiveHidden,
+  resolveResponsiveDirection,
+  resolveResponsiveSpan,
+} from "../engine/responsive.js";
 
 export function CanvasStack({
   children,
@@ -24,8 +31,13 @@ export function CanvasStack({
   hideMode,
   keepMounted,
   fixedHeight,
+  responsive,
 }) {
   const { previewMode, editorLiveStateTree } = useCraftEditorContext();
+  const breakpointTier = useLayoutBreakpoint();
+  const responsiveHidden = isResponsiveHidden(responsive, breakpointTier);
+  const effectiveSpan = resolveResponsiveSpan(span, responsive, breakpointTier);
+  const effectiveDirection = resolveResponsiveDirection(direction, responsive, breakpointTier);
   const hiddenByCondition = useConditionHidden(condition, editorLiveStateTree);
   const {
     connectors: { connect, drag },
@@ -53,17 +65,31 @@ export function CanvasStack({
   const isZStackLayer = parentDisplayName === "CanvasZStack";
   const layerIdx = isZStackLayer ? childNodeIdsOfParent.indexOf(id) : -1;
   const isLayerActive = !isZStackLayer || layerIdx === activeLayerIndex;
-  if (previewMode && hiddenByCondition && hideMode !== "preserve-space" && !keepMounted) {
+  if (
+    previewMode &&
+    ((hiddenByCondition && hideMode !== "preserve-space" && !keepMounted) || responsiveHidden)
+  ) {
     return null;
   }
 
   const handleResize = (nodeId, newSpan) => {
-    setProp((props) => { props.span = Math.max(1, Math.min(12, newSpan)); });
+    const nextSpan = Math.max(1, Math.min(12, newSpan));
+    setProp((props) => {
+      if (breakpointTier === "desktop") {
+        props.span = nextSpan;
+        return;
+      }
+      if (!props.responsive) props.responsive = {};
+      props.responsive[breakpointTier] = {
+        ...(props.responsive[breakpointTier] || {}),
+        span: nextSpan,
+      };
+    });
   };
 
-  const stackSpan = `col-span-${span || 12}`;
+  const stackSpan = `col-span-${effectiveSpan}`;
   const stackSizing = `sizing-${sizing || "auto"}`;
-  const stackDirection = direction === "horizontal" ? "flex-row" : "flex-col";
+  const stackDirection = effectiveDirection === "horizontal" ? "flex-row" : "flex-col";
   const stackWrap = wrap ? "flex-wrap" : "flex-nowrap";
   
   let stackAlign = "items-stretch";
@@ -77,15 +103,20 @@ export function CanvasStack({
     stackAlign = "items-stretch";
   }
 
+  const resolvedGap = typeof gap === "number" ? `${gap}px` : gap;
   const stackStyle = {
     ...(style || {}),
-    gap: typeof gap === "number" ? `${gap}px` : gap,
+    ...(resolvedGap != null && resolvedGap !== "" ? { gap: resolvedGap } : {}),
     ...(previewMode && hiddenByCondition
       ? hideMode === "preserve-space"
         ? { visibility: "hidden", pointerEvents: "none" }
         : { display: "none", pointerEvents: "none" }
       : {}),
+    ...(responsiveHidden && !previewMode ? { opacity: 0.45 } : {}),
   };
+  if (!isZStackLayer || !previewMode) {
+    stackStyle.gridColumn = `span ${effectiveSpan} / span ${effectiveSpan}`;
+  }
   if (sizing === "fixed" && fixedHeight) {
     stackStyle["--fixed-height"] = `${fixedHeight}px`;
   }
@@ -113,22 +144,34 @@ export function CanvasStack({
   return (
     <div
       ref={(ref) => !previewMode && connect(drag(ref))}
-      className={`flex ${stackDirection} ${stackWrap} ${stackAlign} ${previewMode ? "" : "p-2"} self-stretch min-h-0 box-border craft-node craft-node-stack ${stackSpan} ${stackSizing} ${
+      className={`flex ${stackDirection} ${stackWrap} ${stackAlign} self-stretch min-h-0 box-border craft-node craft-node-stack ${stackSpan} ${stackSizing} ${
         isSelected && !previewMode ? "craft-node-selected" : ""
       } ${hiddenByCondition && !previewMode ? "opacity-40 saturate-50" : ""}`}
       style={stackStyle}
       id={id}
       data-node-type="Stack"
-      title={hiddenByCondition && !previewMode ? "Hidden by condition in viewer" : undefined}
+      data-breakpoint={breakpointTier}
+      title={
+        hiddenByCondition && !previewMode
+          ? "Hidden by condition in viewer"
+          : responsiveHidden && !previewMode
+            ? `Hidden on ${breakpointTier}`
+            : undefined
+      }
     >
       {!previewMode && isZStackLayer && (
         <span className="layout-z-stack-layer-badge">
           L{layerIdx + 1}{layerOpacities[layerIdx] != null && layerOpacities[layerIdx] < 1 ? ` ${Math.round(layerOpacities[layerIdx] * 100)}%` : ""}
         </span>
       )}
-      {!previewMode && (condition || repeat) && (
-        <div className="absolute left-2 top-2 z-50 pointer-events-none">
+      {!previewMode && (condition || repeat || responsiveHidden) && (
+        <div className="absolute left-2 top-2 z-50 pointer-events-none flex gap-1">
           <LogicBadges condition={condition} repeat={repeat} />
+          {responsiveHidden && (
+            <span className="rounded border border-sky-500/30 bg-sky-500/10 px-1 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-sky-300">
+              hidden · {breakpointTier}
+            </span>
+          )}
         </div>
       )}
       {isEmpty && !previewMode ? (
@@ -144,7 +187,7 @@ export function CanvasStack({
       {!previewMode && isSelected && (
         <>
           <LayoutResizeHandle
-            node={{ id, span: span || 12 }}
+            node={{ id, span: effectiveSpan }}
             onResize={handleResize}
           />
           <SelectParentButton />
@@ -169,6 +212,7 @@ CanvasStack.craft = {
     repeat: null,
     hideMode: null,
     keepMounted: false,
+    responsive: null,
   },
   isCanvas: true,
   rules: {

@@ -1,111 +1,112 @@
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
-import { Input, Label, Checkbox } from "@jet-admin/ui";
-import { TemplateAutocompleteInput } from "@jet-admin/ui";
+import { Input, Switch } from "@jet-admin/ui";
+import {
+  ConfigSection,
+  ConfigField,
+  BindableInput,
+  SegmentedControl,
+  useConfigValue,
+} from "../config";
 
-export const IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
-  const config = widgetEditorForm.values.widgetConfig || {};
+export const IframeConfigEditor = ({ stateTree }) => {
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
+  const [url, setUrl] = useConfigValue("url", "");
+  const [title, setTitle] = useConfigValue("title", "");
+  const [allowScripts, setAllowScripts] = useConfigValue("allowScripts", true);
+  const [allowForms, setAllowForms] = useConfigValue("allowForms", true);
+  const [allowPopups, setAllowPopups] = useConfigValue("allowPopups", false);
+  const [allowSameOrigin, setAllowSameOrigin] = useConfigValue("allowSameOrigin", false);
+  const [allowFullscreen, setAllowFullscreen] = useConfigValue("allowFullscreen", true);
+  const [allowCamera, setAllowCamera] = useConfigValue("allowCamera", false);
+  const [referrerPolicy, setReferrerPolicy] = useConfigValue("referrerPolicy", "no-referrer-when-downgrade");
+  const [isLoading, setIsLoading] = useConfigValue("isLoading", "");
+  const preset = useMemo(() => {
+    if (allowScripts && allowForms && !allowPopups && !allowSameOrigin) return "interactive";
+    if (!allowScripts && !allowForms && !allowPopups) return "safe";
+    return "custom";
+  }, [allowScripts, allowForms, allowPopups, allowSameOrigin]);
+
+  const applyPreset = (next) => {
+    if (next === "safe") {
+      setAllowScripts(false);
+      setAllowForms(false);
+      setAllowPopups(false);
+      setAllowSameOrigin(false);
+    } else if (next === "interactive") {
+      setAllowScripts(true);
+      setAllowForms(true);
+      setAllowPopups(false);
+      setAllowSameOrigin(false);
+    }
+  };
 
   return (
-    <div className="space-y-2">
-      {/* URL Embed */}
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Embed URL / Target Source</Label>
-        <TemplateAutocompleteInput
-          value={config.url || ""}
-          onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.url", val)}
-          placeholder="e.g. https://example.com"
-          liveStateTree={liveStateTree}
-        />
-        <p className="text-xs text-muted-foreground">
-          Make sure the target site supports framing (doesn't send X-Frame-Options: DENY).
-        </p>
-      </div>
+    <>
+      <ConfigSection id="iframe-content" title="Embed" tab="content">
+        <ConfigField label="URL" path="url" helper="http(s) or relative URLs. Other schemes are blocked.">
+          <BindableInput value={url} onChange={setUrl} liveStateTree={liveStateTree} placeholder="https://example.com" />
+        </ConfigField>
+        <ConfigField label="Frame title" path="title" htmlFor="iframe-title" helper="Read by screen readers.">
+          <Input id="iframe-title" value={title ?? ""} onChange={(event) => setTitle(event.target.value)} placeholder="Embedded dashboard" className="h-8 text-xs" />
+        </ConfigField>
+      </ConfigSection>
 
-      {/* Sandbox Settings */}
-      <div className="space-y-2 border-t pt-2 mt-2">
-        <Label className="text-xs font-medium text-foreground">Sandbox Security Options</Label>
-        <p className="text-xs text-muted-foreground leading-snug mb-1">
-          Toggle capabilities granted to the embedded page. Scripts and forms are
-          enabled by default for saved-content compatibility; disable anything the
-          embedded page does not need.
-        </p>
-
-        {/* Scripts */}
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="iframe-scripts"
-            checked={config.allowScripts ?? true}
-            onCheckedChange={(checked) =>
-              widgetEditorForm.setFieldValue("widgetConfig.allowScripts", !!checked)
-            }
+      <ConfigSection id="iframe-style" title="Security & permissions" tab="style">
+        <ConfigField label="Preset" path="sandboxPreset" defaultValue="interactive">
+          <SegmentedControl
+            ariaLabel="Sandbox preset"
+            value={preset}
+            onChange={applyPreset}
+            options={[
+              { value: "safe", label: "Safe" },
+              { value: "interactive", label: "Interactive" },
+              { value: "custom", label: "Custom" },
+            ]}
           />
-          <Label htmlFor="iframe-scripts" className="text-xs text-muted-foreground cursor-pointer">
-            Allow JavaScript execution (allow-scripts)
-          </Label>
+        </ConfigField>
+        <div className="space-y-1.5">
+          <ConfigField label="Scripts" path="allowScripts" defaultValue={true} inline>
+            <Switch checked={allowScripts !== false} onCheckedChange={setAllowScripts} aria-label="Allow scripts" />
+          </ConfigField>
+          <ConfigField label="Forms" path="allowForms" defaultValue={true} inline>
+            <Switch checked={allowForms !== false} onCheckedChange={setAllowForms} aria-label="Allow forms" />
+          </ConfigField>
+          <ConfigField label="Popups" path="allowPopups" defaultValue={false} inline>
+            <Switch checked={!!allowPopups} onCheckedChange={setAllowPopups} aria-label="Allow popups" />
+          </ConfigField>
+          <ConfigField
+            label="Same origin"
+            path="allowSameOrigin"
+            defaultValue={false}
+            inline
+            helper="Only enable for fully trusted content; scripts plus same-origin can escape the sandbox."
+          >
+            <Switch checked={!!allowSameOrigin} onCheckedChange={setAllowSameOrigin} aria-label="Allow same origin" />
+          </ConfigField>
         </div>
-
-        {/* Forms */}
-        <div className="flex items-center gap-2 mt-1">
-          <Checkbox
-            id="iframe-forms"
-            checked={config.allowForms ?? true}
-            onCheckedChange={(checked) =>
-              widgetEditorForm.setFieldValue("widgetConfig.allowForms", !!checked)
-            }
-          />
-          <Label htmlFor="iframe-forms" className="text-xs text-muted-foreground cursor-pointer">
-            Allow form submission (allow-forms)
-          </Label>
+        <div className="grid grid-cols-2 gap-3">
+          <ConfigField label="Fullscreen" path="allowFullscreen" defaultValue={true} inline>
+            <Switch checked={allowFullscreen !== false} onCheckedChange={setAllowFullscreen} aria-label="Allow fullscreen" />
+          </ConfigField>
+          <ConfigField label="Camera/mic" path="allowCamera" defaultValue={false} inline>
+            <Switch checked={!!allowCamera} onCheckedChange={setAllowCamera} aria-label="Allow camera and microphone" />
+          </ConfigField>
         </div>
+        <ConfigField label="Referrer policy" path="referrerPolicy" defaultValue="no-referrer-when-downgrade" htmlFor="iframe-referrer">
+          <Input id="iframe-referrer" value={referrerPolicy ?? ""} onChange={(event) => setReferrerPolicy(event.target.value)} className="h-8 font-mono text-xs" />
+        </ConfigField>
+      </ConfigSection>
 
-        {/* Popups */}
-        <div className="flex items-center gap-2 mt-1">
-          <Checkbox
-            id="iframe-popups"
-            checked={config.allowPopups ?? false}
-            onCheckedChange={(checked) =>
-              widgetEditorForm.setFieldValue("widgetConfig.allowPopups", !!checked)
-            }
-          />
-          <Label htmlFor="iframe-popups" className="text-xs text-muted-foreground cursor-pointer">
-            Allow popups & new windows (allow-popups)
-          </Label>
-        </div>
-
-        {/* Same Origin */}
-        <div className="flex items-center gap-2 mt-1">
-          <Checkbox
-            id="iframe-origin"
-            checked={config.allowSameOrigin ?? false}
-            onCheckedChange={(checked) =>
-              widgetEditorForm.setFieldValue("widgetConfig.allowSameOrigin", !!checked)
-            }
-          />
-          <Label htmlFor="iframe-origin" className="text-xs text-muted-foreground cursor-pointer">
-            Allow sharing local storage/cookies (allow-same-origin)
-          </Label>
-        </div>
-      </div>
-
-      {/* Is Loading Template */}
-      <div className="space-y-1 mt-2">
-        <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
-        <TemplateAutocompleteInput
-          value={config.isLoading || ""}
-          onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.isLoading', val)}
-          placeholder="e.g. {{ state.queries.myQuery.isLoading }}"
-          liveStateTree={liveStateTree}
-        />
-      </div>
-    </div>
+      <ConfigSection id="iframe-behavior" title="State" tab="behavior">
+        <ConfigField label="Loading template" path="isLoading">
+          <BindableInput value={isLoading} onChange={setIsLoading} liveStateTree={liveStateTree} placeholder="e.g. {{ state.queries.q.isLoading }}" />
+        </ConfigField>
+      </ConfigSection>
+    </>
   );
 };
 
-IframeConfigEditor.propTypes = {
-  widgetEditorForm: PropTypes.object.isRequired,
-  stateTree: PropTypes.object,
-};
-
+IframeConfigEditor.propTypes = { widgetEditorForm: PropTypes.object, stateTree: PropTypes.object };
+IframeConfigEditor.usesConfigKit = true;
 export default IframeConfigEditor;

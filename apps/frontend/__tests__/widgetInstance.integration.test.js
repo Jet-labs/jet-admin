@@ -31,6 +31,7 @@ import {
 } from "../src/logic/appPageRuntime/widgetInstanceIdentity";
 
 global.IS_REACT_ACT_ENVIRONMENT = true;
+jest.mock("../src/logic/appPageRuntime/executeWorkflowWithStreaming", () => ({ executeWorkflowWithStreaming: jest.fn() }));
 
 // ---------------------------------------------------------------------------
 // Pure identity contract

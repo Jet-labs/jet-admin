@@ -58,6 +58,64 @@
     --shadow-whisper: none;
     --shadow-card: none;
     --shadow-deep: none;
+    --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-raised: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+    /* ── Semantic surface / text / border scale ─────────────────────────── */
+    --surface-canvas: 0 0% 9%;
+    --surface-card: 0 0% 12%;
+    --surface-raised: 0 0% 15%;
+    --surface-subtle: 0 0% 11%;
+    --text-primary: 0 0% 98%;
+    --text-secondary: 0 0% 71%;
+    --text-muted: 0 0% 54%;
+    --text-faint: 0 0% 28%;
+    --border-hairline: 0 0% 18%;
+    --border-hairline-strong: 0 0% 21%;
+
+    /* ── Status tokens (meaning, not decoration) ───────────────────────── */
+    --status-info: 217 91% 66%;
+    --status-success: 142 69% 52%;
+    --status-warning: 38 92% 58%;
+    --status-danger: 0 84% 66%;
+    --status-neutral: 0 0% 60%;
+    --status-info-foreground: 0 0% 98%;
+    --status-success-foreground: 0 0% 98%;
+    --status-warning-foreground: 0 0% 9%;
+    --status-danger-foreground: 0 0% 98%;
+
+    /* ── Radius scale (controls 6 / cards 8 / overlays 12) ─────────────── */
+    --radius-control: 6px;
+    --radius-card: 8px;
+    --radius-overlay: 12px;
+
+    /* ── Motion ────────────────────────────────────────────────────────── */
+    --motion-fast: 120ms;
+    --motion-base: 180ms;
+    --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --focus-ring: 0 0 0 2px hsl(var(--ring) / 0.35);
+
+    /* ── Spacing scale (referenced by density) ─────────────────────────── */
+    --space-0: 0px;
+    --space-0-5: 2px;
+    --space-1: 4px;
+    --space-1-5: 6px;
+    --space-2: 8px;
+    --space-2-5: 10px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+
+    /* ── Widget density (comfortable reproduces current p-2 sizing) ────── */
+    --widget-pad-block: var(--space-2);
+    --widget-pad-inline: var(--space-2);
+    --widget-gap: var(--space-2);
+    --widget-row-height: 40px;
+    --widget-font-size: 14px;
+    --widget-font-size-sm: 12px;
+    --widget-control-height: 32px;
+
 /* Terminal Console Panel Tokens */
   --terminal-bg: #0a0a0a;
   --terminal-border: #27272a;
@@ -69,6 +127,176 @@
   --terminal-info: #818cf8;
   /* indigo-400 */
   --terminal-error: hsl(var(--destructive));
+  }
+}
+
+/*
+ * Light theme contract. The app stays dark by default; adding
+ * `theme-light` to <html> or an ancestor swaps the semantic tokens so the
+ * same widgets render with parity. No widget may hard-code a theme branch.
+ */
+.theme-light {
+  color-scheme: light;
+
+  --background: 0 0% 100%;
+  --foreground: 0 0% 9%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 9%;
+  --primary: 237 83% 60%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 9%;
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 40%;
+  --accent: 0 0% 96%;
+  --accent-foreground: 0 0% 9%;
+  --destructive: 0 72% 45%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 90%;
+  --input: 0 0% 88%;
+  --ring: 237 83% 60%;
+
+  --surface-canvas: 0 0% 100%;
+  --surface-card: 0 0% 100%;
+  --surface-raised: 0 0% 98%;
+  --surface-subtle: 0 0% 96%;
+  --text-primary: 0 0% 9%;
+  --text-secondary: 0 0% 27%;
+  --text-muted: 0 0% 42%;
+  --text-faint: 0 0% 64%;
+  --border-hairline: 0 0% 90%;
+  --border-hairline-strong: 0 0% 83%;
+
+  --status-info: 221 83% 45%;
+  --status-success: 142 72% 29%;
+  --status-warning: 32 95% 35%;
+  --status-danger: 0 72% 45%;
+  --status-neutral: 0 0% 40%;
+  --status-info-foreground: 0 0% 100%;
+  --status-success-foreground: 0 0% 100%;
+  --status-warning-foreground: 0 0% 100%;
+  --status-danger-foreground: 0 0% 100%;
+
+  --brand-primary: #4f5bd5;
+  --brand-primary-rgb: 79 91 213;
+  --brand-primary-link: #3e4fc4;
+  --brand-primary-border: rgba(79, 91, 213, 0.3);
+
+  --brand-dark: #ffffff;
+  --brand-dark-card: #ffffff;
+  --brand-border-dark: #f2f2f2;
+  --brand-border: #e5e5e5;
+  --brand-border-mid: #d4d4d4;
+  --brand-border-light: #c9c9c9;
+
+  --brand-text-dark: #a3a3a3;
+  --brand-text-muted: #6b6b6b;
+  --brand-text-secondary: #444444;
+  --brand-text-primary: #171717;
+}
+
+@layer base {
+  .widget-density-compact {
+    --widget-pad-block: var(--space-1-5);
+    --widget-pad-inline: var(--space-2);
+    --widget-gap: var(--space-1-5);
+    --widget-row-height: 32px;
+    --widget-font-size: 12px;
+    --widget-font-size-sm: 11px;
+    --widget-control-height: 28px;
+  }
+
+  .widget-density-comfortable {
+    --widget-pad-block: var(--space-2);
+    --widget-pad-inline: var(--space-2);
+    --widget-gap: var(--space-2);
+    --widget-row-height: 40px;
+    --widget-font-size: 14px;
+    --widget-font-size-sm: 12px;
+    --widget-control-height: 32px;
+  }
+
+  .widget-density-spacious {
+    --widget-pad-block: var(--space-3);
+    --widget-pad-inline: var(--space-4);
+    --widget-gap: var(--space-3);
+    --widget-row-height: 48px;
+    --widget-font-size: 14px;
+    --widget-font-size-sm: 13px;
+    --widget-control-height: 36px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .widget-surface,
+    .widget-surface *,
+    .config-shell,
+    .config-shell * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Status surfaces resolve only through semantic tokens. */
+  .status-info {
+    background-color: hsl(var(--status-info) / 0.1);
+    border-color: hsl(var(--status-info) / 0.25);
+    color: hsl(var(--status-info));
+  }
+  .status-success {
+    background-color: hsl(var(--status-success) / 0.1);
+    border-color: hsl(var(--status-success) / 0.25);
+    color: hsl(var(--status-success));
+  }
+  .status-warning {
+    background-color: hsl(var(--status-warning) / 0.12);
+    border-color: hsl(var(--status-warning) / 0.28);
+    color: hsl(var(--status-warning));
+  }
+  .status-danger {
+    background-color: hsl(var(--status-danger) / 0.1);
+    border-color: hsl(var(--status-danger) / 0.25);
+    color: hsl(var(--status-danger));
+  }
+  .status-neutral {
+    background-color: hsl(var(--muted));
+    border-color: hsl(var(--border));
+    color: hsl(var(--muted-foreground));
+  }
+
+  .status-solid-info {
+    background-color: hsl(var(--status-info));
+    border-color: hsl(var(--status-info));
+    color: hsl(var(--status-info-foreground));
+  }
+  .status-solid-success {
+    background-color: hsl(var(--status-success));
+    border-color: hsl(var(--status-success));
+    color: hsl(var(--status-success-foreground));
+  }
+  .status-solid-warning {
+    background-color: hsl(var(--status-warning));
+    border-color: hsl(var(--status-warning));
+    color: hsl(var(--status-warning-foreground));
+  }
+  .status-solid-danger {
+    background-color: hsl(var(--status-danger));
+    border-color: hsl(var(--status-danger));
+    color: hsl(var(--status-danger-foreground));
+  }
+
+  .widget-surface {
+    padding: var(--widget-pad-block) var(--widget-pad-inline);
+    gap: var(--widget-gap);
+  }
+
+  .config-shell {
+    color: hsl(var(--foreground));
   }
 }
 
@@ -373,4 +601,70 @@ button {
   max-width: 100vw;
   max-height: 100vh;
   box-sizing: border-box;
-}
+}
+/* Widget slider thumb � shared token styling */
+.jet-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: hsl(var(--primary));
+  border: 2px solid hsl(var(--background));
+  box-shadow: var(--shadow-soft);
+  cursor: grab;
+}
+.jet-slider:disabled::-webkit-slider-thumb { cursor: not-allowed; opacity: 0.5; }
+.jet-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: hsl(var(--primary));
+  border: 2px solid hsl(var(--background));
+  box-shadow: var(--shadow-soft);
+  cursor: grab;
+}
+.jet-slider:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+
+/* Optional striped progress fill */
+.jet-progress-striped {
+  background-image: repeating-linear-gradient(45deg, hsl(var(--foreground) / 0.14) 0 6px, transparent 6px 12px);
+}
+
+
+/* Dual-thumb slider � track is inert, thumbs stay interactive */
+.jet-range-input {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  pointer-events: none;
+}
+.jet-range-input::-webkit-slider-runnable-track { background: transparent; height: 8px; }
+.jet-range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: auto;
+  width: 16px;
+  height: 16px;
+  margin-top: -4px;
+  border-radius: 9999px;
+  background: hsl(var(--primary));
+  border: 2px solid hsl(var(--background));
+  box-shadow: var(--shadow-soft);
+  cursor: grab;
+}
+.jet-range-input::-moz-range-track { background: transparent; height: 8px; }
+.jet-range-input::-moz-range-thumb {
+  pointer-events: auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: hsl(var(--primary));
+  border: 2px solid hsl(var(--background));
+  box-shadow: var(--shadow-soft);
+  cursor: grab;
+}
+.jet-range-input:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--primary) / 0.45); }
+.jet-range-input:disabled::-webkit-slider-thumb { opacity: 0.5; cursor: not-allowed; }
+

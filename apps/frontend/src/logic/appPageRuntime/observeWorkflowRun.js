@@ -5,7 +5,7 @@ import { retainSocketRoom } from './socketRoomLease';
 const terminalStatuses = new Set(['COMPLETED', 'FAILED', 'CANCELLED', 'STOPPED']);
 
 /** Observe, never execute/cancel. Socket loss is a transport state, not a run outcome. */
-export function observeWorkflowRun({ tenantID, instanceID, onUpdate, onTerminal, onRequest, onObservationError, pollInterval = 2000 }) {
+export function observeWorkflowRun({ tenantID, instanceID, onUpdate, onTerminal, onRequest, onObservationError, pollInterval = 2000, getStatus = getWorkflowRunStatusAPI, useSockets = true }) {
   let disposed = false, timer = null, polling = false, boundSocket = null;
   let unbind = () => {};
   const alive = () => !disposed;
@@ -24,7 +24,7 @@ export function observeWorkflowRun({ tenantID, instanceID, onUpdate, onTerminal,
     clearTimeout(timer);
     polling = true;
     try {
-      const response = await getWorkflowRunStatusAPI({ tenantID, instanceID });
+      const response = await getStatus({ tenantID, instanceID });
       if (alive()) receive(response?.data ?? response);
     } catch (error) {
       if (alive()) onObservationError?.(error);
@@ -67,8 +67,10 @@ export function observeWorkflowRun({ tenantID, instanceID, onUpdate, onTerminal,
     unbind();
     unsubscribeStore();
   }
-  unsubscribeStore = useSocketStore.subscribe?.(state => bind(state.socket)) || (() => {});
-  bind(useSocketStore.getState().socket);
+  if (useSockets) {
+    unsubscribeStore = useSocketStore.subscribe?.(state => bind(state.socket)) || (() => {});
+    bind(useSocketStore.getState().socket);
+  }
   poll(); // Also works before a shared socket exists or after a missed terminal event.
   return { disconnect };
 }

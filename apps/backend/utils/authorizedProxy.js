@@ -298,6 +298,8 @@ async function authorizedExecuteWorkflow({
   inputValues = {},
   executionCtx,
   executionKey,
+  pinnedWorkflow,
+  applicationExecution,
 }) {
   // ── Gate: context is mandatory ──────────────────────────────────────────
   if (!executionCtx) {
@@ -313,6 +315,12 @@ async function authorizedExecuteWorkflow({
   }
 
   const { caller } = executionCtx;
+  if (applicationExecution && (!pinnedWorkflow || pinnedWorkflow.tenantID !== tenantID || !executionCtx?.caller?.id ||
+    applicationExecution.tenantID !== tenantID || executionCtx.tenantID !== tenantID ||
+    applicationExecution.caller?.id !== caller?.id || applicationExecution.caller?.type !== caller?.type ||
+    executionCtx.originatingResource?.type !== 'application' || executionCtx.originatingResource.id !== applicationExecution.applicationID)) {
+    throw new Error('Invalid application workflow provenance');
+  }
   if (executionKey && !isSystemCaller(executionCtx)) throw new Error('Stable workflow execution keys are reserved for trusted system dispatch');
 
   Logger.log("info", {
@@ -384,7 +392,10 @@ async function authorizedExecuteWorkflow({
     // Resolve & validate inputs through the unified pipeline. The workflow
     // lookup is tenant-scoped: a system caller (cron/listener) must not be
     // able to start a workflow owned by another tenant by ID alone.
-    const workflow = await prisma.tblWorkflows.findFirst({
+    if (pinnedWorkflow && (!applicationExecution || pinnedWorkflow.workflowID !== workflowID || pinnedWorkflow.tenantID !== tenantID)) {
+      throw new Error('Invalid captured workflow execution');
+    }
+    const workflow = pinnedWorkflow || await prisma.tblWorkflows.findFirst({
       where: { workflowID, tenantID },
     });
     if (!workflow) {
@@ -404,7 +415,9 @@ async function authorizedExecuteWorkflow({
     }
 
     // Start workflow with resolved inputs
-    const result = await startWorkflow({ workflowID, tenantID, inputValues: resolved, ...(executionKey ? { executionKey } : {}) });
+    const result = await startWorkflow({ workflowID, tenantID, inputValues: resolved, ...(executionKey ? { executionKey } : {}),
+      ...(pinnedWorkflow ? { pinnedGraph: pinnedWorkflow, applicationExecution, executionCtx } : {}),
+    });
 
     Logger.log("success", {
       message: "authorizedProxy:workflow:started",

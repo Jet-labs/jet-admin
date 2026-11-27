@@ -89,6 +89,30 @@
         ],
         "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.myQuery.isLoading }}). Legacy alias: loading."
       },
+      "tooltip": {
+        "type": "string",
+        "description": "Hover/focus tooltip. Supports template expressions."
+      },
+      "loadingText": {
+        "type": "string"
+      },
+      "successText": {
+        "type": "string"
+      },
+      "shortcut": {
+        "type": "string",
+        "description": "Keyboard shortcut, e.g. Ctrl+Enter."
+      },
+      "confirm": {
+        "type": "object",
+        "properties": {
+          "enabled": { "type": "boolean", "default": false },
+          "title": { "type": "string" },
+          "message": { "type": "string" },
+          "confirmLabel": { "type": "string" },
+          "cancelLabel": { "type": "string" }
+        }
+      },
       "loading": {
         "type": [
           "boolean",

@@ -1,62 +1,134 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 import PropTypes from "prop-types";
-import { Label, RadioGroup, RadioGroupItem } from "@jet-admin/ui";
+import { Label, RadioGroup, RadioGroupItem, WidgetBusy, WidgetSurface, cn } from "@jet-admin/ui";
+import { normalizeFieldBoolean } from "../_shared/fieldContracts";
+
+const normalizeOptions = (widgetConfig) => {
+  const raw = Array.isArray(widgetConfig?.optionsTemplate) ? widgetConfig.optionsTemplate : (widgetConfig?.options || []);
+  const labelKey = widgetConfig?.labelKey || "label";
+  const valueKey = widgetConfig?.valueKey || "value";
+  return raw.map((option) => {
+    if (option && typeof option === "object") {
+      return {
+        label: String(option[labelKey] ?? option.label ?? ""),
+        value: String(option[valueKey] ?? option.value ?? ""),
+        description: option.description || "",
+        disabled: normalizeFieldBoolean(option.disabled, false),
+      };
+    }
+    return { label: String(option), value: String(option), description: "", disabled: false };
+  });
+};
 
 export const RadioGroupWidget = ({ widgetConfig, widgetState, setWidgetState, fireWidgetEvent, onWidgetInit }) => {
   const label = widgetConfig?.label || "";
   const orientation = widgetConfig?.orientation || "vertical";
-  const disabled = widgetConfig?.disabled === true || widgetConfig?.disabled === "true";
-  const isLoading = widgetConfig?.isLoading === true || widgetConfig?.isLoading === "true";
-
-  const options = useMemo(() => {
-    const raw = Array.isArray(widgetConfig?.optionsTemplate) ? widgetConfig.optionsTemplate : (widgetConfig?.options || []);
-    const lk = widgetConfig?.labelKey || "label";
-    const vk = widgetConfig?.valueKey || "value";
-    return raw.map((o) => (typeof o === "object" && o !== null ? { label: String(o.label ?? o[lk] ?? ""), value: String(o.value ?? o[vk] ?? "") } : { label: String(o), value: String(o) }));
-  }, [widgetConfig?.options, widgetConfig?.optionsTemplate, widgetConfig?.labelKey, widgetConfig?.valueKey]);
-
+  const variant = widgetConfig?.variant || "plain";
+  const disabled = normalizeFieldBoolean(widgetConfig?.disabled, false);
+  const readOnly = normalizeFieldBoolean(widgetConfig?.readOnly, false);
+  const required = normalizeFieldBoolean(widgetConfig?.required, false);
+  const isLoading = normalizeFieldBoolean(widgetConfig?.isLoading, false);
+  const density = widgetConfig?.properties?.density || "comfortable";
+  const reactId = useId();
+  const id = `radio-${reactId.replace(/:/g, "")}`;
+  const labelId = `${id}-label`;
+  const [touched, setTouched] = useState(false);
+  const [error, setError] = useState("");
+  const options = useMemo(() => normalizeOptions(widgetConfig), [widgetConfig]);
   const value = widgetState?.value ?? widgetConfig?.defaultValue ?? "";
 
   useEffect(() => {
     if (widgetState?.value === undefined && widgetConfig?.defaultValue !== undefined) {
-      if (setWidgetState) setWidgetState((p) => ({ ...p, value: widgetConfig.defaultValue }));
+      if (setWidgetState) setWidgetState((prev) => ({ ...prev, value: widgetConfig.defaultValue }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [widgetConfig?.defaultValue]);
 
-  // Live callbacks via ref (B05/F02): never initial closures.
   const liveRef = useRef(null);
   liveRef.current = { setWidgetState, fireWidgetEvent };
   const methodsRef = useRef(null);
   if (!methodsRef.current) {
     methodsRef.current = {
-      setValue: (v) => { const rt = liveRef.current; if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: v })); if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: v }); },
-      clear: () => { const rt = liveRef.current; if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: "" })); if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: "" }); },
+      setValue: (v) => {
+        const rt = liveRef.current;
+        if (rt.setWidgetState) rt.setWidgetState((prev) => ({ ...prev, value: v }));
+        if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: v });
+      },
+      clear: () => {
+        const rt = liveRef.current;
+        if (rt.setWidgetState) rt.setWidgetState((prev) => ({ ...prev, value: "" }));
+        if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: "" });
+      },
     };
   }
-  useEffect(() => { if (onWidgetInit) onWidgetInit(methodsRef.current); }, [onWidgetInit]);
+  useEffect(() => {
+    if (onWidgetInit) onWidgetInit(methodsRef.current);
+  }, [onWidgetInit]);
 
+  const handleChange = (nextValue) => {
+    if (disabled || readOnly) return;
+    setTouched(true);
+    setError("");
+    if (setWidgetState) setWidgetState((prev) => ({ ...prev, value: nextValue }));
+    if (fireWidgetEvent) fireWidgetEvent("onChange", { value: nextValue });
+  };
+
+  const errorId = error ? `${id}-error` : undefined;
   return (
-    <div className="flex flex-col gap-2 p-2 w-full relative">
-      {isLoading && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px] rounded">
-          <div className="flex items-center gap-2 rounded bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
-            <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
-            Updating...
-          </div>
-        </div>
+    <WidgetSurface density={density} className="relative flex h-full w-full flex-col gap-1.5" aria-busy={isLoading || undefined}>
+      {isLoading && <WidgetBusy label="Updating…" />}
+      {label && (
+        <Label id={labelId} className="text-xs font-medium text-foreground">
+          {label}
+          {required && <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>}
+        </Label>
       )}
-      {label && <Label className="text-xs font-medium text-foreground">{label}</Label>}
-      <RadioGroup value={String(value ?? "")} onValueChange={(v) => { if (setWidgetState) setWidgetState((p) => ({ ...p, value: v })); if (fireWidgetEvent) fireWidgetEvent("onChange", { value: v }); }} disabled={disabled} className={orientation === "horizontal" ? "flex flex-row flex-wrap gap-4" : "flex flex-col gap-2"}>
+      <RadioGroup
+        value={String(value ?? "")}
+        onValueChange={handleChange}
+        disabled={disabled || readOnly}
+        aria-labelledby={label ? labelId : undefined}
+        aria-required={required || undefined}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={errorId}
+        onBlur={() => {
+          setTouched(true);
+          if (required && !value) setError("Select an option.");
+        }}
+        className={cn(
+          orientation === "horizontal" ? "flex flex-row flex-wrap gap-3" : "flex flex-col gap-2",
+          variant === "cards" && "gap-2"
+        )}
+      >
         {options.length === 0 && <span className="text-xs text-muted-foreground">No options configured</span>}
-        {options.map((o, i) => (
-          <div key={`${o.value}-${i}`} className="flex items-center gap-2">
-            <RadioGroupItem value={String(o.value)} id={`rg-${String(o.value)}-${i}`} />
-            <Label htmlFor={`rg-${String(o.value)}-${i}`} className="text-xs text-foreground cursor-pointer font-normal">{o.label}</Label>
-          </div>
-        ))}
+        {options.map((option, index) => {
+          const optionId = `${id}-${index}`;
+          const selected = String(value) === option.value;
+          return (
+            <label
+              key={`${option.value}-${index}`}
+              htmlFor={optionId}
+              className={cn(
+                "flex cursor-pointer items-start gap-2",
+                variant === "cards" && "min-w-[160px] flex-1 rounded-card border p-2 transition-colors",
+                variant === "cards" && (selected ? "border-primary bg-primary/5" : "border-border bg-card hover:bg-muted/30"),
+                variant === "cards" && option.disabled && "cursor-not-allowed opacity-50",
+                variant === "plain" && option.disabled && "cursor-not-allowed opacity-50"
+              )}
+            >
+              <RadioGroupItem value={option.value} id={optionId} disabled={option.disabled} className="mt-0.5" />
+              <span className="min-w-0">
+                <span className="block text-xs font-medium text-foreground">{option.label}</span>
+                {option.description && <span className="mt-0.5 block text-[11px] leading-snug text-muted-foreground">{option.description}</span>}
+              </span>
+            </label>
+          );
+        })}
       </RadioGroup>
-    </div>
+      {error && touched && (
+        <p id={errorId} role="alert" className="text-[11px] text-destructive">{error}</p>
+      )}
+    </WidgetSurface>
   );
 };
 
@@ -67,4 +139,5 @@ RadioGroupWidget.propTypes = {
   fireWidgetEvent: PropTypes.func,
   onWidgetInit: PropTypes.func,
 };
+
 export default RadioGroupWidget;

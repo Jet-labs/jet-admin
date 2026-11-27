@@ -77,5 +77,7 @@ export * from "./calendar";
 export * from "./_shared/fieldContracts";
 export * from "./_shared/dateContracts";
 export * from "./_shared/fieldA11y";
+// Shared configurator kit (tabs, sections, bindable fields, list editors).
+export * from "./config";
 // Shared components removed, TemplateAutocompleteInput moved to @jet-admin/ui
 export { WidgetEditorContext } from "./context/WidgetEditorContext";

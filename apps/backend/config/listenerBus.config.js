@@ -35,23 +35,24 @@ function getBusConfig() {
   };
 }
 
-function buildEnvelope({ listenerID, tenantID, rawEvent, eventID, enqueuedAt }) {
+function buildEnvelope({ listenerID, tenantID, rawEvent, eventID, enqueuedAt, listenerDefinitionHash }) {
   return {
     eventID: eventID || uuidv4(),
     listenerID,
     tenantID,
     rawEvent,
     enqueuedAt: enqueuedAt || Date.now(),
+    ...(listenerDefinitionHash ? { listenerDefinitionHash } : {}),
   };
 }
 
 /**
  * Publish a raw listener event to the stream (durable, persistent).
  */
-async function publishListenerEvent({ listenerID, tenantID, rawEvent, eventID }) {
+async function publishListenerEvent({ listenerID, tenantID, rawEvent, eventID, listenerDefinitionHash }) {
   const { getRedisClient } = require('./redis.config');
   const { stream, maxLen } = getBusConfig();
-  const envelope = buildEnvelope({ listenerID, tenantID, rawEvent, eventID });
+  const envelope = buildEnvelope({ listenerID, tenantID, rawEvent, eventID, listenerDefinitionHash });
   const client = getRedisClient('bus');
   await client.xadd(stream, 'MAXLEN', '~', String(maxLen), '*', 'data', JSON.stringify(envelope));
   return envelope;

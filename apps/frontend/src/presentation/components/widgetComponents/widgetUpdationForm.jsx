@@ -2,7 +2,7 @@ import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import PropTypes from "prop-types";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { CONSTANTS } from "../../../constants";
 import {
   getWidgetByIDAPI,
@@ -24,6 +24,7 @@ import { WidgetPreview } from "./widgetPreview";
 import { PageHeader } from "@jet-admin/ui";
 import { BundleExportButton } from "../bundleComponents/bundleExportButton";
 import { PublishToLibraryButton } from "../widgetLibraryComponents/publishToLibraryButton";
+import { AssetVersionsButton } from "../assetVersionComponents/assetVersionsButton";
 
 const EMPTY_INITIAL_VALUES = {
   widgetTitle: "",
@@ -138,6 +139,11 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
           entityID={widgetID}
         />
         <PublishToLibraryButton tenantID={tenantID} widgetID={widgetID} />
+        <AssetVersionsButton
+          tenantID={tenantID}
+          assetType="widget"
+          assetID={widgetID}
+        />
 
       </PageHeader>
 
@@ -164,6 +170,7 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
                   widgetEditorForm={updateWidgetForm}
                   dataSourceResults={dataSourceResults}
                   onDataSourceResults={setDataSourceResults}
+                  widgetID={widgetID}
                 />
               )}
             </form>

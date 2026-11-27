@@ -50,6 +50,50 @@ async function validateAppPageReferences({ tenantID, appPageConfig }) {
       error.code = "APP_PAGE_DATASOURCE_TARGET_REQUIRED";
       throw error;
     }
+
+    const versionField = type === "query" ? "queryVersionID" : type === "workflow" ? "workflowVersionID" : "listenerVersionID";
+    const selectedVersionID = typeof source[versionField] === "string" ? source[versionField].trim() : "";
+    const versionMode = source.versionMode || (selectedVersionID ? "specific" : "latest-at-capture");
+    if (!["latest-at-capture", "specific"].includes(versionMode)) {
+      const error = new Error(`App-page data source '${source.alias || type}' has invalid versionMode`);
+      error.statusCode = 400;
+      error.code = "APP_PAGE_DATASOURCE_VERSION_MODE_INVALID";
+      throw error;
+    }
+    if (versionMode === "specific" && !selectedVersionID) {
+      const error = new Error(`App-page data source '${source.alias || type}' selects a specific version but no ${versionField} was supplied`);
+      error.statusCode = 400;
+      error.code = "APP_PAGE_DATASOURCE_VERSION_REQUIRED";
+      throw error;
+    }
+  }
+
+  const widgetSelections = appPageConfig.widgetVersionSelections;
+  if (widgetSelections && typeof widgetSelections === "object" && !Array.isArray(widgetSelections)) {
+    for (const [widgetID, selection] of Object.entries(widgetSelections)) {
+      if (!selection || typeof selection !== "object") {
+        const error = new Error(`Widget version selection for '${widgetID}' must be an object`);
+        error.statusCode = 400;
+        error.code = "APP_PAGE_WIDGET_VERSION_INVALID";
+        throw error;
+      }
+      const selectedVersionID = typeof selection.widgetVersionID === "string"
+        ? selection.widgetVersionID.trim()
+        : "";
+      const versionMode = selection.versionMode || (selectedVersionID ? "specific" : "latest-at-capture");
+      if (!["latest-at-capture", "specific"].includes(versionMode)) {
+        const error = new Error(`Widget '${widgetID}' has invalid versionMode`);
+        error.statusCode = 400;
+        error.code = "APP_PAGE_WIDGET_VERSION_MODE_INVALID";
+        throw error;
+      }
+      if (versionMode === "specific" && !selectedVersionID) {
+        const error = new Error(`Widget '${widgetID}' selects a specific version but no widgetVersionID was supplied`);
+        error.statusCode = 400;
+        error.code = "APP_PAGE_WIDGET_VERSION_REQUIRED";
+        throw error;
+      }
+    }
   }
 
   await assertTenantReferences({ tenantID, dataQueryIDs, workflowIDs, listenerIDs });

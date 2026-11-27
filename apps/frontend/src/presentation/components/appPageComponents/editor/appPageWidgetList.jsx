@@ -1,7 +1,20 @@
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
-import { ExternalLink, GripVertical, Plus, Edit2, Search, Grid2X2, Box, Rows, Layers } from 'lucide-react';
+import {
+  ExternalLink,
+  GripVertical,
+  Plus,
+  Edit2,
+  Search,
+  Grid2X2,
+  Box,
+  Rows,
+  Layers,
+  LayoutTemplate,
+  Star,
+  Clock,
+} from 'lucide-react';
 import PropTypes from "prop-types";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { useEntityItems } from "../../../../logic/hooks/useEntityItems";
@@ -13,6 +26,19 @@ import { WidgetIdeModal } from "./widgetIdeModal";
 import { useDebounce } from "@uidotdev/usehooks";
 import { createWidgetInstanceKey, parseWidgetKey } from "./appPageLayoutUtils";
 import { getWidgetDisplayName, isInternalEntityName } from "../../../../utils/widgetDisplay";
+import { beginCanvasDrag } from "../layout/editor/canvasDragStore";
+import { SECTION_TEMPLATES } from "../layout/editor/sectionTemplates";
+
+const readStoredList = (key) => {
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
 
 export const AppPageWidgetList = ({
   tenantID,
@@ -20,10 +46,47 @@ export const AppPageWidgetList = ({
   onAddWidget,
   appPageEditorForm,
 }) => {
+  const favoritesKey = `jet-admin:widget-palette:favorites:${tenantID}`;
+  const recentsKey = `jet-admin:widget-palette:recents:${tenantID}`;
   const [isIdeOpen, setIsIdeOpen] = useState(false);
   const [selectedWidgetID, setSelectedWidgetID] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [category, setCategory] = useState("all");
+  const [favoriteIDs, setFavoriteIDs] = useState(() => readStoredList(favoritesKey));
+  const [recentIDs, setRecentIDs] = useState(() => readStoredList(recentsKey));
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  const persistFavorites = (next) => {
+    setFavoriteIDs(next);
+    try {
+      window.localStorage.setItem(favoritesKey, JSON.stringify(next));
+    } catch {
+      /* storage unavailable */
+    }
+  };
+
+  const persistRecents = (next) => {
+    setRecentIDs(next);
+    try {
+      window.localStorage.setItem(recentsKey, JSON.stringify(next));
+    } catch {
+      /* storage unavailable */
+    }
+  };
+
+  const toggleFavorite = (widgetID) => {
+    const exists = favoriteIDs.includes(widgetID);
+    persistFavorites(
+      exists
+        ? favoriteIDs.filter((id) => id !== widgetID)
+        : [widgetID, ...favoriteIDs]
+    );
+  };
+
+  const recordRecent = (widgetID) => {
+    const next = [widgetID, ...recentIDs.filter((id) => id !== widgetID)].slice(0, 6);
+    persistRecents(next);
+  };
 
   const {
     items: widgets,
@@ -35,47 +98,125 @@ export const AppPageWidgetList = ({
     search: debouncedSearchQuery,
   });
 
-  const _handleWidgetDragStart = (e, widget) => {
+  const _handleWidgetDragStart = (event, widget, displayName) => {
+    if (event.target?.closest?.("button, a, input, textarea, select")) return;
+    recordRecent(widget.widgetID);
     // Extract the widget ID and create a unique instance key
     const widgetKey = `widget_${widget.widgetID}`;
     const widgetID = parseWidgetKey(widgetKey);
     const instanceKey = createWidgetInstanceKey(widgetID, placedWidgets || []);
-    e.dataTransfer.setData("widget", instanceKey);
+    beginCanvasDrag({
+      payload: { kind: "widget", widgetKey: instanceKey },
+      label: displayName || "Widget",
+      event,
+    });
+  };
 
-    const parentElement = document.getElementById(widgetKey);
-    if (parentElement) {
-      const clone = parentElement.cloneNode(true);
-      clone.style.opacity = "1";
-      clone.style.transform = "translateX(-9999px)";
-      clone.style.position = "absolute";
-      clone.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
-      clone.style.background = "hsl(var(--muted))";
-      clone.style.border = "1px solid hsl(var(--border))";
-      clone.style.borderRadius = "0.5rem";
+  const _handleLayoutDragStart = (event, type, label) => {
+    beginCanvasDrag({
+      payload: { kind: "layout", layoutType: type },
+      label: label || `${type.toUpperCase()} layout`,
+      event,
+    });
+  };
 
-      document.body.appendChild(clone);
-      e.dataTransfer.setDragImage(clone, 0, 0);
+  const _handleTemplateDragStart = (event, template) => {
+    beginCanvasDrag({
+      payload: { kind: "template", templateId: template.id },
+      label: template.label,
+      event,
+    });
+  };
 
-      setTimeout(() => {
-        document.body.removeChild(clone);
-      }, 0);
+  const _handleSnippetDragStart = (event, snippet) => {
+    beginCanvasDrag({
+      payload: { kind: "snippet", tree: snippet.tree },
+      label: snippet.label,
+      event,
+    });
+  };
+
+  const _insertTemplate = (template) => {
+    window.dispatchEvent(
+      new CustomEvent("craft-insert-template", {
+        detail: { templateId: template.id },
+      })
+    );
+  };
+
+  const _insertSnippet = (snippet) => {
+    window.dispatchEvent(
+      new CustomEvent("craft-insert-snippet", {
+        detail: { tree: snippet.tree },
+      })
+    );
+  };
+
+  const snippetWidgets = useMemo(
+    () => (widgets || []).filter((widget) => widget.widgetType === "layout-snippet"),
+    [widgets]
+  );
+  const widgetItems = useMemo(
+    () => (widgets || []).filter((widget) => widget.widgetType !== "layout-snippet"),
+    [widgets]
+  );
+  const userSnippets = useMemo(
+    () =>
+      snippetWidgets
+        .map((widget) => ({
+          id: widget.widgetID,
+          label: widget.widgetTitle || "Saved section",
+          description:
+            widget.widgetDescription ||
+            widget.widgetConfig?.snippet?.description ||
+            "Saved section",
+          tree: widget.widgetConfig?.snippet?.layout || null,
+          isUser: true,
+        }))
+        .filter((snippet) => snippet.tree),
+    [snippetWidgets]
+  );
+  const sectionSnippets = useMemo(
+    () => [
+      ...SECTION_TEMPLATES.map((template) => ({ ...template, isUser: false })),
+      ...userSnippets,
+    ],
+    [userSnippets]
+  );
+
+  const widgetCategories = useMemo(() => {
+    const counts = new Map();
+    widgetItems.forEach((widget) => {
+      const type = widget.widgetType || "custom";
+      counts.set(type, (counts.get(type) || 0) + 1);
+    });
+    return Array.from(counts.entries())
+      .map(([type, count]) => ({
+        type,
+        count,
+        label: WIDGETS_MAP[type]?.label || type,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [widgetItems]);
+
+  const visibleWidgets = useMemo(() => {
+    if (!category || category === "all") return widgetItems;
+    if (category === "favorites") {
+      return widgetItems.filter((widget) => favoriteIDs.includes(widget.widgetID));
     }
-  };
+    return widgetItems.filter((widget) => widget.widgetType === category);
+  }, [widgetItems, category, favoriteIDs]);
 
-  const _handleLayoutDragStart = (e, type) => {
-    e.dataTransfer.setData("layout-type", type);
+  const widgetsByID = useMemo(() => {
+    const map = new Map();
+    widgetItems.forEach((widget) => map.set(widget.widgetID, widget));
+    return map;
+  }, [widgetItems]);
 
-    const clone = document.createElement("div");
-    clone.className = "flex items-center gap-2 rounded border border-border bg-card p-2 shadow-sm text-xs font-semibold font-mono uppercase text-primary";
-    clone.innerText = `${type.toUpperCase()} LAYOUT`;
-    clone.style.transform = "translateX(-9999px)";
-    clone.style.position = "absolute";
-    document.body.appendChild(clone);
-    e.dataTransfer.setDragImage(clone, 0, 0);
-    setTimeout(() => {
-      document.body.removeChild(clone);
-    }, 0);
-  };
+  const recentWidgets = useMemo(
+    () => recentIDs.map((id) => widgetsByID.get(id)).filter(Boolean),
+    [recentIDs, widgetsByID]
+  );
 
   const _renderWidgetIcon = (widgetType) => {
     const widgetConfig = WIDGETS_MAP[widgetType];
@@ -130,7 +271,7 @@ export const AppPageWidgetList = ({
     );
   };
 
-  const _renderWidgetCard = (widget, dragProps = {}) => {
+  const _renderWidgetCard = (widget) => {
     const key = `widget_${widget.widgetID}`;
     const widgetLabel = WIDGETS_MAP[widget.widgetType]?.label || widget.widgetType;
     const widgetDesc = WIDGETS_MAP[widget.widgetType]?.description || "Custom component";
@@ -139,6 +280,7 @@ export const AppPageWidgetList = ({
       widgetTypeLabel: widgetLabel,
     });
     const titleIsInternal = isInternalEntityName(widget.widgetTitle);
+    const isFavorite = favoriteIDs.includes(widget.widgetID);
 
     return (
       <div
@@ -148,10 +290,10 @@ export const AppPageWidgetList = ({
       >
         <div className="flex min-w-0 flex-1 items-center gap-2">
           <div
-            {...dragProps}
-            className={`cursor-grab text-muted-foreground/30 hover:text-foreground active:cursor-grabbing shrink-0 ${
-              dragProps.draggable ? "" : "opacity-60"
-            }`}
+            onPointerDown={(event) => _handleWidgetDragStart(event, widget, displayName)}
+            className="cursor-grab text-muted-foreground/30 hover:text-foreground active:cursor-grabbing shrink-0"
+            style={{ touchAction: "none" }}
+            title={`Drag ${displayName} onto the canvas`}
           >
             <GripVertical className="h-4 w-4" />
           </div>
@@ -180,9 +322,27 @@ export const AppPageWidgetList = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 shrink-0">
-          {_renderWidgetEditIcon(widget.widgetID)}
-          {_renderWidgetLinkIcon(widget.widgetID)}
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              toggleFavorite(widget.widgetID);
+            }}
+            className={`rounded p-1 transition-colors ${
+              isFavorite
+                ? "text-amber-400"
+                : "text-muted-foreground/40 hover:text-amber-400"
+            }`}
+            title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+          >
+            <Star className={`h-3.5 w-3.5 ${isFavorite ? "fill-current" : ""}`} />
+          </button>
+          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 shrink-0">
+            {_renderWidgetEditIcon(widget.widgetID)}
+            {_renderWidgetLinkIcon(widget.widgetID)}
+          </div>
         </div>
       </div>
     );
@@ -223,6 +383,136 @@ export const AppPageWidgetList = ({
         </div>
       </div>
 
+      {!searchQuery && (widgetCategories.length > 1 || favoriteIDs.length > 0) && (
+        <div className="flex gap-1 overflow-x-auto px-2 pb-1">
+          <button
+            type="button"
+            onClick={() => setCategory("all")}
+            className={`shrink-0 rounded-full border px-2 py-0.5 text-[9px] font-medium transition-colors ${
+              category === "all"
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border bg-background text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            All
+          </button>
+          {favoriteIDs.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setCategory("favorites")}
+              className={`flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-medium transition-colors ${
+                category === "favorites"
+                  ? "border-amber-500/50 bg-amber-500/10 text-amber-400"
+                  : "border-border bg-background text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Star className="h-2.5 w-2.5 fill-current" />
+              Favorites
+            </button>
+          )}
+          {widgetCategories.map((item) => (
+            <button
+              key={item.type}
+              type="button"
+              onClick={() => setCategory(item.type)}
+              className={`shrink-0 rounded-full border px-2 py-0.5 text-[9px] font-medium transition-colors ${
+                category === item.type
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-background text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {item.label} · {item.count}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {!searchQuery && recentWidgets.length > 0 && (
+        <div className="flex flex-col gap-1 px-2 pb-1">
+          <span className="flex items-center gap-1 font-mono text-[8px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+            <Clock className="h-2.5 w-2.5" /> Recent
+          </span>
+          <div className="flex flex-wrap gap-1">
+            {recentWidgets.map((widget) => {
+              const widgetLabel = WIDGETS_MAP[widget.widgetType]?.label || widget.widgetType;
+              const displayName = getWidgetDisplayName({
+                widgetTitle: widget.widgetTitle,
+                widgetTypeLabel: widgetLabel,
+              });
+              return (
+                <div
+                  key={widget.widgetID}
+                  onPointerDown={(event) =>
+                    _handleWidgetDragStart(event, widget, displayName)
+                  }
+                  className="flex max-w-[130px] cursor-grab items-center gap-1 rounded border border-border/60 bg-card px-1.5 py-0.5 text-[9px] text-muted-foreground hover:border-primary/40 hover:text-foreground active:cursor-grabbing"
+                  style={{ touchAction: "none" }}
+                  title={`Drag ${displayName} onto the canvas`}
+                >
+                  <GripVertical className="h-2.5 w-2.5 shrink-0 opacity-40" />
+                  <span className="truncate">{displayName}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {!searchQuery && (
+        <div className="flex flex-col gap-1.5 border-b border-border/30 px-2 pb-2">
+          <div className="flex items-center justify-between">
+            <span className="font-mono text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+              Section snippets
+            </span>
+            <span className="flex items-center gap-1 text-[8px] text-muted-foreground/50">
+              {userSnippets.length > 0 ? `${userSnippets.length} saved` : "built-in + saved"}
+              <LayoutTemplate className="h-3 w-3" />
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-1.5">
+            {sectionSnippets.map((snippet) => (
+              <div
+                key={`${snippet.isUser ? "saved" : "builtin"}-${snippet.id}`}
+                onPointerDown={(event) =>
+                  snippet.isUser
+                    ? _handleSnippetDragStart(event, snippet)
+                    : _handleTemplateDragStart(event, snippet)
+                }
+                className="group relative flex cursor-grab flex-col gap-0.5 rounded border border-border/60 bg-card/70 p-1.5 pr-6 hover:border-primary/50 hover:bg-muted/10 active:cursor-grabbing"
+                style={{ touchAction: "none" }}
+                title={`${snippet.description} — drag onto the canvas or click + to insert`}
+              >
+                <span className="truncate text-[10px] font-semibold text-foreground">
+                  {snippet.label}
+                  {snippet.isUser && (
+                    <span className="ml-1 rounded bg-primary/10 px-1 py-0.5 text-[7px] font-medium uppercase tracking-wider text-primary">
+                      saved
+                    </span>
+                  )}
+                </span>
+                <span className="line-clamp-2 text-[8px] leading-tight text-muted-foreground">
+                  {snippet.description}
+                </span>
+                <button
+                  type="button"
+                  onPointerDown={(event) => event.stopPropagation()}
+                  onClick={() =>
+                    snippet.isUser
+                      ? _insertSnippet(snippet)
+                      : _insertTemplate(snippet)
+                  }
+                  className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded border border-border/60 bg-background text-muted-foreground opacity-0 transition-opacity hover:text-primary group-hover:opacity-100"
+                  title={`Insert ${snippet.label}`}
+                  aria-label={`Insert ${snippet.label}`}
+                >
+                  <Plus className="h-2.5 w-2.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="flex w-full min-h-0 flex-1 flex-col gap-2 p-2 pt-0">
         {(() => {
           const layoutItems = [
@@ -248,9 +538,9 @@ export const AppPageWidgetList = ({
                 {filtered.map((layoutItem) => (
                   <div
                     key={layoutItem.type}
-                    draggable
-                    onDragStart={(e) => _handleLayoutDragStart(e, layoutItem.type)}
+                    onPointerDown={(event) => _handleLayoutDragStart(event, layoutItem.type, layoutItem.label)}
                     className="flex items-center gap-2 rounded border border-border/60 bg-card/65 p-2 shadow-sm hover:border-primary/50 cursor-grab active:cursor-grabbing hover:bg-muted/10 transition-all select-none"
+                    style={{ touchAction: "none" }}
                   >
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-muted/50 border border-border/30">
                       {layoutItem.icon}
@@ -275,13 +565,10 @@ export const AppPageWidgetList = ({
           error={loadWidgetsError}
         >
           {debouncedSearchQuery ? (
-            widgets?.length > 0 ? (
+            visibleWidgets.length > 0 ? (
               <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pb-2">
-                {widgets.map((widget) =>
-                  _renderWidgetCard(widget, {
-                    draggable: true,
-                    onDragStart: (e) => _handleWidgetDragStart(e, widget),
-                  })
+                {visibleWidgets.map((widget) =>
+                  _renderWidgetCard(widget)
                 )}
               </div>
             ) : (
@@ -289,20 +576,38 @@ export const AppPageWidgetList = ({
                 <NoEntityUI message="No matching widgets found" />
               </div>
             )
-          ) : widgets?.length > 0 ? (
+          ) : visibleWidgets.length > 0 ? (
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto pb-2">
               <WidgetSelectionTree
                 tenantID={tenantID}
                 entityType="widget"
-                items={widgets}
+                items={visibleWidgets}
                 renderItemRow={(widget) => _renderWidgetCard(widget)}
-                onItemDragStart={(e, widget) => _handleWidgetDragStart(e, widget)}
+                onItemDragStart={(e, widget) => {
+                  const widgetLabel = WIDGETS_MAP[widget.widgetType]?.label || widget.widgetType;
+                  const displayName = getWidgetDisplayName({
+                    widgetTitle: widget.widgetTitle,
+                    widgetTypeLabel: widgetLabel,
+                  });
+                  _handleWidgetDragStart(e, widget, displayName);
+                }}
               />
+            </div>
+          ) : category === "favorites" ? (
+            <div className="flex flex-1 flex-col items-center justify-center gap-1 p-3 text-center">
+              <Star className="h-5 w-5 text-muted-foreground/30" />
+              <span className="text-[10px] text-muted-foreground">
+                Star widgets to keep them here.
+              </span>
             </div>
           ) : (
             <div className="flex flex-1 items-center justify-center">
               <NoEntityUI
-                message={CONSTANTS.STRINGS.WIDGET_DRAWER_LIST_NO_WIDGET}
+                message={
+                  category !== "all"
+                    ? "No widgets in this category"
+                    : CONSTANTS.STRINGS.WIDGET_DRAWER_LIST_NO_WIDGET
+                }
               />
             </div>
           )}

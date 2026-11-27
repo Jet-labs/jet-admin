@@ -497,7 +497,7 @@ appPageService.deleteAppPageByID = async ({
       }
 
     // Versions are not FK-cascaded by design — clean them explicitly.
-      await tx.tblAppPageVersions.deleteMany({
+      await tx.tblAppPageEditorHistory.deleteMany({
         where: { appPageID, tenantID },
       });
     });
@@ -757,13 +757,13 @@ async function snapshotAppPageVersion({
   tx,
 }) {
   const run = async (client) => {
-    const latest = await client.tblAppPageVersions.findFirst({
+    const latest = await client.tblAppPageEditorHistory.findFirst({
       where: { tenantID, appPageID },
       orderBy: { versionNumber: "desc" },
       select: { versionNumber: true },
     });
     const versionNumber = (latest?.versionNumber || 0) + 1;
-    const version = await client.tblAppPageVersions.create({
+    const version = await client.tblAppPageEditorHistory.create({
       data: {
         tenantID,
         appPageID,
@@ -777,15 +777,15 @@ async function snapshotAppPageVersion({
       },
     });
     // Prune oldest beyond the cap, keeping versionNumber monotonic.
-    const overflow = await client.tblAppPageVersions.count({ where: { tenantID, appPageID } });
+    const overflow = await client.tblAppPageEditorHistory.count({ where: { tenantID, appPageID } });
     if (overflow > MAX_VERSIONS_PER_PAGE) {
-      const stale = await client.tblAppPageVersions.findMany({
+      const stale = await client.tblAppPageEditorHistory.findMany({
         where: { tenantID, appPageID },
         orderBy: { versionNumber: "asc" },
         take: overflow - MAX_VERSIONS_PER_PAGE,
         select: { appPageVersionID: true },
       });
-      await client.tblAppPageVersions.deleteMany({
+      await client.tblAppPageEditorHistory.deleteMany({
         where: { appPageVersionID: { in: stale.map((s) => s.appPageVersionID) } },
       });
     }
@@ -820,8 +820,8 @@ appPageService.getAppPageVersions = async ({ userID, tenantID, appPageID, page, 
       findManyOptions.take = pageSize;
     }
     const [versions, totalCount] = await Promise.all([
-      prisma.tblAppPageVersions.findMany(findManyOptions),
-      prisma.tblAppPageVersions.count({ where }),
+      prisma.tblAppPageEditorHistory.findMany(findManyOptions),
+      prisma.tblAppPageEditorHistory.count({ where }),
     ]);
     return {
       versions,
@@ -845,7 +845,7 @@ appPageService.getAppPageVersionByID = async ({ userID, tenantID, appPageID, ver
     params: { userID, tenantID, appPageID, versionID },
   });
   try {
-    const version = await prisma.tblAppPageVersions.findFirst({
+    const version = await prisma.tblAppPageEditorHistory.findFirst({
       where: { tenantID, appPageID, appPageVersionID: versionID },
     });
     if (!version) throw new Error("App page version not found");
@@ -870,7 +870,7 @@ appPageService.restoreAppPageVersion = async ({ userID, tenantID, appPageID, ver
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${appPageID}::text))`;
       const [page, version] = await Promise.all([
         tx.tblAppPages.findFirst({ where: { tenantID, appPageID } }),
-        tx.tblAppPageVersions.findFirst({ where: { tenantID, appPageID, appPageVersionID: versionID } }),
+        tx.tblAppPageEditorHistory.findFirst({ where: { tenantID, appPageID, appPageVersionID: versionID } }),
       ]);
       if (!page) throw new Error("App page not found");
       if (!version) throw new Error("App page version not found");

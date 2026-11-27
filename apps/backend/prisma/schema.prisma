@@ -18,6 +18,7 @@ model tblAPIKeyRoleMappings {
 }
 
 model tblAPIKeys {
+  tblApplications                                    tblApplications[]
   apiKeyID                                            String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tenantID                                            String                  @db.Uuid
   apiKeyHash                                          String                  @db.VarChar
@@ -81,6 +82,7 @@ model tblCronJobHistory {
 }
 
 model tblCronJobs {
+  tblApplicationAssets tblApplicationAssets[]
   cronJobID          String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   cronJobTitle       String              @db.VarChar
   cronJobDescription String?
@@ -108,9 +110,11 @@ model tblCronJobs {
 
   @@index([createdByApiKeyID], map: "idx_tblCronJobs_createdByApiKeyID")
   @@index([folderID], map: "idx_tblCronJobs_folderID")
+  @@unique([tenantID, cronJobID], map: "uq_application_cron_target")
 }
 
 model tblDataQueries {
+  tblApplicationAssets tblApplicationAssets[]
   dataQueryID           String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tenantID              String          @db.Uuid
   createdAt             DateTime        @default(now()) @db.Timestamptz(6)
@@ -135,9 +139,11 @@ model tblDataQueries {
 
   @@index([createdByApiKeyID], map: "idx_tblDataQueries_createdByApiKeyID")
   @@index([folderID], map: "idx_tblDataQueries_folderID")
+  @@unique([tenantID, dataQueryID], map: "uq_application_query_target")
 }
 
 model tblDatasources {
+  tblApplicationAssets tblApplicationAssets[]
   datasourceID          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   datasourceTitle       String           @db.VarChar
   datasourceType        String           @db.VarChar
@@ -162,6 +168,7 @@ model tblDatasources {
 
   @@index([createdByApiKeyID], map: "idx_tblDatasources_createdByApiKeyID")
   @@index([folderID], map: "idx_tblDatasources_folderID")
+  @@unique([tenantID, datasourceID], map: "uq_application_datasource_target")
 }
 
 model tblPermissions {
@@ -192,6 +199,7 @@ model tblRoles {
 }
 
 model tblTenants {
+  tblApplications                                     tblApplications[]
   tenantID                                            String                        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   creatorID                                           String?                       @db.Uuid
   isDisabled                                          Boolean?                      @default(false)
@@ -284,6 +292,7 @@ model tblUserTenantRoleMappings {
 }
 
 model tblUsers {
+  tblApplications                                    tblApplications[]
   userID                      String                        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   firebaseID                  String                        @db.VarChar(128)
   phoneNumber                 String?                       @db.VarChar
@@ -330,6 +339,7 @@ model tblUsersTenantsRelationship {
 }
 
 model tblWidgets {
+  tblApplicationAssets tblApplicationAssets[]
   widgetID          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   widgetTitle       String      @db.VarChar
   widgetDescription String?     @db.VarChar
@@ -349,6 +359,7 @@ model tblWidgets {
 
   @@index([createdByApiKeyID], map: "idx_tblWidgets_createdByApiKeyID")
   @@index([folderID], map: "idx_tblWidgets_folderID")
+  @@unique([tenantID, widgetID], map: "uq_application_widget_target")
 }
 
 model tblTenantConfig {
@@ -424,6 +435,7 @@ model tblWorkflowNodes {
 }
 
 model tblWorkflows {
+  tblApplicationAssets tblApplicationAssets[]
   workflowID           String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title                String                 @db.VarChar
   tenantID             String                 @db.Uuid
@@ -446,6 +458,7 @@ model tblWorkflows {
 
   @@index([createdByApiKeyID], map: "idx_tblWorkflows_createdByApiKeyID")
   @@index([folderID], map: "idx_tblWorkflows_folderID")
+  @@unique([tenantID, workflowID], map: "uq_application_workflow_target")
 }
 
 model tblWorkflowInstanceLogs {
@@ -521,6 +534,7 @@ model tblListenerEvents {
 }
 
 model tblListeners {
+  tblApplicationAssets tblApplicationAssets[]
   listenerID          String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tenantID            String               @db.Uuid
   datasourceID        String               @db.Uuid
@@ -552,9 +566,11 @@ model tblListeners {
   @@index([tenantID], map: "idx_tblListeners_tenantID")
   @@index([createdByApiKeyID], map: "idx_tblListeners_createdByApiKeyID")
   @@index([folderID], map: "idx_tblListeners_folderID")
+  @@unique([tenantID, listenerID], map: "uq_application_listener_target")
 }
 
 model tblAppPages {
+  tblApplicationAssets tblApplicationAssets[]
   appPageID          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   appPageDescription String?     @db.VarChar
   tenantID           String      @db.Uuid
@@ -572,9 +588,221 @@ model tblAppPages {
 
   @@index([createdByApiKeyID], map: "idx_tblAppPages_createdByApiKeyID")
   @@index([folderID], map: "idx_tblAppPages_folderID")
+  @@unique([tenantID, appPageID], map: "uq_application_page_target")
 }
 
-model tblAppPageVersions {
+model tblApplications {
+  applicationID      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantID           String   @db.Uuid
+  title              String   @db.VarChar(255)
+  slug               String   @db.VarChar(80)
+  description        String?
+  status             String   @default("DRAFT") @db.VarChar(20)
+  creatorID          String?  @db.Uuid
+  createdByApiKeyID   String?  @db.Uuid
+  createdAt          DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime @default(now()) @db.Timestamptz(6)
+  tblTenants         tblTenants @relation(fields: [tenantID], references: [tenantID], onDelete: Cascade, onUpdate: NoAction)
+  tblUsers           tblUsers? @relation(fields: [creatorID], references: [userID], onDelete: SetNull, onUpdate: NoAction)
+  tblAPIKeys         tblAPIKeys? @relation(fields: [createdByApiKeyID], references: [apiKeyID], onDelete: SetNull, onUpdate: NoAction)
+  draft              tblApplicationDrafts?
+  assets             tblApplicationAssets[]
+  releases           tblApplicationReleases[]
+  environments       tblApplicationEnvironments[]
+  consumerConfig     tblApplicationConsumerConfigs?
+  consumerPolicies   tblApplicationConsumerPolicies[]
+
+  @@unique([tenantID, applicationID], map: "uq_application_tenant_id")
+  @@unique([tenantID, slug], map: "uq_application_tenant_slug")
+  @@index([tenantID, status, createdAt], map: "idx_application_tenant_status")
+}
+
+model tblApplicationConsumerConfigs {
+  applicationID String   @id @db.Uuid
+  tenantID      String   @db.Uuid
+  enabled       Boolean  @default(false)
+  revision      Int      @default(1)
+  updatedAt     DateTime @default(now()) @db.Timestamptz(6)
+  application   tblApplications @relation(fields: [tenantID, applicationID], references: [tenantID, applicationID], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([tenantID, applicationID], map: "uq_application_consumer_config_scope")
+  @@index([tenantID, applicationID], map: "idx_application_consumer_config")
+}
+
+model tblApplicationConsumerPolicies {
+  policyID      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  applicationID String   @db.Uuid
+  tenantID      String   @db.Uuid
+  policyKey     String   @db.VarChar(255)
+  subjectType   String   @db.VarChar(20)
+  subjectID     String   @db.Uuid
+  routeID       String?  @db.VarChar(64)
+  actionKey     String?  @db.VarChar(64)
+  allow         Boolean  @default(true)
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime @default(now()) @db.Timestamptz(6)
+  application   tblApplications @relation(fields: [tenantID, applicationID], references: [tenantID, applicationID], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([applicationID, policyKey], map: "uq_application_consumer_policy")
+  @@index([tenantID, applicationID], map: "idx_application_consumer_policies")
+}
+
+model tblApplicationDrafts {
+  applicationID String @id @db.Uuid
+  tenantID      String @db.Uuid
+  schemaVersion Int @default(1)
+  revision      Int @default(1)
+  definition    Json
+  updatedAt     DateTime @default(now()) @db.Timestamptz(6)
+  application   tblApplications @relation(fields: [tenantID, applicationID], references: [tenantID, applicationID], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([tenantID, applicationID], map: "uq_application_draft_tenant_id")
+}
+
+// The SQL migration adds exactly-one-target and management-mode CHECKs.
+// Composite FKs prevent cross-tenant links even outside the service layer.
+model tblApplicationAssets {
+  applicationAssetID String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  applicationID String @db.Uuid
+  tenantID String @db.Uuid
+  assetKey String @db.VarChar(64)
+  assetType String @db.VarChar(30)
+  managementMode String @default("referenced") @db.VarChar(20)
+  appPageID String? @db.Uuid
+  pageVersionID String? @db.Uuid
+  widgetID String? @db.Uuid
+  dataQueryID String? @db.Uuid
+  workflowID String? @db.Uuid
+  listenerID String? @db.Uuid
+  cronJobID String? @db.Uuid
+  datasourceID String? @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  application tblApplications @relation(fields: [tenantID, applicationID], references: [tenantID, applicationID], onDelete: Cascade, onUpdate: NoAction)
+  appPage tblAppPages? @relation(fields: [tenantID, appPageID], references: [tenantID, appPageID], onDelete: NoAction, onUpdate: NoAction)
+  widget tblWidgets? @relation(fields: [tenantID, widgetID], references: [tenantID, widgetID], onDelete: NoAction, onUpdate: NoAction)
+  dataQuery tblDataQueries? @relation(fields: [tenantID, dataQueryID], references: [tenantID, dataQueryID], onDelete: NoAction, onUpdate: NoAction)
+  workflow tblWorkflows? @relation(fields: [tenantID, workflowID], references: [tenantID, workflowID], onDelete: NoAction, onUpdate: NoAction)
+  listener tblListeners? @relation(fields: [tenantID, listenerID], references: [tenantID, listenerID], onDelete: NoAction, onUpdate: NoAction)
+  cronJob tblCronJobs? @relation(fields: [tenantID, cronJobID], references: [tenantID, cronJobID], onDelete: NoAction, onUpdate: NoAction)
+  datasource tblDatasources? @relation(fields: [tenantID, datasourceID], references: [tenantID, datasourceID], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([applicationID, assetKey], map: "uq_application_asset_key")
+  @@unique([applicationID, appPageID], map: "uq_application_page")
+  @@unique([applicationID, widgetID], map: "uq_application_widget")
+  @@unique([applicationID, dataQueryID], map: "uq_application_query")
+  @@unique([applicationID, workflowID], map: "uq_application_workflow")
+  @@unique([applicationID, listenerID], map: "uq_application_listener")
+  @@unique([applicationID, cronJobID], map: "uq_application_cron")
+  @@unique([applicationID, datasourceID], map: "uq_application_datasource")
+  @@index([tenantID, applicationID], map: "idx_application_assets_tenant")
+}
+
+model tblApplicationReleases {
+  releaseID      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  applicationID  String   @db.Uuid
+  tenantID       String   @db.Uuid
+  releaseNumber  Int
+  sourceRevision Int
+  schemaVersion  Int      @default(1)
+  contentHash    String   @db.VarChar(64)
+  clientManifest Json
+  serverManifest Json
+  createdAt      DateTime @default(now()) @db.Timestamptz(6)
+  application    tblApplications @relation(fields: [tenantID, applicationID], references: [tenantID, applicationID], onDelete: Cascade, onUpdate: NoAction)
+  deployments    tblApplicationDeployments[]
+  environments   tblApplicationEnvironments[]
+
+  @@unique([applicationID, releaseNumber], map: "uq_application_release_number")
+  @@unique([tenantID, applicationID, releaseID], map: "uq_application_release_scope")
+  @@index([tenantID, applicationID, createdAt], map: "idx_application_releases")
+}
+
+model tblApplicationEnvironments {
+  environmentID    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  applicationID    String   @db.Uuid
+  tenantID         String   @db.Uuid
+  name             String   @default("production") @db.VarChar(40)
+  currentReleaseID String?  @db.Uuid
+  configRevision   Int      @default(1)
+  bindingRevision  Int      @default(1)
+  bindings         Json     @default("{}")
+  createdAt        DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime @default(now()) @db.Timestamptz(6)
+  application      tblApplications @relation(fields: [tenantID, applicationID], references: [tenantID, applicationID], onDelete: Cascade, onUpdate: NoAction)
+  currentRelease   tblApplicationReleases? @relation(fields: [currentReleaseID], references: [releaseID], onDelete: NoAction, onUpdate: NoAction)
+  deployments      tblApplicationDeployments[]
+  bindingRevisions tblApplicationEnvironmentBindingRevisions[]
+
+  @@unique([applicationID, name], map: "uq_application_environment_name")
+  @@index([tenantID, applicationID], map: "idx_application_environments")
+}
+
+model tblApplicationDeployments {
+  deploymentID  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  environmentID String   @db.Uuid
+  releaseID     String   @db.Uuid
+  actorID       String?  @db.Uuid
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
+  environment   tblApplicationEnvironments @relation(fields: [environmentID], references: [environmentID], onDelete: Cascade, onUpdate: NoAction)
+  release       tblApplicationReleases @relation(fields: [releaseID], references: [releaseID], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([environmentID, createdAt], map: "idx_application_deployments_env")
+}
+
+model tblApplicationEnvironmentBindingRevisions {
+  bindingRevisionID String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  environmentID     String   @db.Uuid
+  revision          Int
+  bindings          Json     @default("{}")
+  changeNote        String?  @db.VarChar(2000)
+  createdByUserID   String?  @db.Uuid
+  createdByApiKeyID String?  @db.Uuid
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
+  environment       tblApplicationEnvironments @relation(fields: [environmentID], references: [environmentID], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([environmentID, revision], map: "uq_application_environment_binding_revision")
+  @@index([environmentID, createdAt], map: "idx_application_environment_bindings")
+}
+
+// Immutable definition snapshots shared by all consumers. Drafts remain in
+// their existing asset tables; this table never stores datasource credentials.
+model tblAssetVersions {
+  assetVersionID  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantID        String   @db.Uuid
+  assetType       String   @db.VarChar(30)
+  assetID         String   @db.Uuid
+  versionNumber   Int
+  schemaVersion   Int      @default(1)
+  contentHash     String   @db.VarChar(64)
+  payload         Json
+  status          String   @default("published") @db.VarChar(20)
+  changeNote      String?
+  createdByUserID String?  @db.Uuid
+  createdByApiKeyID String? @db.Uuid
+  createdAt       DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([tenantID, assetType, assetID, versionNumber], map: "uq_asset_version_number")
+  @@index([tenantID, assetType, assetID, versionNumber(sort: Desc)], map: "idx_asset_versions_asset")
+  @@index([tenantID, assetType, contentHash], map: "idx_asset_versions_hash")
+}
+
+// Immutable dependency edges. parentVersionID is set for an asset-version
+// edge; parentReleaseID is set for an application release -> page version edge.
+model tblAssetVersionReferences {
+  referenceID    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantID       String   @db.Uuid
+  parentType     String   @db.VarChar(20)
+  parentVersionID String? @db.Uuid
+  parentReleaseID String? @db.Uuid
+  childVersionID String   @db.Uuid
+  referenceKey   String   @unique @db.VarChar(200)
+  createdAt      DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([tenantID, childVersionID], map: "idx_asset_version_refs_child")
+  @@index([tenantID, parentVersionID], map: "idx_asset_version_refs_parent")
+}
+
+model tblAppPageEditorHistory {
   appPageVersionID   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   appPageID          String    @db.Uuid
   tenantID           String    @db.Uuid
@@ -587,8 +815,9 @@ model tblAppPageVersions {
   createdByApiKeyID  String?   @db.Uuid
   createdAt          DateTime? @default(now()) @db.Timestamptz(6)
 
-  @@unique([appPageID, versionNumber], map: "tblAppPageVersions_version_unique")
-  @@index([tenantID, appPageID, versionNumber(sort: Desc)], map: "idx_tblAppPageVersions_page")
+  @@unique([appPageID, versionNumber], map: "tblAppPageEditorHistory_version_unique")
+  @@index([tenantID, appPageID, versionNumber(sort: Desc)], map: "idx_tblAppPageEditorHistory_page")
+  @@map("tblAppPageEditorHistory")
 }
 
 model tblVaultCredentials {

@@ -70,7 +70,7 @@ async function startConfirmed(client, options, workflowType = WORKFLOW_TYPE) {
 /**
  * Start persisted workflow via Temporal.
  */
-async function startWorkflowTemporal({ workflowID, tenantID, inputValues = {}, executionKey }) {
+async function startWorkflowTemporal({ workflowID, tenantID, inputValues = {}, executionKey, pinnedGraph, applicationExecution, executionCtx }) {
   const { stateManager } = require('../workflowEngine/stateManager');
   const { getTemporalClient } = require('./client');
 
@@ -81,7 +81,7 @@ async function startWorkflowTemporal({ workflowID, tenantID, inputValues = {}, e
     return { instanceID: existing.instanceID, temporalWorkflowId: existing.instanceID, alreadyStarted: true, status: existing.status };
   }
   const { nodes, edges, workflowOptions } = existing?.executionDefinition?.args
-    || await loadPersistedGraph(workflowID, tenantID);
+    || pinnedGraph || await loadPersistedGraph(workflowID, tenantID);
   if (!nodes.find((n) => n.type === 'start')) {
     throw new Error(`No start node for workflow ${workflowID}`);
   }
@@ -98,8 +98,11 @@ async function startWorkflowTemporal({ workflowID, tenantID, inputValues = {}, e
     kind: 'workflow', workflowType: WORKFLOW_TYPE,
     args: { nodes: resolvedNodes, edges, tenantID, workflowID, isTestRun: false, workflowOptions, workflowConfig },
     startOptions,
+    ...(applicationExecution ? { application: applicationExecution } : {}),
   };
-  const { instance, initialContext } = await stateManager.createInstance({ workflowID, tenantID, inputValues, executionKey, executionDefinition: prepared });
+  const { instance, initialContext } = await stateManager.createInstance({ workflowID, tenantID, inputValues, executionKey, executionDefinition: prepared,
+    ...(applicationExecution ? { systemContext: { __executionCtx: executionCtx } } : {}),
+  });
   const definition = instance.executionDefinition || prepared;
 
   const workflowId = instance.instanceID;
@@ -254,14 +257,14 @@ async function startTestWorkflowTemporal({ nodes, edges, tenantID, inputValues =
  *
  * Isolated context: the child sees ONLY `inputValues` as its ctx.input.
  */
-async function runSubWorkflowAndWait({ childWorkflowID, inputValues = {}, tenantID, parentInstanceID, parentNodeID, depth = 0, isTest = false, executionKey = null }) {
+async function runSubWorkflowAndWait({ childWorkflowID, inputValues = {}, tenantID, parentInstanceID, parentNodeID, depth = 0, isTest = false, executionKey = null, pinnedGraph, applicationExecution, executionCtx }) {
   const { stateManager } = require('../workflowEngine/stateManager');
   const { prisma } = require('../../../config/prisma.config');
 
   Logger.log('info', { message: 'temporal:service:runSubWorkflow', params: { childWorkflowID, tenantID, parentInstanceID, parentNodeID, depth, isTest } });
 
   // Tenant isolation: the child must belong to the same tenant.
-  const child = await prisma.tblWorkflows.findFirst({
+  const child = pinnedGraph || await prisma.tblWorkflows.findFirst({
     where: { workflowID: childWorkflowID, tenantID },
     select: { workflowID: true, title: true },
   });
@@ -280,9 +283,16 @@ async function runSubWorkflowAndWait({ childWorkflowID, inputValues = {}, tenant
   }
 
   const systemContext = { __subDepth: depth + 1 };
+  if (applicationExecution) systemContext.__executionCtx = executionCtx;
   if (isTest) systemContext.__isTestRun = true;
 
-  const { nodes, edges, workflowOptions } = await loadPersistedGraph(childWorkflowID, tenantID);
+  const { nodes, edges, workflowOptions } = pinnedGraph || await loadPersistedGraph(childWorkflowID, tenantID);
+  if (pinnedGraph) {
+    const { resolveInputs, extractWorkflowDefinitions } = require('../../../utils/input.util');
+    const validated = await resolveInputs({ type: 'workflow', inputDefinitions: extractWorkflowDefinitions(pinnedGraph), inputValues });
+    if (!validated.valid) throw new Error('Child workflow input validation failed');
+    inputValues = validated.resolved;
+  }
   if (!nodes.find((n) => n.type === 'start')) throw new Error(`Sub-Workflow child has no start node: ${childWorkflowID}`);
   validateExecutableGraph(nodes, edges);
   const workflowConfig = resolveWorkflowConfig(workflowOptions);
@@ -301,7 +311,10 @@ async function runSubWorkflowAndWait({ childWorkflowID, inputValues = {}, tenant
     // Stable per parent activity invocation: a retried activity resumes the
     // same child instance instead of starting a duplicate/orphan.
     executionKey,
-    executionDefinition: executionKey ? {
+    executionDefinition: applicationExecution ? {
+      kind: 'subWorkflow', workflowType: WORKFLOW_TYPE, application: applicationExecution,
+      args: { nodes: resolvedNodes, edges, tenantID, workflowID: childWorkflowID, workflowOptions, workflowConfig }, startOptions,
+    } : executionKey ? {
       kind: 'subWorkflow', workflowType: WORKFLOW_TYPE, workflowID: childWorkflowID,
     } : undefined,
   });

@@ -1,0 +1,4 @@
+html, body, #gallery-root { min-height: 100%; }
+html, body { width: 100%; }
+body { margin: 0; display: block; }
+#gallery-root { width: 100%; }

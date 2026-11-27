@@ -32,6 +32,16 @@ export default {
           DEFAULT: "hsl(var(--destructive) / <alpha-value>)",
           foreground: "var(--brand-text-primary)",
         },
+        success: "hsl(var(--status-success) / <alpha-value>)",
+        warning: "hsl(var(--status-warning) / <alpha-value>)",
+        info: "hsl(var(--status-info) / <alpha-value>)",
+        danger: "hsl(var(--status-danger) / <alpha-value>)",
+        surface: {
+          canvas: "hsl(var(--surface-canvas) / <alpha-value>)",
+          card: "hsl(var(--surface-card) / <alpha-value>)",
+          raised: "hsl(var(--surface-raised) / <alpha-value>)",
+          subtle: "hsl(var(--surface-subtle) / <alpha-value>)",
+        },
         muted: {
           DEFAULT: "var(--brand-border-dark)",
           foreground: "var(--brand-text-muted)",
@@ -70,11 +80,33 @@ export default {
         mono: ["Source Code Pro", "Office Code Pro", "Menlo", "monospace"],
       },
 
+      borderRadius: {
+        control: "var(--radius-control)",
+        card: "var(--radius-card)",
+        overlay: "var(--radius-overlay)",
+      },
+
+      zIndex: {
+        canvas: "1",
+        sticky: "20",
+        overlay: "40",
+        popover: "50",
+        tooltip: "60",
+        toast: "70",
+      },
+
+      transitionDuration: {
+        fast: "120ms",
+        base: "180ms",
+      },
+
       boxShadow: {
         "whisper": "none",
         "card": "none",
         "deep": "none",
         "focus": "rgba(0, 0, 0, 0.1) 0px 4px 12px",
+        "soft": "var(--shadow-soft)",
+        "raised": "var(--shadow-raised)",
       },
       keyframes: {
         "accordion-down": {

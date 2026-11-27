@@ -1,50 +1,27 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import {
-  ArrowRight,
   Check,
-  ChevronDown,
-  Download,
-  Edit,
-  Filter,
-  Play,
-  Plus,
-  RefreshCw,
-  Save,
-  Search,
-  Settings,
-  Trash2,
-  Upload,
-  X,
 } from "lucide-react";
-import { Button, Spinner } from "@jet-admin/ui";
-import { cn } from "@jet-admin/ui";
-
-/**
- * Curated icon set for button widgets (by config `icon` name).
- * Unknown names render no icon rather than crashing the page.
- */
-const ICONS = {
-  play: Play,
-  plus: Plus,
-  download: Download,
-  upload: Upload,
-  trash: Trash2,
-  delete: Trash2,
-  edit: Edit,
-  save: Save,
-  search: Search,
-  refresh: RefreshCw,
-  sync: RefreshCw,
-  arrowRight: ArrowRight,
-  arrow: ArrowRight,
-  check: Check,
-  close: X,
-  x: X,
-  filter: Filter,
-  settings: Settings,
-  chevronDown: ChevronDown,
-};
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  Button,
+  Spinner,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+  WidgetSurface,
+  cn,
+} from "@jet-admin/ui";
+import { getIconComponent } from "../config/IconPicker";
 
 const ALIGNMENTS = {
   left: "justify-start",
@@ -59,15 +36,37 @@ function isTruthyTemplate(value) {
   return str !== "" && str !== "false" && str !== "0" && str !== "no" && str !== "off";
 }
 
+const parseShortcut = (shortcut) => {
+  if (!shortcut || typeof shortcut !== "string") return null;
+  const parts = shortcut
+    .split("+")
+    .map((part) => part.trim().toLowerCase())
+    .filter(Boolean);
+  if (!parts.length) return null;
+  return {
+    ctrl: parts.includes("ctrl") || parts.includes("control"),
+    meta: parts.includes("cmd") || parts.includes("meta"),
+    alt: parts.includes("alt") || parts.includes("option"),
+    shift: parts.includes("shift"),
+    key: parts[parts.length - 1],
+  };
+};
+
+/**
+ * ButtonWidget — action button with guarded execution, optional confirmation,
+ * tooltip, shortcut, loading and success feedback.
+ */
 export const ButtonWidget = ({
-  widgetTitle,     // Title of the widget (optional usage here)
-  widgetType,      // Type of widget (e.g., 'button')
-  widgetConfig,    // Widget-level config (text, variant, size, icon, alignment, ...)
-  onClick,         // Callback to execute the attached event/workflow
-  isLoadingWorkflows, // Loading state of the workflow
-  onWidgetInit,    // Runtime method registration (exposes click/focus)
+  widgetConfig,
+  onClick,
+  isLoadingWorkflows,
+  onWidgetInit,
 }) => {
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const successTimer = useRef(null);
   const text = widgetConfig?.text ?? widgetConfig?.label ?? "Click Me";
   const variant = widgetConfig?.variant || "default";
   const size = widgetConfig?.size || "default";
@@ -75,33 +74,61 @@ export const ButtonWidget = ({
   const fullWidth = isTruthyTemplate(widgetConfig?.fullWidth);
   const iconName = typeof widgetConfig?.icon === "string" ? widgetConfig.icon.trim() : "";
   const iconPosition = widgetConfig?.iconPosition === "right" ? "right" : "left";
-  const Icon = iconName ? ICONS[iconName] || ICONS[iconName.toLowerCase()] || null : null;
-
-  // Dual-read: canonical isLoading, legacy loading fallback (F04).
+  const Icon = getIconComponent(iconName);
+  const density = widgetConfig?.properties?.density || "comfortable";
+  const tooltipText = widgetConfig?.tooltip ? String(widgetConfig.tooltip) : "";
+  const confirm = widgetConfig?.confirm || {};
+  const confirmEnabled = !!confirm.enabled;
   const configLoading = isTruthyTemplate(widgetConfig?.isLoading ?? widgetConfig?.loading);
   const configDisabled = isTruthyTemplate(widgetConfig?.disabled);
   const busy = loading || isLoadingWorkflows || configLoading;
   const disabled = busy || configDisabled;
+  const iconOnly = !String(text || "").trim() || ((size === "icon" || size === "circle") && !!Icon);
+  const accessibleName =
+    widgetConfig?.properties?.ariaLabel ||
+    tooltipText ||
+    String(text || "").trim() ||
+    (iconOnly ? iconName || "Button" : undefined);
+  const loadingText = widgetConfig?.loadingText || "";
+  const successText = widgetConfig?.successText || "";
+  const shortcut = parseShortcut(widgetConfig?.shortcut);
 
-  const handleClick = async (e) => {
+  const buttonRef = useRef(null);
+  const runClick = async (event) => {
     if (disabled) {
-      e?.preventDefault?.();
+      event?.preventDefault?.();
       return;
     }
-    if (onClick) {
-      setLoading(true);
-      try {
-        await onClick(e);
-      } finally {
-        setLoading(false);
-      }
+    if (!onClick) return;
+    setLoading(true);
+    setSuccess(false);
+    setError("");
+    try {
+      await onClick(event);
+      setSuccess(true);
+      if (successTimer.current) clearTimeout(successTimer.current);
+      successTimer.current = setTimeout(() => setSuccess(false), 1400);
+    } catch (clickError) {
+      setError(clickError?.message || "Action failed. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Advertised `click`/`focus` methods (B17/E03): programmatic clicks run the
-  // same guarded path as mouse/keyboard (disabled/busy blocks all routes,
-  // exactly one execution). Method calls never fire unsupported onSubmit.
-  const buttonRef = useRef(null);
+  const handleClick = (event) => {
+    if (disabled) {
+      event?.preventDefault?.();
+      return;
+    }
+    if (confirmEnabled && !confirmOpen) {
+      event?.preventDefault?.();
+      setConfirmOpen(true);
+      return;
+    }
+    runClick(event);
+  };
+
+  // Advertised click/focus methods run the same guarded path.
   const guardedRef = useRef(handleClick);
   guardedRef.current = handleClick;
   const methodsRef = useRef(null);
@@ -116,49 +143,114 @@ export const ButtonWidget = ({
     if (onWidgetInit) onWidgetInit(methodsRef.current);
   }, [onWidgetInit]);
 
-  return (
-    <div
+  useEffect(() => {
+    const cleanup = () => {
+      if (successTimer.current) clearTimeout(successTimer.current);
+    };
+    return cleanup;
+  }, []);
+
+  useEffect(() => {
+    if (!shortcut) return undefined;
+    const handleKeyDown = (event) => {
+      if (disabled) return;
+      const target = event.target;
+      const editable =
+        target instanceof HTMLElement &&
+        (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable);
+      if (editable && !(shortcut.ctrl || shortcut.meta || shortcut.alt)) return;
+      const ctrl = event.ctrlKey || event.metaKey;
+      if (
+        shortcut.ctrl === event.ctrlKey &&
+        shortcut.meta === event.metaKey &&
+        shortcut.alt === event.altKey &&
+        shortcut.shift === event.shiftKey &&
+        (shortcut.ctrl || shortcut.meta ? ctrl : true) &&
+        event.key.toLowerCase() === shortcut.key
+      ) {
+        event.preventDefault();
+        handleClick(event);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [widgetConfig?.shortcut, disabled, confirmEnabled]);
+
+  const displayText = busy && loadingText ? loadingText : success && successText ? successText : text;
+  const LeadingIcon = success ? (successText ? null : Check) : Icon && iconPosition === "left" ? Icon : null;
+  const TrailingIcon = success && successText ? Check : Icon && iconPosition === "right" ? Icon : null;
+
+  const button = (
+    <Button
+      ref={buttonRef}
+      variant={variant}
+      size={size}
+      onClick={handleClick}
+      disabled={disabled}
+      aria-busy={busy}
+      aria-label={accessibleName}
+      aria-keyshortcuts={widgetConfig?.shortcut || undefined}
+      title={tooltipText || (typeof text === "string" ? text : undefined)}
       className={cn(
-        "flex h-full w-full items-center p-1",
-        ALIGNMENTS[align],
-        fullWidth && "items-stretch"
+        "relative inline-flex max-w-full min-w-0 items-center justify-center gap-1.5 text-center",
+        fullWidth && "w-full",
+        iconOnly && "px-0"
       )}
     >
-      <Button
-        ref={buttonRef}
-        variant={variant}
-        size={size}
-        onClick={handleClick}
-        disabled={disabled}
-        aria-busy={busy}
-        aria-live="polite"
-        title={typeof text === "string" ? text : undefined}
-        className={cn(
-          "relative inline-flex max-w-full min-w-0 items-center justify-center gap-1.5 text-center",
-          fullWidth && "w-full"
-        )}
-      >
-        {/* Loading overlay */}
-        {configLoading && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center rounded bg-background/60 backdrop-blur-[1px]">
-            <div className="flex items-center gap-2 rounded bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
-              <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
-              Updating...
-            </div>
-          </div>
-        )}
-        {(loading || isLoadingWorkflows) && <Spinner className="h-4 w-4 shrink-0" />}
-        {Icon && iconPosition === "left" && <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />}
-        <span className="min-w-0 truncate">{text}</span>
-        {Icon && iconPosition === "right" && <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />}
-      </Button>
-    </div>
+      {(busy || (loading && !configLoading)) && <Spinner className="h-4 w-4 shrink-0" />}
+      {LeadingIcon && <LeadingIcon className="h-4 w-4 shrink-0" aria-hidden="true" />}
+      {!iconOnly && (
+        <span className="min-w-0 truncate" aria-live="polite" aria-atomic="true">
+          {displayText}
+        </span>
+      )}
+      {TrailingIcon && <TrailingIcon className="h-4 w-4 shrink-0" aria-hidden="true" />}
+    </Button>
+  );
+
+  const wrappedButton = tooltipText ? (
+    <TooltipProvider delayDuration={250}>
+      <Tooltip>
+        <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <TooltipContent side="top">{tooltipText}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  ) : (
+    button
+  );
+
+  return (
+    <WidgetSurface
+      density={density}
+      className={cn("flex h-full w-full p-1", error ? "flex-col items-stretch justify-center gap-1" : cn("items-center", ALIGNMENTS[align], fullWidth && "items-stretch"))}
+    >
+      {wrappedButton}
+      {error && (
+        <p role="alert" className="w-full px-1 text-[10px] leading-snug text-destructive">
+          {error}
+        </p>
+      )}
+
+      {confirmEnabled && (
+        <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{confirm.title || "Please confirm"}</AlertDialogTitle>
+              <AlertDialogDescription>{confirm.message || "This action will run immediately."}</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{confirm.cancelLabel || "Cancel"}</AlertDialogCancel>
+              <AlertDialogAction onClick={(event) => runClick(event)}>{confirm.confirmLabel || "Confirm"}</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+    </WidgetSurface>
   );
 };
 
 ButtonWidget.propTypes = {
-  widgetTitle: PropTypes.string,
-  widgetType: PropTypes.string,
   widgetConfig: PropTypes.object,
   onClick: PropTypes.func,
   isLoadingWorkflows: PropTypes.bool,

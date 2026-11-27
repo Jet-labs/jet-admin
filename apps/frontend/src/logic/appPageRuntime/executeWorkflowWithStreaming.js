@@ -41,14 +41,19 @@ export const executeWorkflowWithStreaming = ({
   onComplete,
   onError,
   onCancelError,
+  runtimeServices,
+  resume = false,
 }) => {
   // Track listeners so we can tear them down
   let observer = null;
   let currentInstanceID = null;
   let cancelRequested = false;
+  const cancelRun = instanceID => runtimeServices
+    ? runtimeServices.cancelWorkflow({ alias, instanceID })
+    : cancelWorkflowAPI({ tenantID, instanceID });
   const cancel = async () => {
     cancelRequested = true;
-    if (currentInstanceID) return cancelWorkflowAPI({ tenantID, instanceID: currentInstanceID });
+    if (currentInstanceID) return cancelRun(currentInstanceID);
     return { queued: true };
   };
 
@@ -72,7 +77,7 @@ export const executeWorkflowWithStreaming = ({
       dispatch(appPageActions.setWorkflowLoading(alias));
 
       // 2. Execute the workflow API call
-      const runRes = await executeWorkflowAPI({
+      const runRes = runtimeServices ? await runtimeServices.startWorkflow({ alias, inputValues, resume }) : await executeWorkflowAPI({
         tenantID,
         workflowID,
         inputValues,
@@ -90,7 +95,7 @@ export const executeWorkflowWithStreaming = ({
       }
 
       if (disposed || isStale()) {
-        if (cancelRequested) await cancelWorkflowAPI({ tenantID, instanceID }).catch(() => {});
+        if (cancelRequested) await cancelRun(instanceID).catch(() => {});
         return;
       }
       const onUpdate = (data) => {
@@ -153,12 +158,21 @@ export const executeWorkflowWithStreaming = ({
       };
 
       observer = observeWorkflowRun({ tenantID, instanceID, onUpdate, onTerminal,
+        ...(runtimeServices ? { useSockets: false, getStatus: () => runtimeServices.getWorkflowStatus({ alias, instanceID }),
+          onObservationError: error => {
+            if (!disposed && !isStale() && [400, 401, 403, 404, 409].includes(error.status)) {
+              disconnect();
+              dispatch(appPageActions.setWorkflowResult(alias, null, error, false, instanceID));
+              onError?.(error);
+            }
+          },
+        } : {}),
         onRequest: request => {
           if (!disposed && !isStale()) dispatch(appPageActions.setWorkflowRequests(alias, [request], instanceID));
         },
       });
       if (cancelRequested) {
-        try { await cancelWorkflowAPI({ tenantID, instanceID }); }
+        try { await cancelRun(instanceID); }
         catch (error) { if (!disposed && !isStale()) onCancelError?.(error); }
       }
     } catch (error) {

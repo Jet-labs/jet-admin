@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Popover, PopoverContent, PopoverTrigger, Label, Input, Button } from '@jet-admin/ui';
+import { Popover, PopoverContent, PopoverTrigger, Label, Input, Button, WidgetBusy, WidgetSurface, cn } from '@jet-admin/ui';
 import { CalendarRange, ArrowRight, X } from 'lucide-react';
 import { CalendarGrid } from '../_shared/calendarGrid';
 import { TimeInput } from '../_shared/timeInput';
 import { parseDateSafe, toDateKey, toDateTimeKey, toDisplayDate, toDisplayDateTime, validateRangeValues, resolvePresetRange, normalizeRangePlaceholders, serializeDateValue } from '../_shared/dateContracts';
 import { normalizeFieldBoolean } from '../_shared/fieldContracts';
 import { buildFieldId, resolveInstanceKey, useInstanceSuffix } from '../_shared/fieldA11y';
-import { setMonth, setHours, setMinutes, setSeconds } from 'date-fns';
+import { setMonth, setHours, setMinutes, setSeconds, differenceInCalendarDays, subDays } from 'date-fns';
 
 /**
  * DateRangePickerWidget (E12 + F01/F05).
@@ -44,6 +44,7 @@ export function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widg
   const disabled = normalizeFieldBoolean(widgetConfig.disabled, false);
   const readOnly = normalizeFieldBoolean(widgetConfig.readOnly, false);
   const requireApply = normalizeFieldBoolean(widgetConfig.requireApply, false);
+  const comparePrevious = normalizeFieldBoolean(widgetConfig.comparePrevious, false);
   const interactive = !disabled && !readOnly;
   const constraintOpts = useMemo(() => ({
     minDate: widgetConfig.minDate,
@@ -85,6 +86,15 @@ export function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widg
     if (anchor) setCurrentDate(anchor);
   }, [parsedStart, appliedParsedStart]);
 
+  const comparisonFor = (start, end) => {
+    if (!comparePrevious || !start || !end) return null;
+    const days = Math.abs(differenceInCalendarDays(end, start)) + 1;
+    return {
+      start: toDateKey(subDays(start, days)),
+      end: toDateKey(subDays(start, 1)),
+    };
+  };
+
   const commitApplied = (start, end, source) => {
     if (!start && !end) {
       if (setWidgetState) setWidgetState((p) => ({ ...p, start: "", end: "", startDate: "", endDate: "", draftStart: "", draftEnd: "", rangeError: required ? "A date range is required." : null, isOpen: false, lastSource: source }));
@@ -102,7 +112,7 @@ export function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widg
       setWidgetState((p) => ({ ...p, start: startVal, end: endVal, startDate: startDateStr, endDate: endDateStr, draftStart: startVal, draftEnd: endVal, rangeError: null, lastSource: source }));
     }
     if (start && end && fireWidgetEvent) {
-      fireWidgetEvent("onChange", { start: startVal, end: endVal, startDate: startDateStr, endDate: endDateStr, source });
+      fireWidgetEvent("onChange", { start: startVal, end: endVal, startDate: startDateStr, endDate: endDateStr, source, comparison: comparisonFor(start, end) });
     }
   };
 
@@ -317,21 +327,18 @@ export function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widg
   const isOpen = !!widgetState?.isOpen;
   const rangeError = widgetState?.rangeError || null;
   const hasValue = !!(appliedParsedStart || appliedParsedEnd);
+  const comparison = comparePrevious ? comparisonFor(appliedParsedStart, appliedParsedEnd) : null;
+  const density = widgetConfig?.properties?.density || "comfortable";
+  const size = widgetConfig?.size || "default";
+  const sizeClass = size === "sm" ? "h-7 text-xs" : size === "lg" ? "h-10 text-sm" : "h-8 text-sm";
 
   return (
-    <div className="relative flex flex-col gap-1.5 w-full h-full min-h-0">
-      {isLoading && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px] rounded" aria-hidden="true">
-          <div className="flex items-center gap-2 rounded bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
-            <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin motion-reduce:animate-none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
-            Updating...
-          </div>
-        </div>
-      )}
+    <WidgetSurface density={density} className="relative flex h-full w-full min-h-0 flex-col gap-1.5" aria-busy={isLoading || undefined}>
+      {isLoading && <WidgetBusy label="Updating…" />}
 
       {widgetConfig.label && (
         <Label htmlFor={startId}>
-          {widgetConfig.label}{required && <span className="text-rose-500 ml-0.5" aria-hidden="true">*</span>}
+          {widgetConfig.label}{required && <span className="text-destructive ml-0.5" aria-hidden="true">*</span>}
         </Label>
       )}
       {widgetConfig.help && <p id={`${baseId}-help`} className="text-[11px] text-muted-foreground">{widgetConfig.help}</p>}
@@ -367,9 +374,9 @@ export function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widg
                   value={displayStart}
                   aria-label="Range start date"
                   disabled={disabled}
-                  className="pl-9 cursor-pointer pointer-events-none"
+                  className={cn("pl-9 cursor-pointer pointer-events-none", sizeClass)}
                 />
-                <CalendarRange className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                <CalendarRange className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
               </span>
               <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden="true" />
               <span className="relative flex-1 block">
@@ -381,9 +388,9 @@ export function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widg
                   value={displayEnd}
                   aria-label="Range end date"
                   disabled={disabled}
-                  className="pl-9 pr-8 cursor-pointer pointer-events-none"
+                  className={cn("pl-9 pr-8 cursor-pointer pointer-events-none", sizeClass)}
                 />
-                <CalendarRange className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                <CalendarRange className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
                 {hasValue && interactive && (
                   <span
                     role="button"
@@ -391,7 +398,7 @@ export function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widg
                     aria-label="Clear date range"
                     onClick={(e) => { e.stopPropagation(); e.preventDefault(); clearAll("clear-button"); }}
                     onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.stopPropagation(); e.preventDefault(); clearAll("clear-button"); } }}
-                    className="absolute right-2 top-2.5 h-4 w-4 text-muted-foreground hover:text-foreground flex items-center justify-center pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded"
+                    className="absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground hover:text-foreground flex items-center justify-center pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded"
                   >
                     <X className="h-4 w-4" aria-hidden="true" />
                   </span>
@@ -481,10 +488,13 @@ export function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widg
       {rangeError && !isOpen && (
         <p role="alert" className="text-[11px] text-destructive">{rangeError}</p>
       )}
+      {comparison && (
+        <p className="text-[10px] text-muted-foreground">Compared with {comparison.start} – {comparison.end}</p>
+      )}
       <span className="sr-only" aria-live="polite">
         {appliedParsedStart || appliedParsedEnd ? `Selected ${displayStart || "no start"} to ${displayEnd || "no end"}` : "No range selected"}
       </span>
-    </div>
+    </WidgetSurface>
   );
 }
 

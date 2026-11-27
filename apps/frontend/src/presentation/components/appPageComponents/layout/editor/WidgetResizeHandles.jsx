@@ -12,6 +12,7 @@
  * instead of directly manipulating the draggable DOM attribute.
  */
 import React, { useEffect, useRef } from "react";
+import PropTypes from "prop-types";
 
 const HANDLE_SIZE = 8;
 
@@ -62,12 +63,15 @@ function ResizeHandle({ cursor, top, left, wDir, hDir, width, height, onResize }
       const rect = craftParent
         ? craftParent.getBoundingClientRect()
         : el.parentElement?.getBoundingClientRect();
-      const startW = width != null ? width : (rect ? Math.round(rect.width) : 200);
-      const startH = height != null ? height : (rect ? Math.round(rect.height) : 100);
+      const scale = craftParent && craftParent.offsetWidth
+        ? rect.width / craftParent.offsetWidth
+        : 1;
+      const startW = width != null ? width : (craftParent?.offsetWidth || (rect ? Math.round(rect.width) : 200));
+      const startH = height != null ? height : (craftParent?.offsetHeight || (rect ? Math.round(rect.height) : 100));
 
       const onMouseMove = (mv) => {
-        const dx = mv.clientX - startX;
-        const dy = mv.clientY - startY;
+        const dx = (mv.clientX - startX) / (scale || 1);
+        const dy = (mv.clientY - startY) / (scale || 1);
         const newW = wDir !== 0 && startW != null ? Math.max(40, startW + wDir * dx) : (wDir !== 0 ? null : startW);
         const newH = hDir !== 0 && startH != null ? Math.max(24, startH + hDir * dy) : (hDir !== 0 ? null : startH);
         onResize(newW, newH);
@@ -104,7 +108,7 @@ function ResizeHandle({ cursor, top, left, wDir, hDir, width, height, onResize }
         left: `${left}%`,
         width: HANDLE_SIZE,
         height: HANDLE_SIZE,
-        transform: "translate(-50%, -50%)",
+        transform: "translate(-50%, -50%) scale(var(--canvas-handle-scale, 1))",
         cursor,
         zIndex: 60,
         backgroundColor: "hsl(var(--primary))",
@@ -117,7 +121,18 @@ function ResizeHandle({ cursor, top, left, wDir, hDir, width, height, onResize }
   );
 }
 
-export default function WidgetResizeHandles({ nodeId, width, height, onResize, heightOnly = false }) {
+ResizeHandle.propTypes = {
+  cursor: PropTypes.string,
+  top: PropTypes.number,
+  left: PropTypes.number,
+  wDir: PropTypes.number,
+  hDir: PropTypes.number,
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  onResize: PropTypes.func,
+};
+
+export default function WidgetResizeHandles({ width, height, onResize, heightOnly = false }) {
   const handles = heightOnly
     ? ALL_HANDLES.filter((h) => h.wDir === 0)
     : ALL_HANDLES;
@@ -140,3 +155,10 @@ export default function WidgetResizeHandles({ nodeId, width, height, onResize, h
     </>
   );
 }
+
+WidgetResizeHandles.propTypes = {
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  onResize: PropTypes.func,
+  heightOnly: PropTypes.bool,
+};

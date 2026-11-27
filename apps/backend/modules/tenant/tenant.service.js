@@ -187,7 +187,7 @@ tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
 
       // App-page versions have no FK to app pages in the schema, so they
       // must be removed by tenant explicitly.
-      await tx.tblAppPageVersions.deleteMany({ where: { tenantID } });
+      await tx.tblAppPageEditorHistory.deleteMany({ where: { tenantID } });
       await tx.tblAppPages.deleteMany({ where: { tenantID } });
 
       await tx.tblDataQueries.deleteMany({ where: { tenantID } });

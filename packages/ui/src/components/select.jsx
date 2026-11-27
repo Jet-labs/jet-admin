@@ -15,6 +15,7 @@ const SelectTrigger = React.forwardRef(
         "flex w-full items-center justify-between rounded border border-input-custom bg-input-custom text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-border/80 focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
         size === "default" && "h-8 px-2.5 py-1.5 text-sm",
         size === "sm" && "h-7 px-2 text-xs",
+        size === "lg" && "h-10 px-3 py-2 text-base",
         className
       )}
       {...props}

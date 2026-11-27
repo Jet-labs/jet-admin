@@ -40,7 +40,7 @@ export const useAppPageDataSourceManager = () => {
   const stateTree = useAppPageStateTree();
   const dispatch = useAppPageDispatch();
 
-  const { dataSources = [], tenantID, pageID } = meta;
+  const { dataSources = [], tenantID, pageID, runtimeServices } = meta;
 
   // Latest state tree for the executor. Kept in a ref (not a closure) so
   // executeDataSource stays referentially stable across renders.
@@ -162,6 +162,9 @@ export const useAppPageDataSourceManager = () => {
         if (isWorkflow) {
           // Disconnect any existing stream for this alias
           disconnectAlias(alias, false);
+          if (runtimeServices && typeof runtimeServices.startWorkflow !== "function") {
+            throw new Error("Workflow execution is unavailable in this runtime");
+          }
 
           const { disconnect } = executeWorkflowWithStreaming({
             tenantID,
@@ -169,6 +172,8 @@ export const useAppPageDataSourceManager = () => {
             inputValues: resolvedInputValues,
             alias,
             dispatch,
+            runtimeServices: runtimeServices || undefined,
+            resume: true,
             isStale: () => requestCounterRef.current[alias] !== requestID,
           });
 
@@ -179,6 +184,20 @@ export const useAppPageDataSourceManager = () => {
         } else if (isListener) {
           // Disconnect any existing listener stream for this alias
           disconnectAlias(alias, false);
+
+          if (runtimeServices) {
+            if (!runtimeServices.subscribeListener) throw new Error("Listener observation is unavailable in this runtime");
+            const { disconnect } = runtimeServices.subscribeListener({ alias,
+              onEvent: event => {
+                if (isMountedRef.current && requestCounterRef.current[alias] === requestID) dispatch(appPageActions.setListenerResult(alias, event.data, null, event.mode, event.limit));
+              },
+              onError: error => {
+                if (isMountedRef.current && requestCounterRef.current[alias] === requestID) dispatch(appPageActions.setListenerResult(alias, null, error));
+              },
+            });
+            activeDisconnectorsRef.current[alias] = disconnect;
+            return null;
+          }
 
           const handleListenerEvent = (payload) => {
             if (!isMountedRef.current || requestCounterRef.current[alias] !== requestID) return;
@@ -213,9 +232,13 @@ export const useAppPageDataSourceManager = () => {
 
           return null;
         } else {
+          const runtimeQuery = runtimeServices?.runQuery;
           const result = await queryCoordinator.run({
             alias, tenantID, queryID, inputValues: resolvedInputValues,
-            execute: runDataQueryByIDAPI,
+            execute: runtimeQuery
+              ? ({ inputValues, signal }) =>
+                  runtimeQuery({ alias, inputValues, signal })
+              : runDataQueryByIDAPI,
           });
 
           // A successful auto-fetch resets the retry backoff.
@@ -270,7 +293,7 @@ export const useAppPageDataSourceManager = () => {
         return null;
       }
     },
-    [tenantID, pageID, dispatch, disconnectAlias, queryCoordinator]
+    [tenantID, pageID, dispatch, disconnectAlias, queryCoordinator, runtimeServices]
   );
 
   useEffect(() => {
@@ -319,7 +342,10 @@ export const useAppPageDataSourceManager = () => {
     const autoSources = dataSources.filter(
       (ds) =>
         (ds.triggerMode === "auto" || ds.triggerMode === "reactive") &&
-        (ds.queryID || ds.workflowID || ds.listenerID) &&
+        (ds.queryID || ds.workflowID || ds.listenerID ||
+          (runtimeServices && ((ds.type === "query" && runtimeServices.runQuery) ||
+            (ds.type === "workflow" && runtimeServices.startWorkflow) ||
+            (ds.type === "listener" && runtimeServices.subscribeListener)))) &&
         ds.alias &&
         !fetchedAliasesRef.current.has(ds.alias)
     );
@@ -378,7 +404,7 @@ export const useAppPageDataSourceManager = () => {
     pollIntervalsRef.current = {};
 
     const pollingSources = dataSources.filter(
-      (ds) => ds.refetchInterval && ds.refetchInterval > 0 && ds.alias
+      (ds) => ds.type !== "listener" && ds.refetchInterval && ds.refetchInterval > 0 && ds.alias
     );
 
     for (const ds of pollingSources) {

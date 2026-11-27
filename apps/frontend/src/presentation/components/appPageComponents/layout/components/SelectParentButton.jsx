@@ -42,7 +42,7 @@ export function SelectParentButton() {
         e.stopPropagation();
         actions.selectNode(parentId);
       }}
-      className="absolute -top-6 right-2 z-50 flex items-center gap-2 bg-primary text-foreground hover:bg-primary/90 text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded shadow-sm cursor-pointer select-none pointer-events-auto transition-all border border-primary/20"
+      className="select-parent-button absolute -top-6 right-2 z-50 flex items-center gap-2 bg-primary text-foreground hover:bg-primary/90 text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded shadow-sm cursor-pointer select-none pointer-events-auto transition-all border border-primary/20"
       title={`Select parent ${getLabel(parentDisplayName)}`}
     >
       <ArrowUp className="h-2.5 w-2.5" />

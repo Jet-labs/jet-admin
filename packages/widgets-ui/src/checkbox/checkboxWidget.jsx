@@ -1,28 +1,45 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
 import PropTypes from "prop-types";
-import { Checkbox, Label } from "@jet-admin/ui";
+import { Checkbox, Label, WidgetBusy, WidgetSurface, cn } from "@jet-admin/ui";
 import { buildFieldId, resolveInstanceKey, useInstanceSuffix } from "../_shared/fieldA11y";
 import { normalizeFieldBoolean } from "../_shared/fieldContracts";
 
-export const CheckboxWidget = ({ widgetConfig, widgetState, setWidgetState, fireWidgetEvent, onWidgetInit, widgetID, resourceID, placementKey, instanceID }) => {
+export const CheckboxWidget = ({
+  widgetConfig,
+  widgetState,
+  setWidgetState,
+  fireWidgetEvent,
+  onWidgetInit,
+  widgetID,
+  resourceID,
+  placementKey,
+  instanceID,
+}) => {
   const label = widgetConfig?.label || "Checkbox";
   const description = widgetConfig?.description || "";
   const disabled = normalizeFieldBoolean(widgetConfig?.disabled, false);
-  const isLoading = widgetConfig?.isLoading === true || widgetConfig?.isLoading === "true";
+  const readOnly = normalizeFieldBoolean(widgetConfig?.readOnly, false);
+  const required = normalizeFieldBoolean(widgetConfig?.required, false);
+  const indeterminate = normalizeFieldBoolean(widgetConfig?.indeterminate, false);
+  const isLoading = normalizeFieldBoolean(widgetConfig?.isLoading, false);
+  const size = widgetConfig?.size || "default";
+  const density = widgetConfig?.properties?.density || "comfortable";
   const checked = widgetState?.value ?? widgetConfig?.defaultChecked ?? false;
   const boolChecked = normalizeFieldBoolean(checked, false);
+  const [touched, setTouched] = useState(false);
+  const [error, setError] = useState("");
   const instanceKey = useInstanceSuffix(resolveInstanceKey({ instanceID, widgetID, resourceID, placementKey }));
   const controlId = buildFieldId(instanceKey, label, 0);
+  const descriptionId = description ? `${controlId}-desc` : undefined;
+  const errorId = error ? `${controlId}-error` : undefined;
 
   useEffect(() => {
     if (widgetState?.value === undefined && widgetConfig?.defaultChecked !== undefined) {
-      if (setWidgetState) setWidgetState((p) => ({ ...p, value: !!widgetConfig.defaultChecked }));
+      if (setWidgetState) setWidgetState((prev) => ({ ...prev, value: !!widgetConfig.defaultChecked }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [widgetConfig?.defaultChecked]);
 
-  // Current-state refs (B05/F02): methods must read the latest committed
-  // value and live callbacks, never the first render's closure.
   const liveRef = useRef(null);
   liveRef.current = { checked: boolChecked, setWidgetState, fireWidgetEvent };
   const methodsRef = useRef(null);
@@ -31,41 +48,76 @@ export const CheckboxWidget = ({ widgetConfig, widgetState, setWidgetState, fire
       setValue: (v) => {
         const rt = liveRef.current;
         const b = normalizeFieldBoolean(v, false);
-        if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: b }));
+        if (rt.setWidgetState) rt.setWidgetState((prev) => ({ ...prev, value: b }));
         if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: b });
       },
       clear: () => {
         const rt = liveRef.current;
-        if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: false }));
+        if (rt.setWidgetState) rt.setWidgetState((prev) => ({ ...prev, value: false }));
         if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: false });
       },
       toggle: () => {
         const rt = liveRef.current;
-        // Resolve against the latest committed state, not the creation closure.
         const next = !rt.checked;
         if (rt.setWidgetState) rt.setWidgetState(() => ({ value: next }));
         if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: next });
       },
     };
   }
-  useEffect(() => { if (onWidgetInit) onWidgetInit(methodsRef.current); }, [onWidgetInit]);
+  useEffect(() => {
+    if (onWidgetInit) onWidgetInit(methodsRef.current);
+  }, [onWidgetInit]);
+
+  const handleChange = (nextChecked) => {
+    if (disabled || readOnly) return;
+    const b = !!nextChecked;
+    setTouched(true);
+    if (required && !b) setError("This field is required.");
+    else setError("");
+    if (setWidgetState) setWidgetState((prev) => ({ ...prev, value: b }));
+    if (fireWidgetEvent) fireWidgetEvent("onChange", { value: b });
+  };
+
+  const sizeClass = size === "sm" ? "h-3.5 w-3.5" : size === "lg" ? "h-5 w-5" : "h-4 w-4";
+  const describedBy = [descriptionId, errorId].filter(Boolean).join(" ") || undefined;
 
   return (
-    <div className="flex items-start gap-2 p-2 w-full relative">
-      {isLoading && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px] rounded">
-          <div className="flex items-center gap-2 rounded bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
-            <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
-            Updating...
-          </div>
+    <WidgetSurface density={density} className="relative flex h-full w-full flex-col justify-center" aria-busy={isLoading || undefined}>
+      {isLoading && <WidgetBusy label="Updating…" />}
+      <div className="flex items-start gap-2">
+        <Checkbox
+          checked={indeterminate && !boolChecked ? "indeterminate" : boolChecked}
+          disabled={disabled}
+          onCheckedChange={handleChange}
+          onBlur={() => {
+            setTouched(true);
+            if (required && !boolChecked) setError("This field is required.");
+          }}
+          id={controlId}
+          aria-required={required || undefined}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy}
+          aria-readonly={readOnly || undefined}
+          className={cn(sizeClass, "mt-0.5")}
+        />
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <Label htmlFor={controlId} className="cursor-pointer text-xs font-medium leading-snug text-foreground">
+            {label}
+            {required && <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>}
+          </Label>
+          {description && (
+            <span id={descriptionId} className="text-xs leading-snug text-muted-foreground">
+              {description}
+            </span>
+          )}
+          {error && touched && (
+            <span id={errorId} role="alert" className="text-[11px] text-destructive">
+              {error}
+            </span>
+          )}
         </div>
-      )}
-      <Checkbox checked={boolChecked} disabled={disabled} onCheckedChange={(c) => { const b = !!c; if (setWidgetState) setWidgetState((p) => ({ ...p, value: b })); if (fireWidgetEvent) fireWidgetEvent("onChange", { value: b }); }} id={controlId} aria-describedby={description ? `${controlId}-desc` : undefined} />
-      <div className="flex flex-col gap-0.5 min-w-0">
-        <Label htmlFor={controlId} className="text-xs font-medium text-foreground cursor-pointer leading-none">{label}</Label>
-        {description && <span id={`${controlId}-desc`} className="text-xs text-muted-foreground leading-snug">{description}</span>}
       </div>
-    </div>
+    </WidgetSurface>
   );
 };
 
@@ -80,4 +132,5 @@ CheckboxWidget.propTypes = {
   placementKey: PropTypes.string,
   instanceID: PropTypes.string,
 };
+
 export default CheckboxWidget;

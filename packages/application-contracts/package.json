@@ -1,0 +1,15 @@
+{
+  "name": "@jet-admin/application-contracts",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "exports": {
+    ".": { "import": "./dist/index.mjs", "require": "./dist/index.cjs" }
+  },
+  "scripts": {
+    "build": "esbuild src/index.js --bundle --platform=neutral --packages=external --format=esm --outfile=dist/index.mjs && esbuild src/index.js --bundle --platform=neutral --packages=external --format=cjs --outfile=dist/index.cjs"
+  },
+  "dependencies": { "zod": "^4.0.10" },
+  "devDependencies": { "esbuild": "^0.25.3" }
+}

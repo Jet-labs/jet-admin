@@ -1,14 +1,17 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import { useEditor } from "@craftjs/core";
 
 export default function LayoutResizeHandle({ node, onResize }) {
   const [isResizing, setIsResizing] = useState(false);
+  const [liveSpan, setLiveSpan] = useState(node.span || 6);
   const { actions, query } = useEditor();
 
   const handleStart = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsResizing(true);
+    setLiveSpan(node.span || 6);
 
     const startX = e.clientX;
     const startSpan = node.span || 6;
@@ -29,6 +32,7 @@ export default function LayoutResizeHandle({ node, onResize }) {
       const deltaX = moveEvent.clientX - startX;
       const deltaSpan = Math.round(deltaX / colWidth);
       const newSpan = Math.max(1, Math.min(12, startSpan + deltaSpan));
+      setLiveSpan(newSpan);
       onResize(node.id, newSpan);
 
       // Perform real-time row balancing if in a grid row
@@ -97,14 +101,34 @@ export default function LayoutResizeHandle({ node, onResize }) {
   };
 
   return (
-    <div
-      className={`layout-resize-handle ${isResizing ? "active" : ""}`}
-      onMouseDown={handleStart}
-      draggable={true}
-      onDragStart={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-    />
+    <>
+      <div
+        className={`layout-resize-handle ${isResizing ? "active" : ""}`}
+        style={{ width: "calc(6px * var(--canvas-handle-scale, 1))" }}
+        onMouseDown={handleStart}
+        draggable={true}
+        onDragStart={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      />
+      {isResizing && (
+        <div
+          className="pointer-events-none absolute right-2 top-1 z-[80] rounded border border-primary/40 bg-background/95 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-primary shadow-sm"
+          style={{ transform: "scale(var(--canvas-handle-scale, 1))", transformOrigin: "right top" }}
+          aria-live="polite"
+        >
+          {liveSpan} / 12
+        </div>
+      )}
+    </>
   );
 }
+
+LayoutResizeHandle.propTypes = {
+  node: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    span: PropTypes.number,
+  }).isRequired,
+  onResize: PropTypes.func,
+};

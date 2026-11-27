@@ -3,7 +3,6 @@ import React, { useMemo } from "react";
 import {
   updateListenerAPI,
   getListenerByIDAPI,
-  deleteListenerAPI,
 } from "../../../data/apis/listener";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -20,10 +19,9 @@ import {
   ResizablePanelGroup,
 } from "../ui/resizable";
 
-import { Spinner, Tabs, TabsContent, TabsList, TabsTrigger, PageHeader } from "@jet-admin/ui";
+import { Tabs, TabsContent, TabsList, TabsTrigger, PageHeader } from "@jet-admin/ui";
 import { BundleExportButton } from "../bundleComponents/bundleExportButton";
-import { useGlobalUI } from "../../../logic/stores/useUIStore";
-import { useNavigate } from "react-router-dom";
+import { AssetVersionsButton } from "../assetVersionComponents/assetVersionsButton";
 import { ListenerActionManager } from "./listenerActionManager";
 
 const EMPTY_INITIAL_VALUES = {
@@ -43,8 +41,7 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
   };
 
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const { showConfirmation } = useGlobalUI();
+
 
 
   const { data: listener, isLoading: isLoadingListener, error: listenerError } = useQuery({
@@ -117,6 +114,11 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
           tenantID={tenantID}
           entityType="listener"
           entityID={listenerID}
+        />
+        <AssetVersionsButton
+          tenantID={tenantID}
+          assetType="listener"
+          assetID={listenerID}
         />
       </PageHeader>
 

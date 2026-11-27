@@ -17,6 +17,7 @@ export const PageHeader = ({
   isCloning = false,
   hasHistory = false,
   saveText = "Update",
+  saveDisabled = false,
   parentTitle,
   subTitle,
   children,
@@ -91,7 +92,7 @@ export const PageHeader = ({
         )}
 
         {onSave && (
-          <Button onClick={onSave} disabled={isSaving}>
+          <Button onClick={onSave} disabled={isSaving || saveDisabled}>
             {isSaving && <Spinner size={14} className="mr-2" />}
             {saveText}
           </Button>
@@ -113,5 +114,9 @@ PageHeader.propTypes = {
   isCloning: PropTypes.bool,
   hasHistory: PropTypes.bool,
   saveText: PropTypes.string,
+  saveDisabled: PropTypes.bool,
+  parentTitle: PropTypes.string,
+  subTitle: PropTypes.string,
   children: PropTypes.node,
+  leadingChildren: PropTypes.node,
 };

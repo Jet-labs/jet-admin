@@ -25,8 +25,9 @@ import { useDatasourceOptions } from "../../../logic/hooks/useDatasourceOptions"
 
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 
-import { Input, Label, PageHeader } from "@jet-admin/ui";
+import { PageHeader } from "@jet-admin/ui";
 import { BundleExportButton } from "../bundleComponents/bundleExportButton";
+import { AssetVersionsButton } from "../assetVersionComponents/assetVersionsButton";
 
 const EMPTY_INITIAL_VALUES = {
   dataQueryTitle: "Untitled",
@@ -147,6 +148,11 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
           entityType="dataQuery"
           entityID={dataQueryID}
         />
+        <AssetVersionsButton
+          tenantID={tenantID}
+          assetType="query"
+          assetID={dataQueryID}
+        />
         <DataQueryTestingForm
           key={`dataQueryTestingForm_${dataQuery?.dataQueryID}`}
           tenantID={tenantID}
@@ -158,6 +164,12 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
           dataQuery={queryUpdationForm.values}
         />
       </PageHeader>
+
+      <div className="w-full border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs text-amber-900 dark:text-amber-200">
+        Live edits update only this working query. Deployed Applications keep
+        executing the query version captured by their page versions until a new
+        query/page version is captured and published.
+      </div>
 
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingDataQuery || isLoadingDatasources}

@@ -25,6 +25,7 @@ import { useAppPageStateTree } from "./useAppPageStateTree";
 import { useAppPageDispatch } from "./useAppPageDispatch";
 import { AppPageMetaContext } from "./AppPageRuntimeProvider";
 import { getQueryCoordinator } from './queryCoordinator';
+import { executeWorkflowWithStreaming } from './executeWorkflowWithStreaming';
 import { appPageActions } from "./appPageActions";
 import { resolveConfig } from "../evaluationEngine";
 import {
@@ -89,12 +90,35 @@ const showAppPageToast = async (message, variant = "success") => {
   }
 };
 
+const RUNTIME_ACTION_TYPES = new Set([
+  "SET_VARIABLE",
+  "SET_APPLICATION_VARIABLE",
+  "RESET_APPLICATION_STATE",
+  "EMIT_APPLICATION_EVENT",
+  "NAVIGATE",
+  "SHOW_TOAST",
+  "CALL_WIDGET_METHOD",
+  "EXECUTE_QUERY",
+]);
+
 const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowRegistry, isActive = () => true) => {
   const { actionType, config: rawConfigOrig } = action;
   const rawConfig = normalizeEventRefs(rawConfigOrig);
 
   // Resolve {{ }} expressions in action config against current state + event input
   const config = resolveConfig(rawConfig, stateTree);
+
+  // A deployed runtime admits only local UI actions and pinned page data
+  // sources. Direct query/workflow/listener IDs never execute even if a
+  // malformed manifest contains them.
+  if (meta.runtimeServices) {
+    if (!RUNTIME_ACTION_TYPES.has(actionType)) {
+      throw Object.assign(
+        new Error(`Action type "${actionType}" is not available in this runtime release.`),
+        { code: "ACTION_NOT_AVAILABLE" }
+      );
+    }
+  }
 
   switch (actionType) {
     case "SET_VARIABLE": {
@@ -119,6 +143,82 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowR
 
       dispatch(appPageActions.setVariable(variableKey, config.value));
       return { key: variableKey, value: config.value };
+    }
+
+    case "SET_APPLICATION_VARIABLE": {
+      const key =
+        typeof config.key === "string"
+          ? config.key
+              .trim()
+              .replace(/^state\.application\.variables\./, "")
+              .replace(/^application\.variables\./, "")
+          : "";
+      if (!key) {
+        throw Object.assign(
+          new Error("SET_APPLICATION_VARIABLE requires a declared application variable key."),
+          { code: "INVALID_APPLICATION_VARIABLE" }
+        );
+      }
+      if (typeof meta.setApplicationVariable !== "function") {
+        throw Object.assign(
+          new Error("Application state is unavailable in this runtime."),
+          { code: "APPLICATION_STATE_UNAVAILABLE" }
+        );
+      }
+      meta.setApplicationVariable(key, config.value);
+      return { scope: "application", key, value: config.value };
+    }
+
+    case "RESET_APPLICATION_STATE": {
+      if (typeof meta.resetApplicationState !== "function") {
+        throw Object.assign(
+          new Error("Application state is unavailable in this runtime."),
+          { code: "APPLICATION_STATE_UNAVAILABLE" }
+        );
+      }
+      meta.resetApplicationState();
+      return { scope: "application", reset: true };
+    }
+
+    case "EMIT_APPLICATION_EVENT": {
+      const name = typeof config.name === "string" ? config.name.trim() : "";
+      if (!/^[A-Za-z][A-Za-z0-9_.:-]{0,63}$/.test(name)) {
+        throw Object.assign(
+          new Error("EMIT_APPLICATION_EVENT requires a valid event name."),
+          { code: "INVALID_APPLICATION_EVENT" }
+        );
+      }
+      if (typeof meta.emitApplicationEvent !== "function") {
+        throw Object.assign(
+          new Error("Application events are unavailable in this runtime."),
+          { code: "APPLICATION_EVENTS_UNAVAILABLE" }
+        );
+      }
+      meta.emitApplicationEvent(name, config.payload ?? null);
+      return { scope: "application", event: name };
+    }
+
+    case "NAVIGATE": {
+      const routeID = typeof config.routeID === "string" ? config.routeID.trim() : "";
+      if (!routeID) {
+        throw Object.assign(
+          new Error("NAVIGATE requires an application route ID."),
+          { code: "INVALID_NAVIGATION_TARGET" }
+        );
+      }
+      if (typeof meta.navigateToRoute !== "function") {
+        throw Object.assign(
+          new Error("Application navigation is unavailable in this runtime."),
+          { code: "APPLICATION_NAVIGATION_UNAVAILABLE" }
+        );
+      }
+      const target = meta.navigateToRoute({
+        routeID,
+        params: config.params || {},
+        query: config.query || {},
+        replace: config.replace === true,
+      });
+      return { scope: "navigation", routeID, path: target?.path || null };
     }
 
     case "EXECUTE_QUERY": {
@@ -153,14 +253,14 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowR
 
         const isWorkflow = dataSource.type === "workflow";
         if (isWorkflow) {
+          if (meta.runtimeServices && typeof meta.runtimeServices.startWorkflow !== "function") {
+            throw new Error("Workflow execution is unavailable in this runtime");
+          }
           if (typeof workflowRegistry[alias] === "function") {
             workflowRegistry[alias]();
           }
           delete workflowRegistry[alias];
 
-          const { executeWorkflowWithStreaming } = await import(
-            "./executeWorkflowWithStreaming"
-          );
           if (!isActive()) return null;
           const successToast = config?.successToast || dataSource.successToast;
           const errorToast = config?.errorToast || dataSource.errorToast;
@@ -170,6 +270,7 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowR
             inputValues: mergedInputValues,
             alias,
             dispatch,
+            runtimeServices: meta.runtimeServices || undefined,
             onComplete: () => {
               if (isActive()) showAppPageToast(successToast, "success");
             },
@@ -180,18 +281,39 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowR
 
           workflowRegistry[alias] = disconnect;
           return null;
-        } else {
-          const { runDataQueryByIDAPI } = await import("../../data/apis/dataQuery");
-          if (!isActive()) return null;
-          const result = await getQueryCoordinator(dispatch).run({
-            alias,
-            tenantID: meta.tenantID,
-            queryID: dataSource.queryID,
-            inputValues: mergedInputValues,
-            execute: runDataQueryByIDAPI,
-          });
-          return result;
         }
+
+        if (dataSource.type === "listener" && meta.runtimeServices) {
+          if (!meta.runtimeServices.subscribeListener) throw new Error("Listener observation is unavailable in this runtime");
+          workflowRegistry[alias]?.();
+          const { disconnect } = meta.runtimeServices.subscribeListener({ alias,
+            onEvent: event => { if (isActive()) dispatch(appPageActions.setListenerResult(alias, event.data, null, event.mode, event.limit)); },
+            onError: error => { if (isActive()) dispatch(appPageActions.setListenerResult(alias, null, error)); },
+          });
+          workflowRegistry[alias] = disconnect;
+          return null;
+        }
+
+        let execute = meta.runtimeServices?.runQuery
+          ? ({ inputValues, signal }) =>
+              meta.runtimeServices.runQuery({ alias, inputValues, signal })
+          : null;
+        if (!execute) {
+          const { runDataQueryByIDAPI } = await import("../../data/apis/dataQuery");
+          execute = runDataQueryByIDAPI;
+        }
+        if (!isActive()) return null;
+        const result = await getQueryCoordinator(dispatch).run({
+          alias,
+          tenantID: meta.tenantID,
+          queryID: dataSource.queryID,
+          inputValues: mergedInputValues,
+          execute,
+        });
+        if (isActive()) {
+          void showAppPageToast(config?.successToast || dataSource.successToast, "success");
+        }
+        return result;
       } catch (error) {
         if (dataSource.type === "workflow") {
           dispatch(appPageActions.setWorkflowResult(alias, null, error));
@@ -199,6 +321,9 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowR
             workflowRegistry[alias]();
           }
           delete workflowRegistry[alias];
+        }
+        if (isActive() && dataSource.type !== "workflow") {
+          void showAppPageToast(config?.errorToast || dataSource.errorToast, "error");
         }
         console.error(`[AppPageEvents] EXECUTE_QUERY "${alias}" failed:`, error);
         throw error;
@@ -248,9 +373,6 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowR
         // Stable alias per target workflow: re-triggering replaces the active
         // stream instead of accumulating new reducer entries/disconnectors
         // (the old Date.now()-suffixed aliases leaked both).
-        const { executeWorkflowWithStreaming } = await import(
-          "./executeWorkflowWithStreaming"
-        );
         if (!isActive()) return null;
         const temporaryAlias = `direct_workflow_${workflowID}`;
         if (typeof workflowRegistry[temporaryAlias] === "function") {
@@ -393,6 +515,12 @@ export const useWidgetEventHandlers = (instanceID, widgetConfig, identityMeta) =
     async (eventType, eventInputs = {}) => {
       const currentWidgetConfig = widgetConfigRef.current;
       const currentMeta = metaRef.current;
+      if (currentMeta?.runtimeServices?.executionEnabled === false) {
+        return [{ success: false, status: "skipped", error: { code: "COMPOSITION_ONLY", message: "Actions are disabled in composition preview." } }];
+      }
+      if (currentMeta?.runtimeServices?.actionsEnabled === false) {
+        return [{ success: false, status: "skipped", error: { code: "ACTIONS_DISABLED", message: "Actions are not enabled in this runtime release." } }];
+      }
 
       const events = currentWidgetConfig?.events || {};
       const actions = events[eventType];
@@ -402,10 +530,11 @@ export const useWidgetEventHandlers = (instanceID, widgetConfig, identityMeta) =
       }
 
       const results = [];
-      // SET_VARIABLE results applied synchronously to subsequent action
-      // contexts — dispatch alone only updates the tree after a re-render,
-      // so sequential chains would otherwise read stale values.
+      // Session-state mutations are applied synchronously to subsequent
+      // action contexts. dispatch/store updates alone only land after a
+      // re-render, so sequential chains would otherwise read stale values.
       const pendingMutations = {};
+      const pendingApplicationMutations = {};
       for (const action of actions) {
         if (!lifetime.active) break;
         // Re-read the latest tree before each action so sequential chains see
@@ -445,6 +574,13 @@ export const useWidgetEventHandlers = (instanceID, widgetConfig, identityMeta) =
             ...latestStateTree.variables,
             ...pendingMutations,
           },
+          application: {
+            ...(latestStateTree.application || {}),
+            variables: {
+              ...(latestStateTree.application?.variables || {}),
+              ...pendingApplicationMutations,
+            },
+          },
           event: {
             type: eventType,
             widgetID,
@@ -468,7 +604,16 @@ export const useWidgetEventHandlers = (instanceID, widgetConfig, identityMeta) =
           if (action.actionType === "SET_VARIABLE" && result?.key !== undefined) {
             pendingMutations[result.key] = result.value;
           }
+          if (
+            action.actionType === "SET_APPLICATION_VARIABLE" &&
+            result?.scope === "application"
+          ) {
+            pendingApplicationMutations[result.key] = result.value;
+          }
           results.push({ actionType: action.actionType, success: true, result });
+          // A navigation action ends this page instance's chain. Any later
+          // actions belong to the page being left, not the destination.
+          if (action.actionType === "NAVIGATE" && result?.path) break;
         } catch (error) {
           results.push({ actionType: action.actionType, success: false, error });
         }

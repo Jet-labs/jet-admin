@@ -51,7 +51,7 @@ async function resolveActions(job) {
   }
   const actions = await prisma.tblListenerActions.findMany({
     where: { listenerID: job.listenerID, isEnabled: true },
-    orderBy: { orderIndex: 'asc' },
+    orderBy: [{ orderIndex: 'asc' }, { actionID: 'asc' }],
   });
   actionsCache.set(job.listenerID, { at: Date.now(), actions });
   return actions;
@@ -96,6 +96,15 @@ async function _processEvent(job) {
 
   try {
     const actions = await resolveActions(job);
+    // Stamp buffered observations only when both ingress and processing used
+    // the same definition. Old/mixed-version events remain available to legacy
+    // consumers but are not represented as release-pinned observations.
+    const listener = job.listenerDefinitionHash ? await prisma.tblListeners.findFirst({
+      where: { listenerID, tenantID },
+      include: { tblListenerActions: { where: { isEnabled: true }, orderBy: [{ orderIndex: 'asc' }, { actionID: 'asc' }] } },
+    }) : null;
+    const definitionHash = listener ? require('../listenerDefinition').listenerDefinitionHash(listener) : null;
+    const applicationDefinitionHash = definitionHash === job.listenerDefinitionHash ? definitionHash : null;
     maybeEmitTestPreview(job, actions);
     let currentEvent = rawEvent;
 
@@ -133,7 +142,7 @@ async function _processEvent(job) {
           }
         } else {
           // dispatch: continue on error — side-effect failures are independent
-          await _dispatchAction(tenantID, listenerID, action, currentEvent);
+          await _dispatchAction(tenantID, listenerID, action, currentEvent, applicationDefinitionHash);
           eventProcessed = true;
         }
       } catch (actionErr) {
@@ -181,7 +190,7 @@ async function _processEvent(job) {
 
 // ─── Action Dispatch ──────────────────────────────────────────────────────────
 
-async function _dispatchAction(tenantID, listenerID, action, event) {
+async function _dispatchAction(tenantID, listenerID, action, event, applicationDefinitionHash) {
   const { actionType, actionConfig } = action;
   // Create a system execution context for this listener
   const executionCtx = createSystemContext(ORIGIN_TYPES.LISTENER, listenerID, tenantID);
@@ -222,6 +231,8 @@ async function _dispatchAction(tenantID, listenerID, action, event) {
       const eventMeta = (typeof event === 'object' && event !== null)
         ? (event.__metadata ?? null)
         : null;
+      const safeEventMeta = eventMeta && typeof eventMeta === 'object' && !Array.isArray(eventMeta)
+        ? Object.fromEntries(Object.entries(eventMeta).filter(([key]) => key !== 'applicationDefinitionHash')) : eventMeta;
 
       await prisma.tblListenerEvents.create({
         data: {
@@ -229,7 +240,7 @@ async function _dispatchAction(tenantID, listenerID, action, event) {
           tenantID,
           bufferName: actionConfig.bufferName || 'default',
           eventData: event,
-          eventMeta,
+           eventMeta: applicationDefinitionHash ? { ...(safeEventMeta && typeof safeEventMeta === 'object' && !Array.isArray(safeEventMeta) ? safeEventMeta : { sourceMetadata: safeEventMeta }), applicationDefinitionHash } : safeEventMeta,
         },
       });
       // Async retention enforcement (non-blocking)

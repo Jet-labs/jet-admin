@@ -30,6 +30,7 @@ All backend changes require process restart. All `VITE_*` changes require fronte
 |---|---|---|---|---|---|
 | `FIREBASE_CREDENTIALS` | **yes** (any user auth) | — | JSON service-account blob | `config/firebase.config.js` (`verifyIdToken`) | All `Bearer` logins fail |
 | `VAULT_ENCRYPTION_KEY` | **yes** (vault/OAuth/datasources) | — | 32-byte hex | `utils/encryption.util.js` (AES-256-GCM) | Decrypt throws; datasource tests, OAuth callback, AI tools fail. No auto-rotation |
+| `APPLICATION_CURSOR_SECRET` | no | falls back to `VAULT_ENCRYPTION_KEY` | shared secret | `modules/application/application.listenerRuntime.js` (HMAC listener cursors) | Listener observation returns 503; use an explicit secret only when the vault key is not shared with the relevant runtime nodes |
 | `OAUTH_STATE_SECRET` | yes (Google OAuth) | — | JWT secret | `modules/oauth/oauth.controller.js` (10-min state) | OAuth handshake fails signature check |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | yes (Google OAuth) | — | OAuth client pair | `modules/oauth/*`, `modules/vault/vault.service.js` | `/oauth/google/*` 500s |
 | `BACKEND_URL` | no | — | public backend URL | OAuth callback + `OPENROUTER_HTTP_REFERER` fallback | OAuth redirect + OpenRouter referer header wrong behind proxies |

@@ -32,7 +32,7 @@ const checkWidgetContract = (widgetType, widgetConfig, ctx) => {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ["widgetType"],
-      message: `Unknown widgetType '${widgetType}'. Use the 32 registered types (see get_widget_schemas).`,
+      message: `Unknown widgetType '${widgetType}'. Use a registered widget type (see get_widget_schemas).`,
       params: { code: "unknown-type" },
     });
     return;

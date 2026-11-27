@@ -85,4 +85,13 @@ describe('AppPage human-input presentation and recovery', () => {
     expect(mockModalProps.request.collectionRequestID).toBe('new');
     expect(tree.workflows.q.pendingRequests[0].collectionRequestID).toBe('new');
   });
+  test('deployed input submits through application/run/alias provenance instead of the standalone endpoint', async () => {
+    const submitWorkflowInput = jest.fn().mockResolvedValue({ success: true });
+    await act(async () => renderer.update(React.createElement(AppPageRuntimeProvider, { tenantID: 't', pageID: 'p', runtimeServices: { identity: 'release1', executionEnabled: true, submitWorkflowInput } },
+      React.createElement(Probe), React.createElement(AppPageWorkflowInputHost))));
+    await show();
+    await act(async () => mockModalProps.onSubmit({ decision: 'approve' }));
+    expect(submitWorkflowInput).toHaveBeenCalledWith({ alias: 'q', instanceID: 'run', collectionRequestID: 'request', submittedData: { decision: 'approve' } });
+    expect(submitDataCollectionAPI).not.toHaveBeenCalled();
+  });
 });

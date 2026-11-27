@@ -10,7 +10,7 @@ import { WorkflowDataCollectionModal } from '../workflowComponents/workflowDataC
 
 /** Reuse the workflow editor's form/approval UI in both AppPage modes. */
 export function AppPageWorkflowInputHost() {
-  const { tenantID } = useContext(AppPageMetaContext);
+  const { tenantID, runtimeServices } = useContext(AppPageMetaContext);
   const tree = useAppPageStateTree();
   const dispatch = useAppPageDispatch();
   const [dismissed, setDismissed] = useState(new Set());
@@ -34,7 +34,12 @@ export function AppPageWorkflowInputHost() {
     submittingIDs.current.add(request.collectionRequestID);
     setSubmitting(request.collectionRequestID);
     try {
-      await submitDataCollectionAPI({ tenantID, collectionRequestID: request.collectionRequestID, submittedData: data });
+      if (runtimeServices) {
+        if (!runtimeServices.submitWorkflowInput) throw new Error('Workflow input is unavailable in this runtime');
+        await runtimeServices.submitWorkflowInput({ alias, instanceID, collectionRequestID: request.collectionRequestID, submittedData: data });
+      } else {
+        await submitDataCollectionAPI({ tenantID, collectionRequestID: request.collectionRequestID, submittedData: data });
+      }
       if (mounted.current) dispatch(appPageActions.acknowledgeWorkflowRequest(alias, request.collectionRequestID, instanceID));
     } catch (error) {
       if (mounted.current && pendingRef.current.some(item => item.request.collectionRequestID === request.collectionRequestID)) displayError(error?.message || 'Submission failed. Your input has been kept; please retry.');

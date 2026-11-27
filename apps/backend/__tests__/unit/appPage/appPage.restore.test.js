@@ -15,7 +15,7 @@ describe('page restore transaction contract', () => {
         findFirst: jest.fn(async () => { operations.push('read-page'); return { appPageTitle: 'current', appPageConfig: { current: true } }; }),
         update: jest.fn(async () => { operations.push('restore'); }),
       },
-      tblAppPageVersions: {
+      tblAppPageEditorHistory: {
         findFirst: jest.fn(async ({ select }) => select ? { versionNumber: 4 } : { versionNumber: 2, appPageTitle: 'old', appPageConfig: { previous: true } }),
         create: jest.fn(async () => { operations.push('snapshot'); }),
         count: jest.fn(async () => 5),
@@ -29,18 +29,18 @@ describe('page restore transaction contract', () => {
     expect(prisma.$transaction).toHaveBeenCalledTimes(1);
     expect(tx.$executeRaw.mock.calls[0][0].join('?')).toContain('pg_advisory_xact_lock');
     expect(tx.$executeRaw.mock.calls[0][1]).toBe('p');
-    expect(tx.tblAppPageVersions.create.mock.calls[0][0].data).toMatchObject({ versionNumber: 5, appPageConfig: { current: true } });
+    expect(tx.tblAppPageEditorHistory.create.mock.calls[0][0].data).toMatchObject({ versionNumber: 5, appPageConfig: { current: true } });
     expect(tx.tblAppPages.update.mock.calls[0][0].data).toMatchObject({ appPageConfig: { previous: true }, updatedAt: expect.any(Date) });
   });
   test('snapshot failure aborts restore instead of losing undo history', async () => {
-    tx.tblAppPageVersions.create.mockRejectedValue(new Error('snapshot unavailable'));
+    tx.tblAppPageEditorHistory.create.mockRejectedValue(new Error('snapshot unavailable'));
     await expect(appPageService.restoreAppPageVersion(args)).rejects.toThrow('snapshot unavailable');
     expect(tx.tblAppPages.update).not.toHaveBeenCalled();
   });
   test('missing tenant-bound version cannot modify page', async () => {
-    tx.tblAppPageVersions.findFirst.mockResolvedValue(null);
+    tx.tblAppPageEditorHistory.findFirst.mockResolvedValue(null);
     await expect(appPageService.restoreAppPageVersion(args)).rejects.toThrow('version not found');
     expect(tx.tblAppPages.update).not.toHaveBeenCalled();
-    expect(tx.tblAppPageVersions.create).not.toHaveBeenCalled();
+    expect(tx.tblAppPageEditorHistory.create).not.toHaveBeenCalled();
   });
 });

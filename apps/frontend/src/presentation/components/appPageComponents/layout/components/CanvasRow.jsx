@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /**
  * CanvasRow.jsx — Craft.js User Component
  *
@@ -8,9 +9,23 @@ import { useNode } from "@craftjs/core";
 import { useCraftEditorContext, useConditionHidden } from "./CraftEditorContext.js";
 import { LogicBadges } from "./LogicBadges.jsx";
 import { SelectParentButton } from "./SelectParentButton.jsx";
+import { useLayoutBreakpoint } from "../engine/LayoutViewportContext.jsx";
+import { isResponsiveHidden } from "../engine/responsive.js";
 
-export function CanvasRow({ children, sizing, fixedHeight, style, condition, repeat, hideMode, keepMounted }) {
+export function CanvasRow({
+  children,
+  sizing,
+  fixedHeight,
+  style,
+  condition,
+  repeat,
+  hideMode,
+  keepMounted,
+  responsive,
+}) {
   const { previewMode, editorLiveStateTree } = useCraftEditorContext();
+  const breakpointTier = useLayoutBreakpoint();
+  const responsiveHidden = isResponsiveHidden(responsive, breakpointTier);
   const hiddenByCondition = useConditionHidden(condition, editorLiveStateTree);
   const {
     connectors: { connect, drag },
@@ -21,7 +36,10 @@ export function CanvasRow({ children, sizing, fixedHeight, style, condition, rep
     isSelected: node.events.selected,
     isEmpty: node.data.nodes.length === 0,
   }));
-  if (previewMode && hiddenByCondition && hideMode !== "preserve-space" && !keepMounted) {
+  if (
+    previewMode &&
+    ((hiddenByCondition && hideMode !== "preserve-space" && !keepMounted) || responsiveHidden)
+  ) {
     return null;
   }
 
@@ -47,10 +65,20 @@ export function CanvasRow({ children, sizing, fixedHeight, style, condition, rep
       className={`grid grid-cols-12 w-full gap-2 items-stretch box-border craft-node craft-node-row ${rowSizingClass} ${
         isSelected && !previewMode ? "craft-node-selected" : ""
       } ${hiddenByCondition && !previewMode ? "opacity-40 saturate-50" : ""}`}
-      style={rowStyle}
+      style={{
+        ...rowStyle,
+        ...(responsiveHidden && !previewMode ? { opacity: 0.45 } : {}),
+      }}
       id={id}
       data-node-type="Row"
-      title={hiddenByCondition && !previewMode ? "Hidden by condition in viewer" : undefined}
+      data-breakpoint={breakpointTier}
+      title={
+        hiddenByCondition && !previewMode
+          ? "Hidden by condition in viewer"
+          : responsiveHidden && !previewMode
+            ? `Hidden on ${breakpointTier}`
+            : undefined
+      }
     >
       {!previewMode && (condition || repeat) && (
         <div className="absolute left-2 top-2 z-50 pointer-events-none">
@@ -82,6 +110,7 @@ CanvasRow.craft = {
     repeat: null,
     hideMode: null,
     keepMounted: false,
+    responsive: null,
   },
   isCanvas: true,
   rules: {

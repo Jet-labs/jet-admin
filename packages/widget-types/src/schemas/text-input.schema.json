@@ -47,6 +47,67 @@
         "default": 3,
         "description": "Visible rows when inputType is textarea"
       },
+      "labelPosition": {
+        "type": "string",
+        "enum": ["top", "left", "hidden"],
+        "default": "top"
+      },
+      "size": {
+        "type": "string",
+        "enum": ["sm", "default", "lg"],
+        "default": "default"
+      },
+      "variant": {
+        "type": "string",
+        "enum": ["outline", "filled", "underline"],
+        "default": "outline"
+      },
+      "prefix": {
+        "type": "string"
+      },
+      "suffix": {
+        "type": "string"
+      },
+      "help": {
+        "type": "string"
+      },
+      "mask": {
+        "type": "string",
+        "description": "Input mask: 9 = digit, A = letter, * = letter or digit."
+      },
+      "readOnly": {
+        "type": ["boolean", "string"],
+        "default": false
+      },
+      "minLength": {
+        "type": "number"
+      },
+      "pattern": {
+        "type": "string"
+      },
+      "errorMessage": {
+        "type": "string"
+      },
+      "validateOn": {
+        "type": "string",
+        "enum": ["change", "blur", "submit"],
+        "default": "blur"
+      },
+      "showCount": {
+        "type": "boolean",
+        "default": false
+      },
+      "autosize": {
+        "type": "boolean",
+        "default": false
+      },
+      "allowPasswordReveal": {
+        "type": "boolean",
+        "default": true
+      },
+      "autoComplete": {
+        "type": "string"
+      },
       "isLoading": {
         "type": [
           "boolean",

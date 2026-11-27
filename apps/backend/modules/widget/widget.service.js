@@ -45,7 +45,7 @@ async function validateWidgetEventReferences({ tenantID, widgetConfig }) {
 const applyWidgetContract = (widgetType, widgetConfig) => {
   if (!getWidgetDescriptor(widgetType)) {
     throw Object.assign(
-      new Error(`Unknown widgetType '${widgetType}'. Use the 32 registered types.`),
+      new Error(`Unknown widgetType '${widgetType}'. Use a registered widget type.`),
       { code: "WIDGET_TYPE_UNKNOWN", details: [{ code: "unknown-type", field: "widgetType" }] }
     );
   }

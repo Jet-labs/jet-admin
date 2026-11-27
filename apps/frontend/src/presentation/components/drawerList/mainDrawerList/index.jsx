@@ -215,6 +215,13 @@ export const MainDrawerList = () => {
     },
     {
       type: "link",
+      activeKey: "applications",
+      title: "Applications",
+      icon: LayoutGrid,
+      path: CONSTANTS.ROUTES.VIEW_APPLICATIONS.path(tenantID),
+    },
+    {
+      type: "link",
       activeKey: "marketplace",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_MARKETPLACE_TITLE,
       icon: Store,

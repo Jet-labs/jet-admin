@@ -13,6 +13,7 @@ import { useUnsavedChangesGuard } from "../../../logic/hooks/useUnsavedChangesGu
 
 import { PageHeader } from "@jet-admin/ui";
 import { BundleExportButton } from "../bundleComponents/bundleExportButton";
+import { AssetVersionsButton } from "../assetVersionComponents/assetVersionsButton";
 import { WorkflowCloneForm } from "./workflowCloneForm";
 import { WorkflowDeletionForm } from "./workflowDeletionForm";
 
@@ -123,6 +124,11 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
           tenantID={tenantID}
           entityType="workflow"
           entityID={workflowID}
+        />
+        <AssetVersionsButton
+          tenantID={tenantID}
+          assetType="workflow"
+          assetID={workflowID}
         />
       </PageHeader>
       <ReactQueryLoadingErrorWrapper

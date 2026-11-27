@@ -1,7 +1,9 @@
 import React, { useState, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { CONSTANTS } from "../../../constants";
 import { CronJobScheduler } from "./cronJobScheduler";
 import { useInfiniteWorkflows } from "../../../logic/hooks/useWorkflows";
+import { getAssetVersionsAPI } from "../../../data/apis/assetVersion";
 import { useDebounce } from "@uidotdev/usehooks";
 import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -48,6 +50,24 @@ export const CronJobEditor = ({ cronJobEditorForm, initialWorkflow }) => {
   } = useInfiniteWorkflows(tenantID, debouncedWorkflowSearch);
 
   const selectedWorkflowID = cronJobEditorForm.values?.workflowID;
+  const workflowConfig = cronJobEditorForm.values?.workflowConfig || { inputValues: {} };
+  const workflowVersionMode =
+    workflowConfig.versionMode ||
+    (workflowConfig.workflowVersionID ? "specific" : "latest-at-capture");
+  const { data: workflowVersionsData, isLoading: isLoadingWorkflowVersions } = useQuery({
+    queryKey: ["asset-versions", tenantID, "workflow", selectedWorkflowID],
+    queryFn: () =>
+      getAssetVersionsAPI({
+        tenantID,
+        assetType: "workflow",
+        assetID: selectedWorkflowID,
+        page: 1,
+        pageSize: 100,
+      }),
+    enabled: Boolean(tenantID) && Boolean(selectedWorkflowID),
+    refetchOnWindowFocus: false,
+  });
+  const workflowVersions = workflowVersionsData?.versions || [];
 
   const _handleOnScheduleChange = useCallback(
     (value) => {
@@ -161,9 +181,14 @@ export const CronJobEditor = ({ cronJobEditorForm, initialWorkflow }) => {
           <Label htmlFor="workflowID">Workflow</Label>
           <SearchSelect
             value={cronJobEditorForm.values.workflowID || ""}
-            onChange={(val) =>
-              cronJobEditorForm.setFieldValue("workflowID", val)
-            }
+            onChange={(val) => {
+              cronJobEditorForm.setFieldValue("workflowID", val);
+              cronJobEditorForm.setFieldValue("workflowConfig", {
+                ...(cronJobEditorForm.values.workflowConfig || { inputValues: {} }),
+                versionMode: "latest-at-capture",
+                workflowVersionID: "",
+              });
+            }}
             options={workflowOptions}
             selectedLabel={selectedLabel}
             onSearchChange={setWorkflowSearch}
@@ -174,6 +199,61 @@ export const CronJobEditor = ({ cronJobEditorForm, initialWorkflow }) => {
             placeholder="Select a workflow…"
           />
           {touched.workflowID && <FieldError message={errors.workflowID} />}
+        </div>
+
+        <div className="space-y-1 rounded border border-border/60 bg-background/30 p-2">
+          <Label className="text-xs text-muted-foreground">Version at capture</Label>
+          <select
+            className="h-8 w-full rounded border border-border bg-background px-2 text-xs"
+            value={workflowVersionMode}
+            onChange={(event) => {
+              const versionMode = event.target.value;
+              cronJobEditorForm.setFieldValue("workflowConfig", {
+                ...workflowConfig,
+                versionMode,
+                workflowVersionID:
+                  versionMode === "latest-at-capture"
+                    ? ""
+                    : workflowConfig.workflowVersionID || "",
+              });
+            }}
+          >
+            <option value="latest-at-capture">Latest at capture</option>
+            <option value="specific">Specific version</option>
+          </select>
+          <p className="text-[10px] text-muted-foreground">
+            Resolved when this scheduled job version is created, never at runtime.
+          </p>
+          {(workflowVersionMode === "specific" || workflowConfig.workflowVersionID) && (
+            <select
+              className="h-8 w-full rounded border border-border bg-background px-2 text-xs"
+              value={workflowConfig.workflowVersionID || ""}
+              disabled={isLoadingWorkflowVersions}
+              onChange={(event) =>
+                cronJobEditorForm.setFieldValue("workflowConfig", {
+                  ...workflowConfig,
+                  workflowVersionID: event.target.value,
+                })
+              }
+            >
+              <option value="">Choose a version…</option>
+              {workflowVersions.map((version) => (
+                <option key={version.assetVersionID} value={version.assetVersionID}>
+                  v{version.versionNumber}
+                  {version.createdAt
+                    ? ` · ${new Date(version.createdAt).toLocaleString()}`
+                    : ""}
+                </option>
+              ))}
+            </select>
+          )}
+          {!isLoadingWorkflowVersions &&
+            workflowVersions.length === 0 &&
+            workflowVersionMode === "specific" && (
+              <p className="text-[10px] text-destructive">
+                No versions exist for this workflow yet.
+              </p>
+            )}
         </div>
 
         {selectedWorkflow?.workflowOptions?.inputDefinitions?.length > 0 && (

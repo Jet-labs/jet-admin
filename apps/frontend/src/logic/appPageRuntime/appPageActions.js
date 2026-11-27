@@ -16,6 +16,9 @@ export const APP_PAGE_ACTIONS = {
   /** Set a page-level variable: { key, value } */
   SET_VARIABLE: "APP_PAGE_SET_VARIABLE",
 
+  /** Merge multiple page-level variables atomically: { values } */
+  SET_VARIABLES: "APP_PAGE_SET_VARIABLES",
+
   /** Merge updates into a widget's local state: { widgetID, state }.
    * widgetID carries the runtime instance ID (B24, opaque placement key).
    * See useWidgetState contract: object patch or pure updater
@@ -59,6 +62,11 @@ export const appPageActions = {
   setVariable: (key, value) => ({
     type: APP_PAGE_ACTIONS.SET_VARIABLE,
     payload: { key, value },
+  }),
+
+  setVariables: (values) => ({
+    type: APP_PAGE_ACTIONS.SET_VARIABLES,
+    payload: { values },
   }),
 
   setWidgetState: (widgetID, state) => ({

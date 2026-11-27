@@ -21,25 +21,25 @@ const {
   getSupportedMethods,
 } = require("@jet-admin/widget-types");
 
-const TYPES_32 = [
+const TYPES_ALL = [
   "vega-lite", "vega", "button", "table", "text", "stat", "alert", "form",
   "image", "iframe", "date-picker", "date-range-picker", "html",
   "text-input", "select", "multi-select", "checkbox", "radio-group", "switch",
   "slider", "search-input", "file-upload", "divider", "tabs",
   "key-value", "json-viewer", "list", "badge", "progress", "timeline",
-  "video", "code-block",
+  "video", "code-block", "kanban", "calendar",
 ];
 
-describe("samples validate + normalize for all 32 types", () => {
+describe("samples validate + normalize for all registered types", () => {
   test("registry covers all types with sample configs", () => {
-    expect(Object.keys(WIDGETS_MAP).sort()).toEqual([...TYPES_32].sort());
-    for (const type of TYPES_32) {
+    expect(Object.keys(WIDGETS_MAP).sort()).toEqual([...TYPES_ALL].sort());
+    for (const type of TYPES_ALL) {
       expect(WIDGETS_MAP[type].sampleConfig).toBeDefined();
     }
   });
 
   test("every sample validates and normalizes to a stable canonical config", () => {
-    for (const type of TYPES_32) {
+    for (const type of TYPES_ALL) {
       const sample = WIDGETS_MAP[type].sampleConfig;
       const v = validateWidgetConfig(type, sample, { mode: "authoring" });
       expect([type, v.errors]).toEqual([type, []]);
@@ -59,7 +59,7 @@ describe("samples validate + normalize for all 32 types", () => {
   });
 
   test("declared events/methods match the capability source of truth", () => {
-    for (const type of TYPES_32) {
+    for (const type of TYPES_ALL) {
       const supported = getSupportedEvents(type).map((e) => e.value);
       expect(supported).toContain("onClick");
       expect(supported).toContain("onRefresh");

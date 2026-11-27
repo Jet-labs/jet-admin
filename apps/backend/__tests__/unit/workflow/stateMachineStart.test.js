@@ -31,6 +31,16 @@ describe('start validation and ambiguous acknowledgements', () => {
     await expect(startWorkflowTemporal({ workflowID: 'wf', tenantID: 't' })).rejects.toThrow('No start node');
     expect(stateManager.createInstance).not.toHaveBeenCalled();
   });
+  test('a pinned application start persists its graph/provenance and never loads the current graph', async () => {
+    const pinnedGraph = { nodes: [{ id: 'pinned-start', type: 'start', data: {} }], edges: [], workflowOptions: {} };
+    const applicationExecution = { applicationID: 'a', releaseID: 'r1', tenantID: 't', caller: { type: 'user', id: 'u' } };
+    const executionCtx = { tenantID: 't', caller: applicationExecution.caller, originatingResource: { type: 'application', id: 'a' } };
+    await startWorkflowTemporal({ workflowID: 'wf', tenantID: 't', pinnedGraph, applicationExecution, executionCtx });
+    expect(prisma.tblWorkflows.findFirst).not.toHaveBeenCalled();
+    expect(prisma.tblWorkflowNodes.findMany).not.toHaveBeenCalled();
+    expect(stateManager.createInstance).toHaveBeenCalledWith(expect.objectContaining({ executionDefinition: expect.objectContaining({ application: applicationExecution }), systemContext: { __executionCtx: executionCtx } }));
+    expect(start.mock.calls[0][1].args[0].nodes[0].id).toBe('pinned-start');
+  });
   test('graph is loaded only from the requested tenant', async () => {
     prisma.tblWorkflows.findFirst.mockResolvedValue(null);
     await expect(startWorkflowTemporal({ workflowID: 'foreign-wf', tenantID: 't' })).rejects.toThrow('not found in tenant');

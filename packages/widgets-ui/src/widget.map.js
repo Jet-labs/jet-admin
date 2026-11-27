@@ -35,6 +35,7 @@ import { CodeBlockConfigEditor } from "./code-block/codeBlockConfigEditor";
 import { KanbanConfigEditor } from "./kanban/kanbanConfigEditor";
 import { CalendarConfigEditor } from "./calendar/calendarConfigEditor";
 import { BarChart, Component, Table, Type, TrendingUp, AlertTriangle, FileText, Image, Globe, Calendar, CalendarRange, Code, PenLine, ChevronDown, ListChecks, Check, CircleDot, ToggleRight, SlidersHorizontal, Search, Upload, Minus, Layers, Info, Braces, List, Tag, Activity, History, Video, TerminalSquare } from 'lucide-react';
+import { CompositeConfigEditor } from "./composite";
 
 
 // Register widgets
@@ -244,7 +245,17 @@ export const WIDGETS_MAP = {
       text: "Click Me",
       variant: "default",
       size: "default",
+      alignment: "center",
+      fullWidth: false,
+      icon: "",
+      iconPosition: "left",
+      tooltip: "",
+      disabled: false,
       isLoading: "",
+      loadingText: "",
+      successText: "",
+      shortcut: "",
+      confirm: { enabled: false },
       showHeader: false,
     },
   },
@@ -268,13 +279,18 @@ export const WIDGETS_MAP = {
       columns: [],
       emptyText: "No data available.",
       emptyHint: "Ensure the data array template resolves to a non-empty array.",
+      noResultsText: "No rows match the current filters.",
       striped: true,
       dense: false,
+      hoverHighlight: true,
       stickyHeader: true,
+      rowKey: "id",
       isLoading: "",
       pagination: {
         enabled: false,
+        mode: "client",
         pageParam: "page",
+        pageSizeParam: "limit",
         pageSize: 10,
         totalTemplate: "{{ctx.total}}",
       },
@@ -288,6 +304,7 @@ export const WIDGETS_MAP = {
         format: "csv",
         serverSide: false,
         buttonLabel: "Export",
+        scope: "filtered",
       },
       editing: {
         enabled: false,
@@ -302,6 +319,31 @@ export const WIDGETS_MAP = {
         saveLabel: "Save All Changes",
       },
       showHeader: true,
+    },
+  },
+  'composite': {
+    label: "Composite Widget",
+    value: WIDGET_TYPES.COMPOSITE.value,
+    datasetFields: [],
+    defaultAutoRun: false,
+    description: "Reusable combination of existing widgets",
+    component: ({ widgetTitle }) => (
+      <div className="flex h-full w-full items-center justify-center rounded border border-dashed border-border bg-muted/20 p-3 text-center text-[11px] text-muted-foreground">
+        {widgetTitle || "Composite widget"} — open this widget on a page to render
+        its captured layout.
+      </div>
+    ),
+    configEditor: CompositeConfigEditor,
+    icon: ({ className }) => <Layers className={`!text-lg ${className}`} />,
+    sampleConfig: {
+      composite: {
+        schemaVersion: 1,
+        layout: null,
+        inputs: [],
+        outputs: [],
+        values: {},
+      },
+      showHeader: false,
     },
   },
   'text': {
@@ -350,7 +392,18 @@ export const WIDGETS_MAP = {
       suffix: "",
       trendTemplate: "",
       trendDirection: "up-is-good",
+      comparisonLabel: "",
       textAlign: "center",
+      valueSize: "default",
+      format: "number",
+      decimals: 2,
+      currency: "USD",
+      locale: "",
+      icon: "",
+      iconColor: "",
+      sparklineTemplate: "",
+      thresholds: [],
+      animateValue: false,
       isLoading: "",
       showHeader: false,
     },
@@ -547,7 +600,7 @@ export const WIDGETS_MAP = {
     ),
     configEditor: TextInputConfigEditor,
     icon: ({ className }) => <PenLine className={`!text-lg ${className}`} />,
-    sampleConfig: { label: "Name", placeholder: "Type...", inputType: "text", defaultValue: "", isLoading: "", showHeader: false },
+    sampleConfig: { label: "Name", placeholder: "Type...", inputType: "text", defaultValue: "", labelPosition: "top", size: "default", variant: "outline", help: "", prefix: "", suffix: "", showCount: false, required: false, disabled: false, readOnly: false, isLoading: "", showHeader: false },
   },
   'select': {
     label: "Select",
@@ -562,7 +615,7 @@ export const WIDGETS_MAP = {
     ),
     configEditor: SelectConfigEditor,
     icon: ({ className }) => <ChevronDown className={`!text-lg ${className}`} />,
-    sampleConfig: { label: "Status", placeholder: "Select option...", options: [{ label: "Active", value: "active" }, { label: "Archived", value: "archived" }], defaultValue: "", isLoading: "", showHeader: false },
+    sampleConfig: { label: "Status", placeholder: "Select option...", options: [{ label: "Active", value: "active" }, { label: "Archived", value: "archived" }], optionsTemplate: "", labelKey: "label", valueKey: "value", defaultValue: "", required: false, disabled: false, clearable: false, searchable: false, searchPlaceholder: "Search…", emptyText: "No options", size: "default", labelPosition: "top", isLoading: "", showHeader: false },
   },
   'multi-select': {
     label: "Multi Select",

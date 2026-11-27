@@ -24,6 +24,7 @@ const CALLER_TYPES = {
 const ORIGIN_TYPES = {
   WORKFLOW: "workflow",
   APP_PAGE: "appPage",
+  APPLICATION: "application",
   LISTENER: "listener",
   CRON: "cron",
   DIRECT: "direct", // Direct API call, no parent resource

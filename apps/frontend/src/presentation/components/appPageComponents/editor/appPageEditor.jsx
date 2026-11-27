@@ -3,6 +3,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Input, Label, Tabs, TabsContent, TabsList, TabsTrigger } from "@jet-admin/ui";
 import { AppPageWidgetList } from "./appPageWidgetList";
+import { AppPageWidgetVersionsEditor } from "./appPageWidgetVersionsEditor";
 import { AppPageDataSourcesEditor } from "./appPageDataSourcesEditor";
 import { AppPageVariablesEditor } from "./appPageVariablesEditor";
 
@@ -53,12 +54,19 @@ AppPageSettingsEditor.propTypes = {
   appPageEditorForm: PropTypes.object.isRequired,
 };
 
-export const AppPageEditor = ({ appPageEditorForm, tenantID, onAddWidget }) => {
+export const AppPageEditor = ({
+  appPageEditorForm,
+  tenantID,
+  onAddWidget,
+  applicationVariables = null,
+  applicationTitle = null,
+}) => {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-background">
       <Tabs defaultValue="widgets" className="flex flex-col h-full w-full">
         <TabsList>
           <TabsTrigger value="widgets" className="text-[11px] font-semibold p-2">Widgets</TabsTrigger>
+          <TabsTrigger value="widget-versions" className="text-[11px] font-semibold p-2">Widget versions</TabsTrigger>
           <TabsTrigger value="datasources" className="text-[11px] font-semibold p-2">Data</TabsTrigger>
           <TabsTrigger value="variables" className="text-[11px] font-semibold p-2">Vars</TabsTrigger>
           <TabsTrigger value="settings" className="text-[11px] font-semibold p-2">Settings</TabsTrigger>
@@ -73,8 +81,16 @@ export const AppPageEditor = ({ appPageEditorForm, tenantID, onAddWidget }) => {
           />
         </TabsContent>
 
+        <TabsContent value="widget-versions" className="flex-1 min-h-0 m-0 data-[state=active]:flex data-[state=active]:flex-col data-[state=inactive]:hidden overflow-y-auto">
+          <AppPageWidgetVersionsEditor appPageEditorForm={appPageEditorForm} />
+        </TabsContent>
+
         <TabsContent value="datasources" className="flex-1 min-h-0 m-0 data-[state=active]:flex data-[state=active]:flex-col data-[state=inactive]:hidden overflow-hidden">
-          <AppPageDataSourcesEditor appPageEditorForm={appPageEditorForm} />
+          <AppPageDataSourcesEditor
+            appPageEditorForm={appPageEditorForm}
+            applicationVariables={applicationVariables}
+            applicationTitle={applicationTitle}
+          />
         </TabsContent>
 
         <TabsContent value="variables" className="flex-1 min-h-0 m-0 data-[state=active]:flex data-[state=active]:flex-col data-[state=inactive]:hidden overflow-hidden">
@@ -93,4 +109,6 @@ AppPageEditor.propTypes = {
   appPageEditorForm: PropTypes.object.isRequired,
   tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   onAddWidget: PropTypes.func.isRequired,
+  applicationVariables: PropTypes.object,
+  applicationTitle: PropTypes.string,
 };

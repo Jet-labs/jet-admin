@@ -1,0 +1,23 @@
+{
+  "widgetType": "calendar",
+  "description": "Month calendar rendering dated records from an array with configurable date, title, subtitle and group keys.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "dataArrayTemplate": {
+        "type": "string",
+        "description": "Template resolving to an array of dated records"
+      },
+      "dateKey": { "type": "string", "default": "due_date" },
+      "titleKey": { "type": "string", "default": "name" },
+      "subtitleKey": { "type": "string", "default": "owner" },
+      "groupKey": { "type": "string", "default": "status" },
+      "emptyText": { "type": "string", "default": "No dated records." },
+      "isLoading": {
+        "type": ["boolean", "string"],
+        "description": "Loading overlay — boolean or template expression."
+      }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onItemClick"]
+}

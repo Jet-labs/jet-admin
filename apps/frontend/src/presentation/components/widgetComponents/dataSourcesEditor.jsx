@@ -13,6 +13,9 @@ import {
 } from "@jet-admin/ui";
 import { WorkflowConsole } from "../workflowComponents/workflowConsole";
 import { useRuntimeStore } from "../../../logic/stores/useRuntimeStore";
+import { getAssetVersionsAPI } from "../../../data/apis/assetVersion";
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
 
 /**
  * DataSourcesEditor
@@ -26,6 +29,80 @@ import { useRuntimeStore } from "../../../logic/stores/useRuntimeStore";
  * - alias: user-defined key for the results context
  * - inputArgValues: key/value pairs passed at execution time
  */
+
+const WidgetDataSourceVersionSelector = ({ source, onChange }) => {
+  const { tenantID } = useParams();
+  const assetType = source.type === "workflow" ? "workflow" : "query";
+  const assetID = source.type === "workflow" ? source.workflowID : source.queryID;
+  const versionField = source.type === "workflow" ? "workflowVersionID" : "queryVersionID";
+  const versionMode = source.versionMode || (source[versionField] ? "specific" : "latest-at-capture");
+  const { data, isLoading } = useQuery({
+    queryKey: ["asset-versions", tenantID, assetType, assetID],
+    queryFn: () => getAssetVersionsAPI({ tenantID, assetType, assetID, page: 1, pageSize: 100 }),
+    enabled: Boolean(tenantID) && Boolean(assetID),
+    refetchOnWindowFocus: false,
+  });
+  const versions = data?.versions || [];
+  if (!assetID) return null;
+  return (
+    <div className="space-y-1 rounded border border-border/60 bg-background/30 p-2">
+      <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+        Version at widget capture
+      </Label>
+      <Select
+        value={versionMode}
+        onValueChange={(value) =>
+          onChange({
+            ...source,
+            versionMode: value,
+            ...(value === "latest-at-capture" ? { [versionField]: "" } : {}),
+          })
+        }
+      >
+        <SelectTrigger className="text-xs">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="latest-at-capture">Latest at capture</SelectItem>
+          <SelectItem value="specific">Specific version</SelectItem>
+        </SelectContent>
+      </Select>
+      <p className="text-[10px] text-muted-foreground">
+        Resolved when this widget version is created, never at runtime.
+      </p>
+      {(versionMode === "specific" || source[versionField]) && (
+        <Select
+          value={source[versionField] || ""}
+          onValueChange={(value) =>
+            onChange({ ...source, versionMode: "specific", [versionField]: value })
+          }
+          disabled={isLoading}
+        >
+          <SelectTrigger className="text-xs">
+            <SelectValue placeholder="Choose a version…" />
+          </SelectTrigger>
+          <SelectContent>
+            {versions.map((version) => (
+              <SelectItem key={version.assetVersionID} value={version.assetVersionID}>
+                v{version.versionNumber}
+                {version.createdAt ? ` · ${new Date(version.createdAt).toLocaleString()}` : ""}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+      {!isLoading && versions.length === 0 && versionMode === "specific" && (
+        <p className="text-[10px] text-destructive">No versions exist for this asset yet.</p>
+      )}
+    </div>
+  );
+};
+
+WidgetDataSourceVersionSelector.propTypes = {
+  source: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
 export const DataSourcesEditor = ({
   widgetEditorForm,
   dataQueries,
@@ -70,6 +147,14 @@ export const DataSourcesEditor = ({
           next.workflowID = "";
           next.inputArgValues = {};
           next.alias = "";
+          next.versionMode = "latest-at-capture";
+          next.queryVersionID = "";
+          next.workflowVersionID = "";
+        }
+        if (field === "queryID" || field === "workflowID") {
+          next.versionMode = "latest-at-capture";
+          next.queryVersionID = "";
+          next.workflowVersionID = "";
         }
         // Auto-generate alias when source is selected
         if (field === "queryID" && value) {
@@ -258,6 +343,14 @@ export const DataSourcesEditor = ({
                 </Select>
               )}
             </div>
+
+            <WidgetDataSourceVersionSelector
+              source={source}
+              onChange={(nextSource) => {
+                const updated = dataSources.map((src, i) => (i === idx ? nextSource : src));
+                updateDataSources(updated);
+              }}
+            />
 
             {/* Alias */}
             <div className="space-y-1">

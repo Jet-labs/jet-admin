@@ -24,6 +24,10 @@ export const WIDGET_TYPES = {
     name: "Text / Markdown",
     value: "text",
   },
+  COMPOSITE: {
+    name: "Composite Widget",
+    value: "composite",
+  },
   STAT: {
     name: "Stat / KPI",
     value: "stat",
@@ -263,8 +267,16 @@ export const WIDGET_EVENT_TYPES = {
     {
       value: "onExport", label: "On Export", desc: "Fires when export is triggered",
       inputDefinitions: [
-        { key: "event.format", description: "Export format (csv / json)" },
+        { key: "event.format", description: "Export format (csv / json / xlsx)" },
         { key: "event.rowCount", description: "Total rows exported" },
+      ],
+    },
+    {
+      value: "onRowExpand", label: "On Row Expand", desc: "Fires when a row detail panel opens or closes",
+      inputDefinitions: [
+        { key: "event.row", description: "Row object" },
+        { key: "event.rowIndex", description: "Zero-based row index" },
+        { key: "event.expanded", description: "Whether the detail row is now open" },
       ],
     },
     {
@@ -302,6 +314,79 @@ export const WIDGET_EVENT_TYPES = {
       inputDefinitions: [
         { key: "event.edits", description: "Array of { rowIndex, originalRow, changes } objects" },
       ],
+    },
+  ],
+
+  /** Kanban-specific events */
+  kanban: [
+    {
+      value: "onCardSelect",
+      label: "On Card Select",
+      desc: "Fires when a card is selected",
+      inputDefinitions: [
+        { key: "event.card", description: "Selected card object" },
+        { key: "event.group", description: "Column value the card belongs to" },
+      ],
+    },
+    {
+      value: "onCardMove",
+      label: "On Card Move",
+      desc: "Fires when a card is dropped into another column or moved with the keyboard/drawer",
+      inputDefinitions: [
+        { key: "event.card", description: "Moved card object" },
+        { key: "event.id", description: "Stable card id" },
+        { key: "event.from", description: "Previous column value" },
+        { key: "event.to", description: "Destination column value" },
+      ],
+    },
+    {
+      value: "onCardCreate",
+      label: "On Card Create",
+      desc: "Fires when the quick-add control creates a card",
+      inputDefinitions: [
+        { key: "event.card", description: "Optimistic card object" },
+        { key: "event.column", description: "Column value" },
+        { key: "event.title", description: "New card title" },
+      ],
+    },
+  ],
+
+  /** Calendar-specific events */
+  calendar: [
+    {
+      value: "onEventSelect",
+      label: "On Event Select",
+      desc: "Fires when a dated record is selected",
+      inputDefinitions: [
+        { key: "event.event", description: "Selected record object" },
+        { key: "event.date", description: "Calendar date key (YYYY-MM-DD)" },
+      ],
+    },
+    {
+      value: "onEventMove",
+      label: "On Event Move",
+      desc: "Fires when a record is dragged onto another day",
+      inputDefinitions: [
+        { key: "event.event", description: "Moved record object" },
+        { key: "event.id", description: "Stable item id" },
+        { key: "event.from", description: "Original date (YYYY-MM-DD)" },
+        { key: "event.to", description: "Destination date (YYYY-MM-DD)" },
+      ],
+    },
+    {
+      value: "onEventCreate",
+      label: "On Event Create",
+      desc: "Fires when the add control on a day is used",
+      inputDefinitions: [
+        { key: "event.date", description: "Date key (YYYY-MM-DD)" },
+        { key: "event.dateKey", description: "Configured date field" },
+      ],
+    },
+    {
+      value: "onDateClick",
+      label: "On Date Click",
+      desc: "Fires with the date when create-on-date is used",
+      inputDefinitions: [{ key: "event.date", description: "Date key (YYYY-MM-DD)" }],
     },
   ],
 
@@ -371,6 +456,22 @@ export const WIDGET_EVENT_TYPES = {
         { key: "event.source", description: "user | method" },
       ],
     },
+    {
+      value: "onAutosave", label: "On Autosave", desc: "Fires after edits settle when autosave is enabled",
+      inputDefinitions: [
+        { key: "event.values", description: "Current form values" },
+        { key: "event.formData", description: "Alias of values" },
+        { key: "event.dirty", description: "Changed field keys" },
+      ],
+    },
+    {
+      value: "onValidate", label: "On Validate", desc: "Fires after validation, including async validation",
+      inputDefinitions: [
+        { key: "event.values", description: "Current form values" },
+        { key: "event.errors", description: "Validation errors object" },
+        { key: "event.isValid", description: "Whether validation passed" },
+      ],
+    },
   ],
 
   /** Alert-specific events */
@@ -378,7 +479,16 @@ export const WIDGET_EVENT_TYPES = {
     {
       value: "onDismiss", label: "On Dismiss", desc: "Fires when the alert is dismissed",
       inputDefinitions: [
-        { key: "event.inputDefinitions[0]", description: "Dismiss payload" },
+        { key: "event.title", description: "Alert title" },
+        { key: "event.message", description: "Alert message" },
+        { key: "event.source", description: "user | timeout" },
+      ],
+    },
+    {
+      value: "onAction", label: "On Action", desc: "Fires when an alert action button is clicked",
+      inputDefinitions: [
+        { key: "event.actionKey", description: "Configured action key" },
+        { key: "event.label", description: "Action label" },
       ],
     },
   ],
@@ -468,6 +578,14 @@ export const WIDGET_EVENT_TYPES = {
       value: "onClear", label: "On Clear", desc: "Fires when selection is cleared",
       inputDefinitions: [{ key: "event.value", description: "Empty array" }],
     },
+    {
+      value: "onLoadOptions", label: "On Load Options", desc: "Fires when async options need a page or search",
+      inputDefinitions: [
+        { key: "event.searchTerm", description: "Current filter text" },
+        { key: "event.page", description: "1-based page number" },
+        { key: "event.pageSize", description: "Requested page size" },
+      ],
+    },
   ],
   checkbox: [
     {
@@ -511,11 +629,44 @@ export const WIDGET_EVENT_TYPES = {
   ],
   "file-upload": [
     {
-      value: "onChange", label: "On Change", desc: "Fires when files are selected",
+      value: "onChange", label: "On Change", desc: "Fires when files are selected or uploads finish",
       inputDefinitions: [
-        { key: "event.files", description: "Array of { name, size, type } file metadata" },
+        { key: "event.files", description: "Array of { name, size, type, status, progress, url } file metadata" },
         { key: "event.fileNames", description: "Array of file names" },
+        { key: "event.fileUrls", description: "Array of uploaded URLs" },
       ],
+    },
+    {
+      value: "onUploadStart", label: "On Upload Start", desc: "Fires when a file upload begins",
+      inputDefinitions: [{ key: "event.file", description: "File metadata" }],
+    },
+    {
+      value: "onUploadProgress", label: "On Upload Progress", desc: "Fires during upload progress",
+      inputDefinitions: [
+        { key: "event.file", description: "File metadata" },
+        { key: "event.progress", description: "Percentage 0–100" },
+        { key: "event.loaded", description: "Bytes uploaded" },
+        { key: "event.total", description: "Total bytes" },
+      ],
+    },
+    {
+      value: "onUploadComplete", label: "On Upload Complete", desc: "Fires when an upload succeeds",
+      inputDefinitions: [
+        { key: "event.file", description: "File metadata" },
+        { key: "event.url", description: "Resolved file URL" },
+        { key: "event.response", description: "Parsed response body" },
+      ],
+    },
+    {
+      value: "onUploadError", label: "On Upload Error", desc: "Fires when an upload fails",
+      inputDefinitions: [
+        { key: "event.file", description: "File metadata" },
+        { key: "event.status", description: "HTTP status (0 for network error)" },
+      ],
+    },
+    {
+      value: "onUploadCancel", label: "On Upload Cancel", desc: "Fires when an upload is cancelled",
+      inputDefinitions: [{ key: "event.file", description: "File metadata" }],
     },
     {
       value: "onClear", label: "On Clear", desc: "Fires when files are cleared",
@@ -653,6 +804,7 @@ export const WIDGET_METHODS = {
   ],
   "file-upload": [
     { name: "clear", description: "Clear selected files" },
+    { name: "retry", description: "Retry a failed upload by index" },
   ],
   tabs: [
     { name: "setTab", description: "Select tab by value" },

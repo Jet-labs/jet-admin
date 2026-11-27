@@ -4,10 +4,9 @@ node_modules/
 npm-debug.log*
 yarn-error.log*
 
-apps/frontend/dist/
-apps/frontend/build/
-dist/
-build/
+# Build outputs - all dist/build folders anywhere (Dockerfile patterns are root-relative)
+**/dist/
+**/build/
 
 # Development files
 .git/

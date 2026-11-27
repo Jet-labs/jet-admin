@@ -31,6 +31,7 @@ import {
 import { useInfiniteDataQueries } from "../../../logic/hooks/useDataQueries";
 import { useInfiniteDatasources } from "../../../logic/hooks/useDatasources";
 import { getDataQueryByIDAPI } from "../../../data/apis/dataQuery";
+import { getAssetVersionsAPI } from "../../../data/apis/assetVersion";
 import { getAllWorkflowsAPI, getWorkflowByIDAPI } from "../../../data/apis/workflow";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import debounce from "lodash/debounce";
@@ -501,6 +502,11 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
         }
     }, [dataQueries]);
 
+    const getAssetVersions = useCallback(
+        ({ assetType, assetID }) => getAssetVersionsAPI({ tenantID, assetType, assetID }),
+        [tenantID]
+    );
+
     // Find selected node
     const selectedNode = values.nodes.find(n => n.id === selectedNodeId);
 
@@ -522,6 +528,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
             workflowContext={workflowContext}
             tenantID={tenantID}
             onQueryTest={handleQueryTest}
+            getAssetVersions={getAssetVersions}
             
             // Infinite Scroll props for UI
             querySearch={querySearch}

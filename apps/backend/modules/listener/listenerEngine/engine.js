@@ -55,7 +55,7 @@ class ListenerEngine {
           tblDatasources: true,
           tblListenerActions: {
             where: { isEnabled: true },
-            orderBy: { orderIndex: 'asc' },
+            orderBy: [{ orderIndex: 'asc' }, { actionID: 'asc' }],
           },
         },
       });
@@ -105,6 +105,7 @@ class ListenerEngine {
     const isCurrent = () => this.generations.get(listenerID) === generation;
 
     try {
+      const definitionHash = require('../listenerDefinition').listenerDefinitionHash(listener);
       const publishEvent = this.eventPublisherFactory ? await this.eventPublisherFactory(listener) : addListenerEvent;
       if (!isCurrent()) return;
       const datasource = listener.tblDatasources;
@@ -182,6 +183,7 @@ class ListenerEngine {
               listenerID: listener.listenerID,
               tenantID: listener.tenantID,
               rawEvent,
+              listenerDefinitionHash: definitionHash,
               actions: listener.tblListenerActions,
             });
           } catch (enqueueErr) {
@@ -296,7 +298,7 @@ class ListenerEngine {
           tblDatasources: true,
           tblListenerActions: {
             where: { isEnabled: true },
-            orderBy: { orderIndex: 'asc' },
+            orderBy: [{ orderIndex: 'asc' }, { actionID: 'asc' }],
           },
         },
       });

@@ -17,7 +17,18 @@
     "read": { "title": "tenant:apppage:read", "description": "Permission to read a specific app page" },
     "update": { "title": "tenant:apppage:update", "description": "Permission to update an app page" },
     "delete": { "title": "tenant:apppage:delete", "description": "Permission to delete an app page" },
+    "execute": { "title": "tenant:apppage:execute", "description": "Permission to execute an app page runtime inside an application" },
     "export": { "title": "tenant:apppage:export", "description": "Permission to export an app page as a dependency bundle" }
+  },
+  "application": {
+    "list": { "title": "tenant:application:list", "description": "List applications in a tenant" },
+    "create": { "title": "tenant:application:create", "description": "Create an application draft" },
+    "read": { "title": "tenant:application:read", "description": "Read an application composition" },
+    "update": { "title": "tenant:application:update", "description": "Edit and preview an application draft" },
+    "archive": { "title": "tenant:application:archive", "description": "Archive an application without deleting its assets" },
+    "publish": { "title": "tenant:application:publish", "description": "Compile an immutable application release" },
+    "deploy": { "title": "tenant:application:deploy", "description": "Deploy an application release to an environment" },
+    "execute": { "title": "tenant:application:execute", "description": "Use a deployed application runtime" }
   },
   "audit": {
     "list": { "title": "tenant:audit:list", "description": "Permission to list audit logs" }
@@ -65,6 +76,7 @@
     "update": { "title": "tenant:listener:update", "description": "Permission to update a listener" },
     "delete": { "title": "tenant:listener:delete", "description": "Permission to delete a listener" },
     "execute": { "title": "tenant:listener:execute", "description": "Permission to execute a listener (cross-resource binding)" },
+    "observe": { "title": "tenant:listener:observe", "description": "Permission to observe a buffered listener from an application runtime" },
     "export": { "title": "tenant:listener:export", "description": "Permission to export a listener as a dependency bundle" }
   },
   "marketplace": {

@@ -1,319 +1,262 @@
-import React from "react";
+import React, { useMemo } from "react";
 import PropTypes from "prop-types";
-import { Plus, Trash2 } from "lucide-react";
-import { Label, Input, Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Checkbox } from "@jet-admin/ui";
+import { Input, Switch } from "@jet-admin/ui";
+import {
+  ConfigSection,
+  ConfigField,
+  BindableInput,
+  BindableSwitch,
+  ConditionBuilder,
+  OptionListEditor,
+  SegmentedControl,
+  TagField,
+  useConfigValue,
+} from "../config";
 
-export const FormConfigEditor = ({ widgetEditorForm }) => {
-    const config = widgetEditorForm.values.widgetConfig || {};
-    const fields = config.fields || [];
+const FIELD_TYPES = ["text", "email", "password", "number", "textarea", "checkbox", "select", "radio", "switch", "date", "datetime", "file", "hidden"];
 
-    const handleAddField = () => {
-        const newField = {
-            key: `field_${fields.length + 1}`,
-            label: `Field ${fields.length + 1}`,
-            type: "text",
-            placeholder: "",
-            required: false,
-            defaultValue: "",
-            options: [],
-        };
-        widgetEditorForm.setFieldValue("widgetConfig.fields", [...fields, newField]);
-    };
+export const FormConfigEditor = ({ stateTree }) => {
+  const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
+  const [submitLabel, setSubmitLabel] = useConfigValue("submitLabel", "Submit");
+  const [resetLabel, setResetLabel] = useConfigValue("resetLabel", "Reset");
+  const [showReset, setShowReset] = useConfigValue("showReset", false);
+  const [layout, setLayout] = useConfigValue("layout", "vertical");
+  const [columns, setColumns] = useConfigValue("columns", 1);
+  const [size, setSize] = useConfigValue("size", "default");
+  const [labelPosition, setLabelPosition] = useConfigValue("labelPosition", "top");
+  const [stickyActions, setStickyActions] = useConfigValue("stickyActions", false);
+  const [stepper, setStepper] = useConfigValue("stepper", false);
+  const [autosave, setAutosave] = useConfigValue("autosave", false);
+  const [autosaveDelay, setAutosaveDelay] = useConfigValue("autosaveDelay", 900);
+  const [validationUrl, setValidationUrl] = useConfigValue("validationUrl", "");
+  const [successMessage, setSuccessMessage] = useConfigValue("successMessage", "");
+  const [warnUnsaved, setWarnUnsaved] = useConfigValue("warnUnsaved", false);
+  const [fields, setFields] = useConfigValue("fields", []);
+  const [isLoading, setIsLoading] = useConfigValue("isLoading", "");
 
-    const handleRemoveField = (idx) => {
-        const updated = [...fields];
-        updated.splice(idx, 1);
-        widgetEditorForm.setFieldValue("widgetConfig.fields", updated);
-    };
-
-    const handleFieldChange = (idx, key, val) => {
-        widgetEditorForm.setFieldValue(`widgetConfig.fields[${idx}].${key}`, val);
-    };
-
-    const handleOptionsChange = (idx, optionsStr) => {
-        const list = optionsStr.split(",").map((s) => s.trim()).filter(Boolean);
-        handleFieldChange(idx, "options", list);
-    };
-
-    return (
-        <div className="space-y-2">
-            {/* Global Form Settings */}
-            <div className="grid grid-cols-2 gap-2 pb-2 border-b">
-                <div className="space-y-1">
-                    <Label className="text-xs font-medium text-foreground">Submit Button Text</Label>
-                    <Input
-                        type="text"
-                        className="text-xs h-8"
-                        value={config.submitLabel || "Submit"}
-                        onChange={(e) => widgetEditorForm.setFieldValue("widgetConfig.submitLabel", e.target.value)}
-                    />
-                </div>
-                <div className="space-y-1">
-                    <Label className="text-xs font-medium text-foreground">Size / Spacing</Label>
-                    <Select
-                        value={config.size || "default"}
-                        onValueChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.size", val)}
-                    >
-                        <SelectTrigger className="text-xs h-8">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="sm">Compact (Small)</SelectItem>
-                            <SelectItem value="default">Normal (Default)</SelectItem>
-                            <SelectItem value="lg">Spacious (Large)</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="space-y-1">
-                    <Label className="text-xs font-medium text-foreground">Layout</Label>
-                    <Select
-                        value={config.layout || "vertical"}
-                        onValueChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.layout", val)}
-                    >
-                        <SelectTrigger className="text-xs h-8">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="vertical">Vertical (stacked)</SelectItem>
-                            <SelectItem value="horizontal">Horizontal (wrapped row)</SelectItem>
-                            <SelectItem value="grid">Grid (columns)</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="space-y-1">
-                    <Label className="text-xs font-medium text-foreground">Grid columns</Label>
-                    <Input
-                        type="number"
-                        min={1}
-                        max={4}
-                        className="text-xs h-8"
-                        value={config.columns ?? 2}
-                        disabled={(config.layout || "vertical") !== "grid"}
-                        onChange={(e) => widgetEditorForm.setFieldValue("widgetConfig.columns", Number(e.target.value) || 1)}
-                    />
-                </div>
-                <div className="space-y-1 col-span-2">
-                    <Label className="text-xs font-medium text-foreground">Reset button label <span className="text-muted-foreground font-normal">(empty hides reset)</span></Label>
-                    <Input
-                        type="text"
-                        className="text-xs h-8"
-                        value={config.resetLabel ?? ""}
-                        placeholder="Reset — empty hides the button"
-                        onChange={(e) => {
-                          widgetEditorForm.setFieldValue("widgetConfig.resetLabel", e.target.value);
-                          widgetEditorForm.setFieldValue("widgetConfig.showReset", e.target.value !== "");
-                        }}
-                    />
-                </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-                <Label className="text-xs font-semibold text-foreground">Fields list</Label>
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-7 px-2 text-xs gap-1"
-                    onClick={handleAddField}
-                >
-                    <Plus className="h-3 w-3" /> Add Field
-                </Button>
-            </div>
-
-            {/* Field Item Editors */}
-            <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
-                {fields.map((field, idx) => (
-                    <div key={idx} className="p-2 border rounded bg-muted/10 relative space-y-2">
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="absolute top-1 right-1 h-6 w-6 text-muted-foreground hover:text-destructive"
-                            onClick={() => handleRemoveField(idx)}
-                            aria-label={`Remove field ${field.label || field.key || idx + 1}`}
-                        >
-                            <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-
-                        <div className="grid grid-cols-2 gap-2 pr-5">
-                            {/* Field Label */}
-                            <div className="space-y-1">
-                                <Label className="text-xs text-muted-foreground font-medium">Label</Label>
-                                <Input
-                                    type="text"
-                                    className="text-xs h-7"
-                                    value={field.label || ""}
-                                    onChange={(e) => handleFieldChange(idx, "label", e.target.value)}
-                                    placeholder="e.g. Email Address"
-                                />
-                            </div>
-
-                            {/* Unique Key */}
-                            <div className="space-y-1">
-                                <Label className="text-xs text-muted-foreground font-medium">Key (Unique ID)</Label>
-                                <Input
-                                    type="text"
-                                    className="text-xs h-7 font-mono"
-                                    value={field.key || ""}
-                                    onChange={(e) => handleFieldChange(idx, "key", e.target.value)}
-                                    placeholder="e.g. email"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-2">
-                            {/* Type Select */}
-                            <div className="space-y-1">
-                                <Label className="text-xs text-muted-foreground font-medium">Input Type</Label>
-                                <Select
-                                    value={field.type || "text"}
-                                    onValueChange={(val) => handleFieldChange(idx, "type", val)}
-                                >
-                                    <SelectTrigger className="text-[11px] h-7 bg-background">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="text">Text (Single line)</SelectItem>
-                                        <SelectItem value="email">Email</SelectItem>
-                                        <SelectItem value="password">Password</SelectItem>
-                                        <SelectItem value="number">Number</SelectItem>
-                                        <SelectItem value="textarea">Textarea</SelectItem>
-                                        <SelectItem value="checkbox">Checkbox</SelectItem>
-                                        <SelectItem value="select">Select / Dropdown</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            {/* Placeholder */}
-                            {field.type !== "checkbox" && (
-                                <div className="space-y-1">
-                                    <Label className="text-xs text-muted-foreground font-medium">Placeholder</Label>
-                                    <Input
-                                        type="text"
-                                        className="text-xs h-7"
-                                        value={field.placeholder || ""}
-                                        onChange={(e) => handleFieldChange(idx, "placeholder", e.target.value)}
-                                        placeholder="Hint text..."
-                                    />
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Help text */}
-                        <div className="space-y-1">
-                            <Label className="text-xs text-muted-foreground font-medium">Help text (optional)</Label>
-                            <Input
-                                type="text"
-                                className="text-xs h-7"
-                                value={field.help || ""}
-                                onChange={(e) => handleFieldChange(idx, "help", e.target.value)}
-                                placeholder="Shown under the field"
-                            />
-                        </div>
-
-                        {/* Options list for select type */}
-                        {field.type === "select" && (
-                            <div className="space-y-1">
-                                <Label className="text-xs text-muted-foreground font-medium">Options (comma-separated)</Label>
-                                <Input
-                                    type="text"
-                                    className="text-xs h-7"
-                                    value={(field.options || []).join(", ")}
-                                    onChange={(e) => handleOptionsChange(idx, e.target.value)}
-                                    placeholder="admin, member, guest"
-                                />
-                            </div>
-                        )}
-
-                        {/* Number bounds */}
-                        {field.type === "number" && (
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="space-y-1">
-                                    <Label className="text-xs text-muted-foreground font-medium">Min</Label>
-                                    <Input type="number" className="text-xs h-7" value={field.validation?.min ?? ""} onChange={(e) => handleFieldChange(idx, "validation", { ...(field.validation || {}), min: e.target.value === "" ? undefined : Number(e.target.value) })} />
-                                </div>
-                                <div className="space-y-1">
-                                    <Label className="text-xs text-muted-foreground font-medium">Max</Label>
-                                    <Input type="number" className="text-xs h-7" value={field.validation?.max ?? ""} onChange={(e) => handleFieldChange(idx, "validation", { ...(field.validation || {}), max: e.target.value === "" ? undefined : Number(e.target.value) })} />
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="grid grid-cols-3 gap-2 pt-1 border-t border-dashed">
-                            {/* Required Check */}
-                            <div className="flex items-center gap-1.5">
-                                <Checkbox
-                                    id={`field-req-${idx}`}
-                                    checked={!!field.required}
-                                    onCheckedChange={(val) => handleFieldChange(idx, "required", !!val)}
-                                  />
-                                <Label htmlFor={`field-req-${idx}`} className="text-xs text-muted-foreground cursor-pointer font-medium">
-                                      Required
-                                  </Label>
-                              </div>
-                            {/* Disabled */}
-                            <div className="flex items-center gap-1.5">
-                                <Checkbox
-                                    id={`field-dis-${idx}`}
-                                    checked={!!field.disabled}
-                                    onCheckedChange={(val) => handleFieldChange(idx, "disabled", !!val)}
-                                  />
-                                <Label htmlFor={`field-dis-${idx}`} className="text-xs text-muted-foreground cursor-pointer font-medium">
-                                      Disabled
-                                  </Label>
-                              </div>
-                            {/* Read-only */}
-                            <div className="flex items-center gap-1.5">
-                                <Checkbox
-                                    id={`field-ro-${idx}`}
-                                    checked={!!field.readOnly}
-                                    onCheckedChange={(val) => handleFieldChange(idx, "readOnly", !!val)}
-                                  />
-                                <Label htmlFor={`field-ro-${idx}`} className="text-xs text-muted-foreground cursor-pointer font-medium">
-                                      Read-only
-                                  </Label>
-                              </div>
-
-                              {/* Default Value */}
-                              <div className="space-y-0.5 col-span-3">
-                                  <Label className="text-[9px] text-muted-foreground block leading-none">Default Value</Label>
-                                  <Input
-                                      type="text"
-                                    className="text-xs h-6 font-mono px-1.5"
-                                      value={field.defaultValue ?? ""}
-                                      onChange={(e) => handleFieldChange(idx, "defaultValue", e.target.value)}
-                                      placeholder="e.g. {{widgets.table1.selectedRow.name}}"
-                                  />
-                              </div>
-                          </div>
-                      </div>
-                  ))}
-                  {fields.length === 0 && (
-                      <div className="text-center p-4 border border-dashed text-xs text-muted-foreground rounded">
-                          Click 'Add Field' above to define dynamic form fields.
-                      </div>
-                  )}
-              </div>
-
-              {/* Show Reset Option */}
-              <div className="flex items-center gap-2 pt-2">
-                <Checkbox
-                    id="form-show-reset"
-                    checked={config.showReset ?? (config.resetLabel !== undefined ? config.resetLabel !== "" : false)}
-                    onCheckedChange={(checked) =>
-                        widgetEditorForm.setFieldValue("widgetConfig.showReset", !!checked)
-                    }
-                />
-                <Label htmlFor="form-show-reset" className="text-xs text-muted-foreground cursor-pointer">
-                    Show form reset button alongside submit
-                </Label>
-            </div>
+  const renderField = (field, index, update, ids) => (
+    <>
+      <div className="grid grid-cols-2 gap-1.5">
+        <div className="space-y-0.5">
+          <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Label</label>
+          <Input value={field?.label ?? ""} onChange={(event) => update(index, "label", event.target.value)} className="h-7 text-[11px]" placeholder="Email address" />
         </div>
-    );
+        <div className="space-y-0.5">
+          <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Key</label>
+          <Input value={field?.key ?? ""} onChange={(event) => update(index, "key", event.target.value)} className="h-7 font-mono text-[11px]" placeholder="email" />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-1.5">
+        <div className="space-y-0.5">
+          <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Type</label>
+          <select
+            value={field?.type || "text"}
+            onChange={(event) => update(index, "type", event.target.value)}
+            className="h-7 w-full rounded border border-input-custom bg-input-custom px-1.5 text-[11px] text-foreground"
+          >
+            {FIELD_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
+          </select>
+        </div>
+        <div className="space-y-0.5">
+          <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Placeholder</label>
+          <Input value={field?.placeholder ?? ""} onChange={(event) => update(index, "placeholder", event.target.value)} className="h-7 text-[11px]" />
+        </div>
+      </div>
+      {["select", "radio"].includes(field?.type) && (
+        <div className="space-y-0.5">
+          <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Options</label>
+          <TagField value={Array.isArray(field?.options) ? field.options : []} onChange={(options) => update(index, "options", options)} placeholder="Add an option…" />
+        </div>
+      )}
+      <div className="space-y-0.5">
+        <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Help text</label>
+        <Input value={field?.help ?? ""} onChange={(event) => update(index, "help", event.target.value)} className="h-7 text-[11px]" />
+      </div>
+      <div className="space-y-0.5">
+        <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Default value</label>
+        <BindableInput value={field?.defaultValue ?? ""} onChange={(value) => update(index, "defaultValue", value)} liveStateTree={liveStateTree} placeholder="e.g. {{ state.variables.name }}" />
+      </div>
+      <div className="grid grid-cols-2 gap-1.5">
+        <div className="space-y-0.5">
+          <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Width (cols)</label>
+          <Input type="number" min={1} max={4} value={field?.width ?? ""} onChange={(event) => update(index, "width", event.target.value === "" ? "" : Number(event.target.value))} className="h-7 text-[11px]" />
+        </div>
+        <div className="space-y-0.5">
+          <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Section / step</label>
+          <Input value={field?.section ?? ""} onChange={(event) => update(index, "section", event.target.value)} placeholder="Details" className="h-7 text-[11px]" />
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-border/50 pt-1">
+        {[["required", "Required", field?.required], ["disabled", "Disabled", field?.disabled], ["readOnly", "Read-only", field?.readOnly]].map(([key, label, checked]) => (
+          <label key={key} className="flex items-center gap-1 text-[10px] text-muted-foreground">
+            <Switch checked={!!checked} onCheckedChange={(value) => update(index, key, !!value)} className="h-[14px] w-[24px] [&>span]:h-2.5 [&>span]:w-2.5 data-[state=checked]:[&>span]:translate-x-2.5" aria-label={`${label} ${field?.label || field?.key || index + 1}`} />
+            {label}
+          </label>
+        ))}
+      </div>
+      <details className="rounded-control border border-border/60 bg-muted/20 p-1.5">
+        <summary className="cursor-pointer text-[10px] text-muted-foreground">Validation & visibility</summary>
+        <div className="mt-1.5 space-y-1.5">
+          <div className="grid grid-cols-2 gap-1.5">
+            <div className="space-y-0.5">
+              <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Min</label>
+              <Input type="number" value={field?.validation?.min ?? ""} onChange={(event) => update(index, "validation", { ...(field?.validation || {}), min: event.target.value === "" ? undefined : Number(event.target.value) })} className="h-7 text-[11px]" />
+            </div>
+            <div className="space-y-0.5">
+              <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Max</label>
+              <Input type="number" value={field?.validation?.max ?? ""} onChange={(event) => update(index, "validation", { ...(field?.validation || {}), max: event.target.value === "" ? undefined : Number(event.target.value) })} className="h-7 text-[11px]" />
+            </div>
+            <div className="space-y-0.5">
+              <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Min length</label>
+              <Input type="number" value={field?.validation?.minLength ?? ""} onChange={(event) => update(index, "validation", { ...(field?.validation || {}), minLength: event.target.value === "" ? undefined : Number(event.target.value) })} className="h-7 text-[11px]" />
+            </div>
+            <div className="space-y-0.5">
+              <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Max length</label>
+              <Input type="number" value={field?.validation?.maxLength ?? ""} onChange={(event) => update(index, "validation", { ...(field?.validation || {}), maxLength: event.target.value === "" ? undefined : Number(event.target.value) })} className="h-7 text-[11px]" />
+            </div>
+          </div>
+          <div className="space-y-0.5">
+            <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Pattern</label>
+            <Input value={field?.validation?.pattern ?? ""} onChange={(event) => update(index, "validation", { ...(field?.validation || {}), pattern: event.target.value })} className="h-7 font-mono text-[11px]" />
+          </div>
+          <div className="space-y-0.5">
+            <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Error message</label>
+            <Input value={field?.validation?.message ?? ""} onChange={(event) => update(index, "validation", { ...(field?.validation || {}), message: event.target.value })} className="h-7 text-[11px]" />
+          </div>
+          <div className="space-y-0.5">
+            <label className="text-[9px] uppercase tracking-wider text-muted-foreground">Visible when</label>
+            <ConditionBuilder value={field?.visibleWhen} onChange={(value) => update(index, "visibleWhen", value)} fields={["values.status", "values.role"]} emptyLabel="Always visible." />
+          </div>
+        </div>
+      </details>
+    </>
+  );
+
+  return (
+    <>
+      <ConfigSection id="form-settings" title="Form settings" tab="content">
+        <div className="grid grid-cols-2 gap-2">
+          <ConfigField label="Submit label" path="submitLabel" defaultValue="Submit" htmlFor="form-submit-label">
+            <Input id="form-submit-label" value={submitLabel ?? ""} onChange={(event) => setSubmitLabel(event.target.value)} className="h-8 text-xs" />
+          </ConfigField>
+          <ConfigField label="Reset label" path="resetLabel" defaultValue="Reset" htmlFor="form-reset-label">
+            <Input id="form-reset-label" value={resetLabel ?? ""} onChange={(event) => setResetLabel(event.target.value)} className="h-8 text-xs" />
+          </ConfigField>
+        </div>
+        <ConfigField label="Show reset" path="showReset" defaultValue={false} inline>
+          <Switch checked={!!showReset} onCheckedChange={setShowReset} aria-label="Show reset" />
+        </ConfigField>
+        <div className="grid grid-cols-2 gap-2">
+          <ConfigField label="Layout" path="layout" defaultValue="vertical">
+            <SegmentedControl
+              ariaLabel="Form layout"
+              value={layout || "vertical"}
+              onChange={setLayout}
+              options={[
+                { value: "vertical", label: "Stack" },
+                { value: "horizontal", label: "Row" },
+                { value: "grid", label: "Grid" },
+              ]}
+            />
+          </ConfigField>
+          <ConfigField label="Columns" path="columns" defaultValue={1}>
+            <SegmentedControl
+              ariaLabel="Form columns"
+              value={String(Math.min(4, Math.max(1, Number(columns) || 1)))}
+              onChange={(value) => setColumns(Number(value))}
+              options={[
+                { value: "1", label: "1" },
+                { value: "2", label: "2" },
+                { value: "3", label: "3" },
+                { value: "4", label: "4" },
+              ]}
+            />
+          </ConfigField>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <ConfigField label="Size" path="size" defaultValue="default">
+            <SegmentedControl
+              ariaLabel="Form size"
+              value={size || "default"}
+              onChange={setSize}
+              options={[
+                { value: "sm", label: "S" },
+                { value: "default", label: "M" },
+                { value: "lg", label: "L" },
+              ]}
+            />
+          </ConfigField>
+          <ConfigField label="Label position" path="labelPosition" defaultValue="top">
+            <SegmentedControl
+              ariaLabel="Form label position"
+              value={labelPosition || "top"}
+              onChange={setLabelPosition}
+              options={[
+                { value: "top", label: "Top" },
+                { value: "hidden", label: "Hidden" },
+              ]}
+            />
+          </ConfigField>
+        </div>
+        <ConfigField label="Sticky actions" path="stickyActions" defaultValue={false} inline>
+          <Switch checked={!!stickyActions} onCheckedChange={setStickyActions} aria-label="Sticky actions" />
+        </ConfigField>
+        <div className="grid grid-cols-2 gap-3">
+          <ConfigField label="Stepper" path="stepper" defaultValue={false} inline helper="Groups fields by their Section / step value.">
+            <Switch checked={!!stepper} onCheckedChange={setStepper} aria-label="Stepper" />
+          </ConfigField>
+          <ConfigField label="Autosave" path="autosave" defaultValue={false} inline helper="Fires onAutosave after edits settle.">
+            <Switch checked={!!autosave} onCheckedChange={setAutosave} aria-label="Autosave" />
+          </ConfigField>
+        </div>
+        {autosave && (
+          <ConfigField label="Autosave delay (ms)" path="autosaveDelay" defaultValue={900} htmlFor="form-autosave-delay">
+            <Input
+              id="form-autosave-delay"
+              type="number"
+              min={250}
+              max={10000}
+              step={50}
+              value={autosaveDelay ?? 900}
+              onChange={(event) => setAutosaveDelay(Number(event.target.value))}
+              className="h-8 text-xs"
+            />
+          </ConfigField>
+        )}
+        <ConfigField label="Async validation URL" path="validationUrl" helper="Optional POST endpoint receiving { values, fields }; return { errors } to block submit.">
+          <BindableInput value={validationUrl} onChange={setValidationUrl} liveStateTree={liveStateTree} placeholder="https://api.example.com/validate" />
+        </ConfigField>
+        <ConfigField label="Success message" path="successMessage">
+          <BindableInput value={successMessage} onChange={setSuccessMessage} liveStateTree={liveStateTree} placeholder="Saved successfully." />
+        </ConfigField>
+        <ConfigField label="Warn on unsaved changes" path="warnUnsaved" defaultValue={false} inline>
+          <Switch checked={!!warnUnsaved} onCheckedChange={setWarnUnsaved} aria-label="Warn on unsaved changes" />
+        </ConfigField>
+      </ConfigSection>
+
+      <ConfigSection id="form-fields" title="Fields" description="Build the form fields, validation and conditional visibility." tab="content">
+        <OptionListEditor
+          value={fields || []}
+          onChange={setFields}
+          labelKey="label"
+          valueKey="key"
+          itemLabel="Field"
+          allowDisabled={false}
+          showValue={false}
+          renderFields={renderField}
+          getPreview={(field) => `${field?.label || field?.key || "Untitled"} · ${field?.type || "text"}`}
+        />
+      </ConfigSection>
+
+      <ConfigSection id="form-behavior" title="State" tab="behavior">
+        <ConfigField label="Loading template" path="isLoading">
+          <BindableInput value={isLoading} onChange={setIsLoading} liveStateTree={liveStateTree} placeholder="e.g. {{ state.queries.q.isLoading }}" />
+        </ConfigField>
+      </ConfigSection>
+    </>
+  );
 };
 
-FormConfigEditor.propTypes = {
-    widgetEditorForm: PropTypes.object.isRequired,
-};
-
+FormConfigEditor.propTypes = { widgetEditorForm: PropTypes.object, stateTree: PropTypes.object };
+FormConfigEditor.usesConfigKit = true;
 export default FormConfigEditor;

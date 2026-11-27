@@ -11,8 +11,10 @@
  * Fix: Uses parseWidgetKey() utility instead of inline split for reliable ID extraction.
  */
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Clock, RefreshCw, X } from "lucide-react";
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { AppPageMetaContext } from "../../../../logic/appPageRuntime/AppPageRuntimeProvider";
+import { Clock, Play, RefreshCw, X } from "lucide-react";
+import { useCraftEditorContext } from "../layout/components/CraftEditorContext.js";
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
 import { useQuery } from "@tanstack/react-query";
 import PropTypes from "prop-types";
@@ -36,6 +38,11 @@ import {
 } from "../../../../logic/appPageRuntime/widgetInstanceIdentity";
 import { shapeTableRowSelect } from "../../../../logic/appPageRuntime/useWidgetEventHandlers";
 import { getWidgetDisplayName } from "../../../../utils/widgetDisplay";
+import { useWidgetDraftStore } from "../../../../logic/stores/widgetDraftStore";
+import { useApplicationEventFacade } from "../../../../logic/applicationRuntime/applicationEventBus";
+import CompositeWidgetBody from "../layout/components/CompositeWidgetBody.jsx";
+
+const hasStyleValue = (value) => value !== undefined && value !== null && value !== "";
 
 const WidgetContent = ({
   RenderedWidgetComponent,
@@ -54,6 +61,8 @@ const WidgetContent = ({
   resourceID,
   placementKey,
   instanceID,
+  emitApplicationEvent,
+  subscribeApplicationEvent,
 }) => {
   const widgetData = useMemo(() => {
     return resolveWidgetData({
@@ -108,6 +117,8 @@ const WidgetContent = ({
       fireWidgetEvent={fireWidgetEvent}
       widgetState={widgetState}
       setWidgetState={setWidgetState}
+      emitApplicationEvent={emitApplicationEvent}
+      subscribeApplicationEvent={subscribeApplicationEvent}
       {...runtimeEventHandlers}
       {...drillHandlers}
       {...tableHandlers}
@@ -132,6 +143,8 @@ WidgetContent.propTypes = {
   resourceID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   placementKey: PropTypes.string,
   instanceID: PropTypes.string,
+  emitApplicationEvent: PropTypes.func,
+  subscribeApplicationEvent: PropTypes.func,
 };
 
 const MemoizedWidgetContent = React.memo(WidgetContent);
@@ -142,9 +155,9 @@ export const AppPageWidgetSlot = ({
   index,
   handleDelete,
   editable = false,
-  sizing,
   scopedStateTree = null,
   repeatPath = [],
+  layoutRadius,
 }) => {
   // B24 identity split: resourceID (persisted definition) vs instanceID
   // (placement key, repeat-qualified inside repeats). State, methods and
@@ -156,7 +169,16 @@ export const AppPageWidgetSlot = ({
     instanceID,
   } = deriveSlotIdentity(widgetKey, repeatPath);
   const [isMouseHover, setIsMouseHover] = useState(false);
+  const [hydrated, setHydrated] = useState(() => !editable);
+  const shellRef = useRef(null);
   const onLoadFiredRef = useRef(false);
+  const runtimeServices = useContext(AppPageMetaContext)?.runtimeServices;
+  const { previewMode } = useCraftEditorContext();
+  const shouldHydrateLazily = editable && !previewMode;
+  const {
+    emitApplicationEvent,
+    subscribeApplicationEvent,
+  } = useApplicationEventFacade();
 
   const {
     isLoading: isLoadingWidget,
@@ -164,10 +186,15 @@ export const AppPageWidgetSlot = ({
     error: loadWidgetError,
     refetch: refetchWidget,
   } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID), resourceID],
-    queryFn: () => getWidgetByIDAPI({ tenantID, widgetID: resourceID }),
+    queryKey: runtimeServices
+      ? ["application-widget", tenantID, runtimeServices.identity, resourceID]
+      : [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID), resourceID],
+    queryFn: () => runtimeServices
+      ? runtimeServices.resolveWidget(resourceID)
+      : getWidgetByIDAPI({ tenantID, widgetID: resourceID }),
     refetchOnWindowFocus: false,
   });
+  const draft = useWidgetDraftStore((state) => state.drafts[String(resourceID)]);
 
   const globalStateTree = useAppPageStateTree();
   const baseStateTree = scopedStateTree || globalStateTree;
@@ -219,6 +246,72 @@ export const AppPageWidgetSlot = ({
     }
   }, [widget, fireWidgetEvent]);
 
+  // Design-mode hydration: keep heavy widget bodies unmounted until the slot
+  // scrolls into view, then hydrate on the next idle frame. Viewer and preview
+  // mode render immediately. Users can force a single widget with the button.
+  useEffect(() => {
+    if (!shouldHydrateLazily || hydrated) return undefined;
+    const node = shellRef.current;
+    if (!node) return undefined;
+    let cancelled = false;
+    let idleHandle = null;
+    let timer = null;
+
+    const hydrate = () => {
+      if (cancelled) return;
+      const idle =
+        typeof window !== "undefined" && typeof window.requestIdleCallback === "function"
+          ? window.requestIdleCallback.bind(window)
+          : null;
+      if (idle) {
+        idleHandle = idle(() => {
+          if (!cancelled) setHydrated(true);
+        }, { timeout: 800 });
+      } else {
+        timer = window.setTimeout(() => {
+          if (!cancelled) setHydrated(true);
+        }, 120);
+      }
+    };
+
+    if (typeof IntersectionObserver === "undefined") {
+      hydrate();
+      return () => {
+        cancelled = true;
+        if (idleHandle && window.cancelIdleCallback) window.cancelIdleCallback(idleHandle);
+        if (timer) window.clearTimeout(timer);
+      };
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          observer.disconnect();
+          hydrate();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(node);
+
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+      if (idleHandle && window.cancelIdleCallback) window.cancelIdleCallback(idleHandle);
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [shouldHydrateLazily, hydrated, widgetKey]);
+
+  useEffect(() => {
+    setHydrated(!shouldHydrateLazily);
+  }, [shouldHydrateLazily, widgetKey]);
+
+  useEffect(() => {
+    const hydrateAll = () => setHydrated(true);
+    window.addEventListener("craft-hydrate-widgets", hydrateAll);
+    return () => window.removeEventListener("craft-hydrate-widgets", hydrateAll);
+  }, []);
+
   const handleOnWidgetInit = useCallback(
     (widgetView) => {
       if (widgetView && typeof widgetView === "object") {
@@ -230,9 +323,10 @@ export const AppPageWidgetSlot = ({
 
   const resolvedConfigRef = useRef(null);
   const resolvedConfigKeyRef = useRef(null);
+  const sourceConfig = draft?.config || widget?.widgetConfig;
   const resolvedConfig = useMemo(() => {
-    if (!widget?.widgetConfig || !stateTree) return widget?.widgetConfig;
-    const resolved = resolveConfig(widget.widgetConfig, stateTree);
+    if (!sourceConfig || !stateTree) return sourceConfig;
+    const resolved = (runtimeServices?.resolveConfig || resolveConfig)(sourceConfig, stateTree);
     try {
       const key = JSON.stringify(resolved);
       if (key === resolvedConfigKeyRef.current) {
@@ -244,12 +338,21 @@ export const AppPageWidgetSlot = ({
       resolvedConfigRef.current = resolved;
     }
     return resolved;
-  }, [widget?.widgetConfig, stateTree]);
+  }, [sourceConfig, stateTree, runtimeServices]);
 
   const widgetRender = useMemo(() => {
     if (!widget) return null;
 
-    const resolvedType = widget.widgetType || "vega-lite";
+    const resolvedType = draft?.widgetType || widget.widgetType || "vega-lite";
+
+    if (resolvedType === "composite") {
+      return {
+        composite: resolvedConfig?.composite || widget.widgetConfig?.composite || null,
+        isComposite: true,
+        widgetType: resolvedType,
+      };
+    }
+
     const WidgetComponent = WIDGETS_MAP[resolvedType]?.component;
 
     if (!WidgetComponent) {
@@ -262,7 +365,7 @@ export const AppPageWidgetSlot = ({
       Component: WidgetComponent,
       widgetType: resolvedType,
     };
-  }, [widget]);
+  }, [widget, draft?.widgetType, resolvedConfig]);
 
   const RenderedWidgetComponent = widgetRender?.Component;
   const refreshLabel =
@@ -270,6 +373,10 @@ export const AppPageWidgetSlot = ({
       ? `${widget.refreshInterval}s refresh`
       : null;
   const showHeader = resolvedConfig?.properties?.showHeader ?? true;
+  const density = resolvedConfig?.properties?.density || "comfortable";
+  const ariaLabel = resolvedConfig?.properties?.ariaLabel || undefined;
+  const testId = resolvedConfig?.properties?.testId || undefined;
+  const isHidden = resolvedConfig?.properties?.hidden === true || resolvedConfig?.properties?.hidden === "true";
 
   const widgetStyleProps = resolvedConfig?.properties?.style || {};
   const customCSS = widgetStyleProps.customCSS;
@@ -281,12 +388,17 @@ export const AppPageWidgetSlot = ({
   const widgetCss = resolvedConfig?.properties?.widgetTailwindCss || "";
 
   const widgetInlineStyle = {
-    ...(widgetStyleProps.backgroundColor && { backgroundColor: widgetStyleProps.backgroundColor }),
-    ...(widgetStyleProps.textColor && { color: widgetStyleProps.textColor }),
-    ...(widgetStyleProps.padding && { padding: widgetStyleProps.padding }),
-    ...(widgetStyleProps.borderWidth && { borderWidth: widgetStyleProps.borderWidth }),
-    ...(widgetStyleProps.borderColor && { borderColor: widgetStyleProps.borderColor }),
-    ...(widgetStyleProps.borderRadius && { borderRadius: widgetStyleProps.borderRadius }),
+    // Layout-level radius from the page layout. A widget's own configured
+    // radius below still wins when explicitly set; otherwise the card keeps
+    // its normal rounded class/custom CSS.
+    ...(hasStyleValue(layoutRadius) && { borderRadius: layoutRadius }),
+    ...(hasStyleValue(widgetStyleProps.backgroundColor) && { backgroundColor: widgetStyleProps.backgroundColor }),
+    ...(hasStyleValue(widgetStyleProps.textColor) && { color: widgetStyleProps.textColor }),
+    ...(hasStyleValue(widgetStyleProps.padding) && { padding: widgetStyleProps.padding }),
+    ...(hasStyleValue(widgetStyleProps.borderWidth) && { borderWidth: widgetStyleProps.borderWidth }),
+    ...(hasStyleValue(widgetStyleProps.borderColor) && { borderColor: widgetStyleProps.borderColor }),
+    ...(hasStyleValue(widgetStyleProps.borderRadius) && { borderRadius: widgetStyleProps.borderRadius }),
+    ...(hasStyleValue(widgetStyleProps.boxShadow) && { boxShadow: widgetStyleProps.boxShadow }),
     ...(widgetStyleProps.showBorder === false && { border: "none", boxShadow: "none" }),
   };
 
@@ -299,16 +411,22 @@ export const AppPageWidgetSlot = ({
     return handlers;
   }, [widget?.widgetConfig?.events, fireWidgetEvent]);
 
+  if (isHidden) return null;
+
   return (
     <>
       {customCSS && (
         <style dangerouslySetInnerHTML={{ __html: `.${customCSSClassName} { ${customCSS} }` }} />
       )}
       <Card
-        className={`relative flex h-full w-full flex-col overflow-hidden rounded bg-card transition-colors duration-150 ${
+        className={`widget-density-${density} relative flex h-full w-full flex-col overflow-hidden rounded bg-card transition-colors duration-150 ${
           widgetStyleProps.showBorder !== false ? "border border-border/70 shadow-[0_1px_2px_rgba(0,0,0,0.05)]" : "border border-transparent"
         } ${editable && isMouseHover ? "border-primary/60" : ""} ${customCSSClassName} ${containerCss}`}
         style={widgetInlineStyle}
+        data-density={density}
+        data-testid={testId}
+        aria-label={ariaLabel}
+        aria-busy={isLoadingWidget || undefined}
         onMouseEnter={editable ? () => setIsMouseHover(true) : null}
         onMouseLeave={editable ? () => setIsMouseHover(false) : null}
         onClick={editable ? (e) => e.stopPropagation() : null}
@@ -324,9 +442,9 @@ export const AppPageWidgetSlot = ({
             <div className="flex items-center gap-2 border-b border-border/60 bg-muted/30 px-2 py-1.5">
               <div className="min-w-0 flex-1 truncate text-[13px] font-medium text-foreground">
                 {getWidgetDisplayName({
-                  widgetTitle: widget.widgetTitle,
+                  widgetTitle: draft?.title || widget.widgetTitle,
                   widgetTypeLabel:
-                    WIDGETS_MAP[widget.widgetType]?.label || widget.widgetType,
+                    WIDGETS_MAP[draft?.widgetType || widget.widgetType]?.label || draft?.widgetType || widget.widgetType,
                 })}
               </div>
 
@@ -392,9 +510,58 @@ export const AppPageWidgetSlot = ({
             </div>
           ) : null}
 
-          {RenderedWidgetComponent
+          {shouldHydrateLazily && !hydrated ? (
+            <div
+              ref={shellRef}
+              className="flex min-h-[56px] flex-1 flex-col items-center justify-center gap-2 bg-muted/10 p-3"
+              aria-busy="true"
+              data-widget-shell="true"
+            >
+              <div className="flex w-full max-w-[180px] flex-col gap-1.5">
+                <span className="h-2 w-2/3 animate-pulse rounded bg-muted-foreground/15" />
+                <span className="h-2 w-full animate-pulse rounded bg-muted-foreground/10" />
+                <span className="h-2 w-4/5 animate-pulse rounded bg-muted-foreground/10" />
+              </div>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setHydrated(true);
+                }}
+                className="flex items-center gap-1 rounded border border-border/60 bg-background px-2 py-1 text-[9px] font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground"
+              >
+                <Play className="h-2.5 w-2.5" />
+                Load widget
+              </button>
+              <span className="text-[8px] text-muted-foreground/50">
+                hydrated when scrolled into view
+              </span>
+            </div>
+          ) : widgetRender?.isComposite ? (
+            <div
+              ref={shellRef}
+              className="flex min-h-[56px] flex-1 flex-col min-w-0 overflow-hidden bg-transparent"
+            >
+              <CompositeWidgetBody
+                composite={widgetRender.composite}
+                title={
+                  widget
+                    ? getWidgetDisplayName({
+                        widgetTitle: draft?.title || widget.widgetTitle,
+                        widgetTypeLabel:
+                          WIDGETS_MAP[draft?.widgetType || widget.widgetType]?.label ||
+                          "Composite",
+                      })
+                    : "Composite widget"
+                }
+              />
+            </div>
+          ) : RenderedWidgetComponent
             ? (
-              <div className={`flex min-h-[56px] flex-1 flex-col min-w-0 bg-transparent ${widgetCss}`}>
+              <div
+                ref={shellRef}
+                className={`flex min-h-[56px] flex-1 flex-col min-w-0 bg-transparent ${widgetCss}`}
+              >
                 <ErrorBoundary title="Widget Render Error">
                   <MemoizedWidgetContent
                     RenderedWidgetComponent={RenderedWidgetComponent}
@@ -413,6 +580,8 @@ export const AppPageWidgetSlot = ({
                     resourceID={resourceID}
                     placementKey={placementKey}
                     instanceID={instanceID}
+                    emitApplicationEvent={emitApplicationEvent}
+                    subscribeApplicationEvent={subscribeApplicationEvent}
                   />
                 </ErrorBoundary>
               </div>
@@ -434,4 +603,5 @@ AppPageWidgetSlot.propTypes = {
   sizing: PropTypes.string,
   scopedStateTree: PropTypes.object,
   repeatPath: PropTypes.array,
+  layoutRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };

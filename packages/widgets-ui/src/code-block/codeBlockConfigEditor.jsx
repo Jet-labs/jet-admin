@@ -1,47 +1,86 @@
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
-import { Input, Label, Checkbox, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
-import { TemplateAutocompleteInput } from "@jet-admin/ui";
+import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Switch } from "@jet-admin/ui";
+import {
+  ConfigSection,
+  ConfigField,
+  BindableInput,
+  useConfigValue,
+} from "../config";
 
-export const CodeBlockConfigEditor = ({ widgetEditorForm, stateTree }) => {
-  const config = widgetEditorForm.values.widgetConfig || {};
+export const CodeBlockConfigEditor = ({ stateTree }) => {
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
+  const [code, setCode] = useConfigValue("code", "");
+  const [language, setLanguage] = useConfigValue("language", "sql");
+  const [filename, setFilename] = useConfigValue("filename", "");
+  const [showCopy, setShowCopy] = useConfigValue("showCopy", true);
+  const [showLineNumbers, setShowLineNumbers] = useConfigValue("showLineNumbers", true);
+  const [wrap, setWrap] = useConfigValue("wrap", false);
+  const [maxHeight, setMaxHeight] = useConfigValue("maxHeight", "");
+  const [isLoading, setIsLoading] = useConfigValue("isLoading", "");
+
   return (
-    <div className="space-y-2">
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Code</Label>
-        <TemplateAutocompleteInput isTextArea value={config.code || ""} onChange={(v) => widgetEditorForm.setFieldValue("widgetConfig.code", v)} placeholder="SELECT * FROM orders LIMIT 10" liveStateTree={liveStateTree} />
-      </div>
-      <div className="grid grid-cols-2 gap-2">
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-foreground">Language</Label>
-          <Select value={config.language || "sql"} onValueChange={(v) => widgetEditorForm.setFieldValue("widgetConfig.language", v)}>
-            <SelectTrigger className="text-xs"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="sql">SQL</SelectItem>
-              <SelectItem value="json">JSON</SelectItem>
-              <SelectItem value="javascript">JavaScript</SelectItem>
-              <SelectItem value="bash">Bash</SelectItem>
-              <SelectItem value="python">Python</SelectItem>
-              <SelectItem value="text">Plain text</SelectItem>
-            </SelectContent>
-          </Select>
+    <>
+      <ConfigSection id="code-content" title="Code" tab="content">
+        <ConfigField label="Code" path="code" helper="Supports template expressions.">
+          <BindableInput value={code} onChange={setCode} liveStateTree={liveStateTree} multiline rows={8} placeholder="SELECT * FROM orders LIMIT 10;" />
+        </ConfigField>
+        <div className="grid grid-cols-2 gap-2">
+          <ConfigField label="Language" path="language" defaultValue="sql">
+            <Select value={language || "sql"} onValueChange={setLanguage}>
+              <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sql">SQL</SelectItem>
+                <SelectItem value="json">JSON</SelectItem>
+                <SelectItem value="javascript">JavaScript</SelectItem>
+                <SelectItem value="bash">Bash</SelectItem>
+                <SelectItem value="python">Python</SelectItem>
+                <SelectItem value="html">HTML</SelectItem>
+                <SelectItem value="css">CSS</SelectItem>
+                <SelectItem value="text">Plain text</SelectItem>
+              </SelectContent>
+            </Select>
+          </ConfigField>
+          <ConfigField label="Filename" path="filename" htmlFor="code-filename">
+            <Input id="code-filename" value={filename ?? ""} onChange={(event) => setFilename(event.target.value)} placeholder="query.sql" className="h-8 font-mono text-xs" />
+          </ConfigField>
         </div>
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-foreground">Max Height (px)</Label>
-          <Input type="number" className="text-sm h-8" value={config.maxHeight ?? ""} onChange={(e) => widgetEditorForm.setFieldValue("widgetConfig.maxHeight", e.target.value === "" ? undefined : Number(e.target.value))} placeholder="Auto" />
+        <ConfigField label="Max height (px)" path="maxHeight" htmlFor="code-max-height">
+          <Input
+            id="code-max-height"
+            type="number"
+            min={0}
+            value={maxHeight ?? ""}
+            onChange={(event) => setMaxHeight(event.target.value === "" ? "" : Number(event.target.value))}
+            placeholder="Auto"
+            className="h-8 text-xs"
+          />
+        </ConfigField>
+      </ConfigSection>
+
+      <ConfigSection id="code-style" title="Viewer" tab="style">
+        <div className="grid grid-cols-3 gap-3">
+          <ConfigField label="Copy button" path="showCopy" defaultValue={true} inline>
+            <Switch checked={showCopy !== false} onCheckedChange={setShowCopy} aria-label="Copy button" />
+          </ConfigField>
+          <ConfigField label="Line numbers" path="showLineNumbers" defaultValue={true} inline>
+            <Switch checked={showLineNumbers !== false} onCheckedChange={setShowLineNumbers} aria-label="Line numbers" />
+          </ConfigField>
+          <ConfigField label="Wrap lines" path="wrap" defaultValue={false} inline>
+            <Switch checked={!!wrap} onCheckedChange={setWrap} aria-label="Wrap lines" />
+          </ConfigField>
         </div>
-      </div>
-      <div className="flex items-center gap-2 pt-1">
-        <Checkbox id="cb-copy" checked={config.showCopy !== false} onCheckedChange={(c) => widgetEditorForm.setFieldValue("widgetConfig.showCopy", !!c)} />
-        <Label htmlFor="cb-copy" className="text-xs text-muted-foreground cursor-pointer">Show copy button</Label>
-      </div>
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
-        <TemplateAutocompleteInput value={config.isLoading || ""} onChange={(v) => widgetEditorForm.setFieldValue("widgetConfig.isLoading", v)} placeholder="e.g. {{ state.queries.q.isLoading }}" liveStateTree={liveStateTree} />
-      </div>
-    </div>
+      </ConfigSection>
+
+      <ConfigSection id="code-behavior" title="State" tab="behavior">
+        <ConfigField label="Loading template" path="isLoading">
+          <BindableInput value={isLoading} onChange={setIsLoading} liveStateTree={liveStateTree} placeholder="e.g. {{ state.queries.q.isLoading }}" />
+        </ConfigField>
+      </ConfigSection>
+    </>
   );
 };
-CodeBlockConfigEditor.propTypes = { widgetEditorForm: PropTypes.object.isRequired, stateTree: PropTypes.object };
+
+CodeBlockConfigEditor.propTypes = { widgetEditorForm: PropTypes.object, stateTree: PropTypes.object };
+CodeBlockConfigEditor.usesConfigKit = true;
 export default CodeBlockConfigEditor;

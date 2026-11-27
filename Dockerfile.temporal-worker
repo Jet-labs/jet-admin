@@ -37,6 +37,7 @@ COPY package*.json ./
 # their own nested binaries (esbuild versions differ per package, so npm
 # nests instead of hoisting — no usable root .bin/esbuild).
 COPY apps/backend/package*.json ./apps/backend/
+COPY packages/application-contracts/package*.json ./packages/application-contracts/
 COPY packages/datasource-types/package*.json ./packages/datasource-types/
 COPY packages/datasources-logic/package*.json ./packages/datasources-logic/
 COPY packages/datasources-ui/package*.json ./packages/datasources-ui/

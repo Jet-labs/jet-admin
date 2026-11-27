@@ -11,6 +11,7 @@ import { useInfiniteAppPages } from "../../../logic/hooks/useAppPages";
 import { getWorkflowByIDAPI } from "../../../data/apis/workflow";
 import { getDataQueryByIDAPI } from "../../../data/apis/dataQuery";
 import { getAppPageByIDAPI } from "../../../data/apis/appPage";
+import { getAssetVersionsAPI } from "../../../data/apis/assetVersion";
 import { useDebounce } from "@uidotdev/usehooks";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { CONSTANTS } from "../../../constants";
@@ -709,6 +710,81 @@ const ActionForm = ({ action, nextOrderIndex = 0, onSave, onCancel, isSaving, te
   );
 };
 
+const VersionCaptureSelector = ({
+  config,
+  onChange,
+  tenantID,
+  assetType,
+  assetID,
+  versionField,
+}) => {
+  const { data, isLoading } = useQuery({
+    queryKey: ["asset-versions", tenantID, assetType, assetID],
+    queryFn: () => getAssetVersionsAPI({ tenantID, assetType, assetID, page: 1, pageSize: 100 }),
+    enabled: Boolean(tenantID) && Boolean(assetID),
+    refetchOnWindowFocus: false,
+  });
+  const versions = data?.versions || [];
+  const versionMode = config.versionMode || (config[versionField] ? "specific" : "latest-at-capture");
+  return (
+    <div className="space-y-1 rounded border border-border/60 bg-background/30 p-2">
+      <Label className="text-xs text-muted-foreground">Version at listener capture</Label>
+      <Select
+        value={versionMode}
+        onValueChange={(value) =>
+          onChange({
+            ...config,
+            versionMode: value,
+            ...(value === "latest-at-capture" ? { [versionField]: "" } : {}),
+          })
+        }
+      >
+        <SelectTrigger className="h-8 text-xs">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="latest-at-capture">Latest at capture</SelectItem>
+          <SelectItem value="specific">Specific version</SelectItem>
+        </SelectContent>
+      </Select>
+      <p className="text-[10px] text-muted-foreground">
+        Resolved when this listener version is created, never at runtime.
+      </p>
+      {(versionMode === "specific" || config[versionField]) && (
+        <Select
+          value={config[versionField] ? String(config[versionField]) : ""}
+          onValueChange={(value) => onChange({ ...config, [versionField]: value })}
+          disabled={isLoading}
+        >
+          <SelectTrigger className="h-8 text-xs">
+            <SelectValue placeholder="Choose a version…" />
+          </SelectTrigger>
+          <SelectContent>
+            {versions.map((version) => (
+              <SelectItem key={version.assetVersionID} value={String(version.assetVersionID)}>
+                v{version.versionNumber}
+                {version.createdAt ? ` · ${new Date(version.createdAt).toLocaleString()}` : ""}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+      {!isLoading && versions.length === 0 && versionMode === "specific" && (
+        <p className="text-[10px] text-destructive">No versions exist for this asset yet.</p>
+      )}
+    </div>
+  );
+};
+
+VersionCaptureSelector.propTypes = {
+  config: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
+  tenantID: PropTypes.string.isRequired,
+  assetType: PropTypes.string.isRequired,
+  assetID: PropTypes.string,
+  versionField: PropTypes.string.isRequired,
+};
+
 const TriggerWorkflowConfig = ({ config, onChange, tenantID, renderModeToggle, isJsonMode, getJsonString }) => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
@@ -746,7 +822,7 @@ const TriggerWorkflowConfig = ({ config, onChange, tenantID, renderModeToggle, i
                 if (key) defaultMapping[key] = `{{event.${key}}}`;
               });
             }
-            onChange({ ...config, workflowID: val, inputValues: defaultMapping });
+            onChange({ ...config, workflowID: val, inputValues: defaultMapping, versionMode: "latest-at-capture", workflowVersionID: "" });
           }}
           options={workflows.map(w => ({
             value: w.workflowID,
@@ -761,6 +837,14 @@ const TriggerWorkflowConfig = ({ config, onChange, tenantID, renderModeToggle, i
           selectedLabel={selectedWorkflowDetail?.title}
         />
       </div>
+      <VersionCaptureSelector
+        config={config}
+        onChange={onChange}
+        tenantID={tenantID}
+        assetType="workflow"
+        assetID={config.workflowID}
+        versionField="workflowVersionID"
+      />
       <div className="space-y-1">
         <div className="flex justify-between items-end mb-1">
           <div>
@@ -872,7 +956,7 @@ const TriggerQueryConfig = ({ config, onChange, tenantID, renderModeToggle, isJs
               const key = inputDef.key || inputDef.name;
               if (key) defaultMapping[key] = `{{event.${key}}}`;
             });
-            onChange({ ...config, dataQueryID: val, inputValues: defaultMapping });
+            onChange({ ...config, dataQueryID: val, inputValues: defaultMapping, versionMode: "latest-at-capture", queryVersionID: "" });
           }}
           options={dataQueries.map(q => ({
             value: q.dataQueryID,
@@ -887,6 +971,14 @@ const TriggerQueryConfig = ({ config, onChange, tenantID, renderModeToggle, isJs
           selectedLabel={selectedQueryDetail?.dataQueryTitle}
         />
       </div>
+      <VersionCaptureSelector
+        config={config}
+        onChange={onChange}
+        tenantID={tenantID}
+        assetType="query"
+        assetID={config.dataQueryID}
+        versionField="queryVersionID"
+      />
       <div className="space-y-1">
         <div className="flex justify-between items-end mb-1">
           <div>

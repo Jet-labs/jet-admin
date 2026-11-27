@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jet Admin — Layout Lab</title>
+    <style>
+      /* The app shell centers the main app in the viewport; the lab owns its
+         own document flow and needs normal page scrolling. */
+      html,
+      body {
+        display: block !important;
+        height: auto !important;
+        min-height: 100% !important;
+        overflow: auto !important;
+        align-items: initial !important;
+      }
+      #layout-lab-root {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="layout-lab-root"></div>
+    <script type="module" src="/src/dev/layoutLabMain.jsx"></script>
+  </body>
+</html>

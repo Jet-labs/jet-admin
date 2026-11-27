@@ -21,7 +21,7 @@ async function executeNodeActivity({ node, context, tenantID, instanceID, workfl
     );
   }
   const { resolveInputs } = require('../../../../utils/input.util');
-  const { authorizedExecuteDataQuery } = require('../../../../utils/authorizedProxy');
+  const { authorizedExecuteDataQuery, createQueryEngine, defaultDatasourceFetcher } = require('../../../../utils/authorizedProxy');
   const { runSubWorkflowAndWait } = require('../service');
   const { createSystemContext, deriveChildContext, ORIGIN_TYPES } = require('../../../../utils/executionContext');
 
@@ -67,6 +67,34 @@ async function executeNodeActivity({ node, context, tenantID, instanceID, workfl
     deriveChildContext,
     ORIGIN_TYPES,
   };
+
+  const applicationRun = await require('../../../application/application.workflowExecution').loadApplicationWorkflowExecution({ instanceID, tenantID, workflowID });
+  if (applicationRun) {
+    const { workflow, queryVersions, childWorkflowVersions, provenance, executionCtx } = applicationRun;
+    const pinnedNode = workflow.nodes.find(item => item.id === nodeID && item.type === nodeType);
+    if (!pinnedNode) throw new Error('Node is not part of the starting application release');
+    const { extractQueryDefinitions } = require('../../../../utils/input.util');
+    services.resolveInputs = params => {
+      const query = queryVersions[params.id];
+      if (params.type !== 'query' || !query || pinnedNode.data.dataQueryID !== params.id) throw new Error('Query dependency is not pinned for this node');
+      return resolveInputs({ ...params, inputDefinitions: extractQueryDefinitions(query) });
+    };
+    services.authorizedExecuteDataQuery = params => {
+      const query = queryVersions[params.dataQueryID];
+      if (!query || pinnedNode.data.dataQueryID !== params.dataQueryID) throw new Error('Query dependency is not pinned for this node');
+      return authorizedExecuteDataQuery({ ...params, executionCtx, inputDefinitions: extractQueryDefinitions(query),
+        engine: createQueryEngine({ queryFetcher: async id => id === query.dataQueryID ? query : null, datasourceFetcher: defaultDatasourceFetcher }),
+      });
+    };
+    services.runSubWorkflow = params => {
+      const child = childWorkflowVersions[params.childWorkflowID];
+      if (!child || pinnedNode.data.childWorkflowID !== params.childWorkflowID) throw new Error('Child workflow dependency is not pinned for this node');
+      return runSubWorkflowAndWait({ ...params, pinnedGraph: child, executionCtx,
+        applicationExecution: { ...provenance, workflowVersionID: child.assetVersionID },
+        ...(childExecutionKey ? { executionKey: childExecutionKey } : {}),
+      });
+    };
+  }
 
   let executionCtx = context?.__executionCtx;
   if (!executionCtx && (workflowID || tenantID)) {

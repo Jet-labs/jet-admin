@@ -1,113 +1,114 @@
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
-import { Label, Switch, CodeEditor, TemplateAutocompleteInput } from "@jet-admin/ui";
+import { CodeEditor, Input, Switch } from "@jet-admin/ui";
+import {
+  ConfigSection,
+  ConfigField,
+  BindableInput,
+  ColorField,
+  SegmentedControl,
+  useConfigValue,
+} from "../config";
 
-export const HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
-  const config = widgetEditorForm.values.widgetConfig || {};
+export const HtmlConfigEditor = ({ stateTree }) => {
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
+  const [html, setHtml] = useConfigValue("html", "");
+  const [css, setCss] = useConfigValue("css", "");
+  const [mode, setMode] = useConfigValue("templateMode", "template");
+  const [colorScheme, setColorScheme] = useConfigValue("colorScheme", "light");
+  const [backgroundColor, setBackgroundColor] = useConfigValue("backgroundColor", "#ffffff");
+  const [textColor, setTextColor] = useConfigValue("textColor", "#111827");
+  const [allowScripts, setAllowScripts] = useConfigValue("allowScripts", false);
+  const [allowForms, setAllowForms] = useConfigValue("allowForms", false);
+  const [allowPopups, setAllowPopups] = useConfigValue("allowPopups", false);
+  const [isLoading, setIsLoading] = useConfigValue("isLoading", "");
 
   return (
-    <div className="space-y-2">
-      {/* HTML Source */}
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">HTML Markup</Label>
-        <p className="text-xs text-muted-foreground leading-snug">
-          Supports standard HTML structure, inline styles, and <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]">{"{{expression}}"}</code> templates.
-        </p>
-        <CodeEditor
-          language="html"
-          value={config.html || ""}
-          onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.html", val)}
-          stateTree={liveStateTree}
-          templateMode="js-template"
-          height={200}
-          showExpandButton={true}
-          showFormatButton={false}
-          showLineNumbers={true}
-          title="HTML Source"
-        />
-      </div>
-
-      {/* CSS Stylesheet */}
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">CSS Stylesheet</Label>
-        <p className="text-xs text-muted-foreground leading-snug">
-          Custom styles scoped to this widget's sandboxed iframe container.
-        </p>
-        <CodeEditor
-          language="css"
-          value={config.css || ""}
-          onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.css", val)}
-          stateTree={liveStateTree}
-          templateMode="js-template"
-          height={150}
-          showExpandButton={true}
-          showFormatButton={false}
-          showLineNumbers={true}
-          title="CSS Styles"
-        />
-      </div>
-
-      {/* Is Loading Template */}
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">
-          Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span>
-        </Label>
-        <TemplateAutocompleteInput
-          value={config.isLoading || ""}
-          onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.isLoading", val)}
-          placeholder="e.g. {{ state.queries.myQuery.isLoading }}"
-          liveStateTree={liveStateTree}
-        />
-      </div>
-
-      {/* Sandbox Isolation Flags */}
-      <div className="space-y-2 pt-2 mt-2 border-t border-border/60">
-        <Label className="text-xs font-semibold text-foreground uppercase tracking-wider">Sandbox Security</Label>
-        
-        {/* Allow Scripts */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5 pr-2">
-            <Label className="text-xs font-medium text-foreground">Execute JavaScript</Label>
-            <p className="text-xs text-muted-foreground">Allows running &lt;script&gt; tags inside the iframe sandbox.</p>
-          </div>
-          <Switch
-            checked={config.allowScripts === true || config.allowScripts === "true"}
-            onCheckedChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.allowScripts", val)}
+    <>
+      <ConfigSection id="html-content" title="Markup" tab="content">
+        <ConfigField label="Authoring mode" path="templateMode" defaultValue="template">
+          <SegmentedControl
+            ariaLabel="HTML authoring mode"
+            value={mode || "template"}
+            onChange={setMode}
+            options={[
+              { value: "raw", label: "Raw HTML" },
+              { value: "template", label: "Templates" },
+            ]}
           />
-        </div>
-
-        {/* Allow Forms */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5 pr-2">
-            <Label className="text-xs font-medium text-foreground">Submit Forms</Label>
-            <p className="text-xs text-muted-foreground">Allows form submissions within the sandboxed iframe.</p>
-          </div>
-          <Switch
-            checked={config.allowForms === true || config.allowForms === "true"}
-            onCheckedChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.allowForms", val)}
+        </ConfigField>
+        <ConfigField label="HTML" path="html">
+          <CodeEditor
+            language="html"
+            value={html || ""}
+            onChange={setHtml}
+            stateTree={liveStateTree}
+            templateMode={mode === "raw" ? undefined : "js-template"}
+            height={180}
+            showExpandButton
+            showFormatButton={false}
+            showLineNumbers
+            title="HTML"
           />
-        </div>
-
-        {/* Allow Popups */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5 pr-2">
-            <Label className="text-xs font-medium text-foreground">Allow Popups</Label>
-            <p className="text-xs text-muted-foreground">Allows links opening in new tabs or window popups.</p>
-          </div>
-          <Switch
-            checked={config.allowPopups === true || config.allowPopups === "true"}
-            onCheckedChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.allowPopups", val)}
+        </ConfigField>
+        <ConfigField label="CSS" path="css">
+          <CodeEditor
+            language="css"
+            value={css || ""}
+            onChange={setCss}
+            stateTree={liveStateTree}
+            templateMode={mode === "raw" ? undefined : "js-template"}
+            height={120}
+            showExpandButton
+            showFormatButton={false}
+            showLineNumbers
+            title="CSS"
           />
+        </ConfigField>
+      </ConfigSection>
+
+      <ConfigSection id="html-style" title="Theme" tab="style">
+        <ConfigField label="Color scheme" path="colorScheme" defaultValue="light">
+          <SegmentedControl
+            ariaLabel="Color scheme"
+            value={colorScheme || "light"}
+            onChange={setColorScheme}
+            options={[
+              { value: "light", label: "Light" },
+              { value: "dark", label: "Dark" },
+            ]}
+          />
+        </ConfigField>
+        <div className="grid grid-cols-2 gap-2">
+          <ConfigField label="Background" path="backgroundColor">
+            <ColorField value={backgroundColor} onChange={setBackgroundColor} label="Background" />
+          </ConfigField>
+          <ConfigField label="Text color" path="textColor">
+            <ColorField value={textColor} onChange={setTextColor} label="Text" />
+          </ConfigField>
         </div>
-      </div>
-    </div>
+      </ConfigSection>
+
+      <ConfigSection id="html-security" title="Sandbox security" tab="behavior">
+        <div className="space-y-1.5">
+          <ConfigField label="Execute JavaScript" path="allowScripts" defaultValue={false} inline helper="Allows script tags inside the sandbox.">
+            <Switch checked={!!allowScripts} onCheckedChange={setAllowScripts} aria-label="Execute JavaScript" />
+          </ConfigField>
+          <ConfigField label="Submit forms" path="allowForms" defaultValue={false} inline>
+            <Switch checked={!!allowForms} onCheckedChange={setAllowForms} aria-label="Submit forms" />
+          </ConfigField>
+          <ConfigField label="Popups" path="allowPopups" defaultValue={false} inline>
+            <Switch checked={!!allowPopups} onCheckedChange={setAllowPopups} aria-label="Allow popups" />
+          </ConfigField>
+        </div>
+        <ConfigField label="Loading template" path="isLoading">
+          <BindableInput value={isLoading} onChange={setIsLoading} liveStateTree={liveStateTree} placeholder="e.g. {{ state.queries.q.isLoading }}" />
+        </ConfigField>
+      </ConfigSection>
+    </>
   );
 };
 
-HtmlConfigEditor.propTypes = {
-  widgetEditorForm: PropTypes.object.isRequired,
-  stateTree: PropTypes.object,
-};
-
+HtmlConfigEditor.propTypes = { widgetEditorForm: PropTypes.object, stateTree: PropTypes.object };
+HtmlConfigEditor.usesConfigKit = true;
 export default HtmlConfigEditor;

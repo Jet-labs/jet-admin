@@ -9,6 +9,7 @@ import { useDebounce } from "@uidotdev/usehooks";
 import { getWorkflowByIDAPI } from "../../../../data/apis/workflow";
 import { getDataQueryByIDAPI } from "../../../../data/apis/dataQuery";
 import { getListenerByIDAPI } from "../../../../data/apis/listener";
+import { getAssetVersionsAPI } from "../../../../data/apis/assetVersion";
 import { useAppPageDispatch, appPageActions, useAppPageStateTree } from "../../../../logic/appPageRuntime";
 import {
   Button,
@@ -33,9 +34,14 @@ import { displaySuccess, displayError } from "../../../../utils/notification";
 import { CONSTANTS } from "../../../../constants";
 import { useGlobalUI } from "../../../../logic/stores/useUIStore";
 
-export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
+export const AppPageDataSourcesEditor = ({
+  appPageEditorForm,
+  applicationVariables = null,
+  applicationTitle = null,
+}) => {
   const { tenantID } = useParams();
   const { showConfirmation } = useGlobalUI();
+  const [manualRefreshPath, setManualRefreshPath] = useState("");
 
   const [workflowSearch, setWorkflowSearch] = useState("");
   const debouncedWorkflowSearch = useDebounce(workflowSearch, 300);
@@ -299,6 +305,10 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
       type: "query",
       queryID: "",
       workflowID: "",
+      queryVersionID: "",
+      workflowVersionID: "",
+      listenerVersionID: "",
+      versionMode: "latest-at-capture",
       inputValues: {},
       triggerMode: "auto",
       refreshOn: [],
@@ -341,6 +351,16 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
         next.channelName = "";
         next.inputValues = {};
         next.refreshOn = [];
+        next.versionMode = "latest-at-capture";
+        next.queryVersionID = "";
+        next.workflowVersionID = "";
+        next.listenerVersionID = "";
+      }
+      if (field === "queryID" || field === "workflowID" || field === "listenerID") {
+        next.versionMode = "latest-at-capture";
+        next.queryVersionID = "";
+        next.workflowVersionID = "";
+        next.listenerVersionID = "";
       }
       return next;
     });
@@ -372,6 +392,34 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
     enabled: Boolean(tenantID) && Boolean(selectedListenerID),
     refetchOnWindowFocus: false,
   });
+
+  const selectedVersionTarget =
+    selectedSource?.type === "query" && selectedSource.queryID
+      ? { assetType: "query", assetID: selectedSource.queryID, field: "queryVersionID" }
+      : selectedSource?.type === "workflow" && selectedSource.workflowID
+        ? { assetType: "workflow", assetID: selectedSource.workflowID, field: "workflowVersionID" }
+        : selectedSource?.type === "listener" && selectedSource.listenerID
+          ? { assetType: "listener", assetID: selectedSource.listenerID, field: "listenerVersionID" }
+          : null;
+  const { data: sourceVersionsData, isLoading: isLoadingSourceVersions } = useQuery({
+    queryKey: [
+      "asset-versions",
+      tenantID,
+      selectedVersionTarget?.assetType,
+      selectedVersionTarget?.assetID,
+    ],
+    queryFn: () =>
+      getAssetVersionsAPI({
+        tenantID,
+        assetType: selectedVersionTarget.assetType,
+        assetID: selectedVersionTarget.assetID,
+        page: 1,
+        pageSize: 100,
+      }),
+    enabled: Boolean(tenantID) && Boolean(selectedVersionTarget),
+    refetchOnWindowFocus: false,
+  });
+  const sourceVersions = sourceVersionsData?.versions || [];
 
   const getSourceInputDefinitions = (source) => {
     if (source.type === "query" && source.queryID) {
@@ -515,8 +563,115 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
               )}
             </div>
 
+            {selectedVersionTarget && (
+              <div className="rounded border border-border bg-muted/20 p-2 flex flex-col gap-2">
+                <div className="flex flex-col space-y-1">
+                  <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                    Version at page capture
+                  </Label>
+                  <Select
+                    value={
+                      selectedSource.versionMode ||
+                      (selectedSource[selectedVersionTarget.field]
+                        ? "specific"
+                        : "latest-at-capture")
+                    }
+                    onValueChange={(val) => {
+                      const updated = dataSources.map((src, i) =>
+                        i === editingIndex
+                          ? {
+                              ...src,
+                              versionMode: val,
+                              ...(val === "latest-at-capture"
+                                ? { [selectedVersionTarget.field]: "" }
+                                : {}),
+                            }
+                          : src
+                      );
+                      updateDataSources(updated);
+                    }}
+                  >
+                    <SelectTrigger className="text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="latest-at-capture">
+                        Latest at capture
+                      </SelectItem>
+                      <SelectItem value="specific">
+                        Specific version
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Determines which version is captured when this page version
+                    is created or published. It does not track later live edits.
+                  </p>
+                </div>
+
+                {(selectedSource.versionMode === "specific" ||
+                  selectedSource[selectedVersionTarget.field]) && (
+                  <div className="flex flex-col space-y-1">
+                    <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                      Selected version
+                    </Label>
+                    <Select
+                      value={
+                        selectedSource[selectedVersionTarget.field]
+                          ? String(selectedSource[selectedVersionTarget.field])
+                          : ""
+                      }
+                      onValueChange={(val) =>
+                        handleSourceChange(
+                          editingIndex,
+                          selectedVersionTarget.field,
+                          val
+                        )
+                      }
+                      disabled={isLoadingSourceVersions}
+                    >
+                      <SelectTrigger className="text-xs">
+                        <SelectValue placeholder="Choose a version…" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sourceVersions.map((version) => (
+                          <SelectItem
+                            key={version.assetVersionID}
+                            value={String(version.assetVersionID)}
+                          >
+                            v{version.versionNumber}
+                            {version.createdAt
+                              ? ` · ${new Date(version.createdAt).toLocaleString()}`
+                              : ""}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {!isLoadingSourceVersions && sourceVersions.length === 0 && (
+                      <p className="text-xs text-destructive">
+                        No versions exist for this asset yet.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             {selectedSource.type === "listener" && (
               <div className="flex flex-col space-y-1">
+                <Label htmlFor="listener-buffer-name" className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  Runtime buffer
+                </Label>
+                <Input
+                  id="listener-buffer-name"
+                  className="w-full text-xs"
+                  placeholder="default"
+                  value={selectedSource.bufferName || ""}
+                  onChange={(e) => handleSourceChange(editingIndex, "bufferName", e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Deployed Applications observe this saved listener buffer. Add a matching Save to buffer action to the listener before publishing. Leave blank to use default.
+                </p>
                 <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                   Custom Channel Name (Optional)
                 </Label>
@@ -552,46 +707,184 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
               </Select>
             </div>
 
-            {selectedSource.triggerMode === "reactive" && (
-              <div className="rounded border border-border bg-muted/30 p-2 flex flex-col gap-2">
-                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                  Refresh When Variable Changes
-                </p>
-                {variables.length === 0 ? (
-                  <p className="text-xs text-muted-foreground/70 italic">
-                    No page variables defined. Define variables in the Variables tab first.
-                  </p>
-                ) : (
-                  <div className="flex flex-col gap-2 max-h-36 overflow-y-auto">
-                    {variables.map((v) => {
-                      const path = `variables.${v.key}`;
-                      const isChecked = selectedSource.refreshOn?.includes(path);
-                      return (
-                        <div key={v.key} className="flex items-center gap-2">
-                          <Checkbox
-                            id={`refreshOn-${v.key}`}
-                            checked={isChecked}
-                            onCheckedChange={(checked) => {
-                              const current = selectedSource.refreshOn || [];
-                              const next = checked
-                                ? [...current, path]
-                                : current.filter((p) => p !== path);
-                              handleSourceChange(editingIndex, "refreshOn", next);
-                            }}
-                          />
-                          <Label
-                            htmlFor={`refreshOn-${v.key}`}
-                            className="text-xs font-mono cursor-pointer"
+            {selectedSource.triggerMode === "reactive" && (() => {
+              const refreshOn = selectedSource.refreshOn || [];
+              const pagePaths = new Set(
+                variables.map((variable) => `variables.${variable.key}`)
+              );
+              const applicationPaths = new Set(
+                Object.keys(applicationVariables || {}).map(
+                  (key) => `application.variables.${key}`
+                )
+              );
+              const customPaths = refreshOn.filter(
+                (path) => !pagePaths.has(path) && !applicationPaths.has(path)
+              );
+              const togglePath = (path, checked) => {
+                const next = checked
+                  ? [...refreshOn.filter((item) => item !== path), path]
+                  : refreshOn.filter((item) => item !== path);
+                handleSourceChange(editingIndex, "refreshOn", next);
+              };
+              const addManualPath = () => {
+                const path = manualRefreshPath.trim();
+                if (!path || refreshOn.includes(path)) return;
+                if (!/^[A-Za-z][A-Za-z0-9_.-]{0,199}$/.test(path)) {
+                  displayError(
+                    "Use a state path such as application.variables.selectedCustomer."
+                  );
+                  return;
+                }
+                handleSourceChange(editingIndex, "refreshOn", [...refreshOn, path]);
+                setManualRefreshPath("");
+              };
+
+              return (
+                <div className="rounded border border-border bg-muted/30 p-2 flex flex-col gap-3">
+                  <div className="flex flex-wrap items-center justify-between gap-1">
+                    <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                      Refresh When Variable Changes
+                    </p>
+                    {applicationTitle && (
+                      <span className="rounded border border-border/60 bg-background px-1.5 py-0.5 text-[9px] text-muted-foreground">
+                        App: {applicationTitle}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                      Page variables
+                    </span>
+                    {variables.length === 0 ? (
+                      <p className="text-xs text-muted-foreground/70 italic">
+                        No page variables defined. Define variables in the Variables tab.
+                      </p>
+                    ) : (
+                      <div className="flex max-h-36 flex-col gap-2 overflow-y-auto">
+                        {variables.map((variable) => {
+                          const path = `variables.${variable.key}`;
+                          return (
+                            <div key={variable.key} className="flex items-center gap-2">
+                              <Checkbox
+                                id={`refreshOn-page-${variable.key}`}
+                                checked={refreshOn.includes(path)}
+                                onCheckedChange={(checked) => togglePath(path, checked)}
+                              />
+                              <Label
+                                htmlFor={`refreshOn-page-${variable.key}`}
+                                className="text-xs font-mono cursor-pointer"
+                              >
+                                {path}
+                              </Label>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 border-t border-border/50 pt-2">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                      Application variables
+                    </span>
+                    {applicationVariables && Object.keys(applicationVariables).length > 0 ? (
+                      <div className="flex max-h-36 flex-col gap-2 overflow-y-auto">
+                        {Object.entries(applicationVariables).map(([key, declaration]) => {
+                          const path = `application.variables.${key}`;
+                          return (
+                            <div key={key} className="flex items-center gap-2">
+                              <Checkbox
+                                id={`refreshOn-app-${key}`}
+                                checked={refreshOn.includes(path)}
+                                onCheckedChange={(checked) => togglePath(path, checked)}
+                              />
+                              <Label
+                                htmlFor={`refreshOn-app-${key}`}
+                                className="text-xs font-mono cursor-pointer"
+                              >
+                                {path}
+                              </Label>
+                              {declaration?.type && (
+                                <span className="ml-auto text-[9px] text-muted-foreground/60">
+                                  {Array.isArray(declaration.type)
+                                    ? declaration.type.join(" | ")
+                                    : declaration.type}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-muted-foreground/70 italic">
+                        No application context is available for this page edit. Add a
+                        path manually below or open the page from Application Studio.
+                      </p>
+                    )}
+                  </div>
+
+                  {customPaths.length > 0 && (
+                    <div className="flex flex-col gap-1 border-t border-border/50 pt-2">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                        Custom paths
+                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {customPaths.map((path) => (
+                          <span
+                            key={path}
+                            className="inline-flex items-center gap-1 rounded border border-border/60 bg-background px-1.5 py-0.5 font-mono text-[9px] text-foreground"
                           >
                             {path}
-                          </Label>
-                        </div>
-                      );
-                    })}
+                            <button
+                              type="button"
+                              onClick={() => togglePath(path, false)}
+                              className="text-muted-foreground hover:text-destructive"
+                              aria-label={`Remove ${path}`}
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-1 border-t border-border/50 pt-2">
+                    <Label
+                      htmlFor="refresh-on-manual-path"
+                      className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70"
+                    >
+                      Add path manually
+                    </Label>
+                    <div className="flex gap-1">
+                      <Input
+                        id="refresh-on-manual-path"
+                        value={manualRefreshPath}
+                        onChange={(event) => setManualRefreshPath(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            addManualPath();
+                          }
+                        }}
+                        placeholder="application.variables.selectedCustomer"
+                        className="h-7 flex-1 font-mono text-[11px]"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={addManualPath}
+                        disabled={!manualRefreshPath.trim()}
+                      >
+                        Add
+                      </Button>
+                    </div>
                   </div>
-                )}
-              </div>
-            )}
+                </div>
+              );
+            })()}
 
             <div className="flex flex-col space-y-1">
               <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
@@ -805,4 +1098,6 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
 
 AppPageDataSourcesEditor.propTypes = {
   appPageEditorForm: PropTypes.object.isRequired,
+  applicationVariables: PropTypes.object,
+  applicationTitle: PropTypes.string,
 };

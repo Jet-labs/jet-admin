@@ -255,6 +255,7 @@ async function addListenerEvent(eventJob) {
     listenerID: eventJob.listenerID,
     tenantID: eventJob.tenantID,
     rawEvent: eventJob.rawEvent,
+    listenerDefinitionHash: eventJob.listenerDefinitionHash,
     eventID: eventJob.eventID || uuidv4(),
   });
 }

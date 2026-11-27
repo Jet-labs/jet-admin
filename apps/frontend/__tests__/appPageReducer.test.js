@@ -39,6 +39,18 @@ describe('appPageReducer', () => {
     expect(next.widgetStates).toBe(withQuery.widgetStates);
   });
 
+  test('SET_VARIABLES merges multiple keys and preserves slice references', () => {
+    const prev = initWith([{ key: 'page', defaultValue: 1 }, { key: 'search', defaultValue: '' }]);
+    const withQuery = appPageReducer(prev, appPageActions.setQueryResult('q', [1]));
+    const next = appPageReducer(
+      withQuery,
+      appPageActions.setVariables({ page: 2, search: 'open' })
+    );
+    expect(next.variables).toEqual({ page: 2, search: 'open' });
+    expect(next.queryResults).toBe(withQuery.queryResults);
+    expect(next.widgetStates).toBe(withQuery.widgetStates);
+  });
+
   test('SET_QUERY_RESULT stores data shape; SET_QUERY_LOADING preserves data', () => {
     let s = initWith([]);
     s = appPageReducer(s, appPageActions.setQueryResult('films', [{ id: 1 }]));

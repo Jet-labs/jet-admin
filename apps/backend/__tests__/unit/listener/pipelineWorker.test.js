@@ -12,6 +12,7 @@ jest.mock('../../../config/queue.config', () => ({
 const mockPrisma = {
   tblListeners: {
     update: jest.fn().mockReturnValue({ catch: jest.fn() }),
+    findFirst: jest.fn(),
   },
   tblListenerActions: {
     findMany: jest.fn(),
@@ -99,6 +100,17 @@ describe('PipelineWorker', () => {
         eventCount: { increment: 1 },
       },
     });
+  });
+  it('stamps only matching ingress/processing definitions and cannot accept forged event metadata', async () => {
+    const listener = { listenerID: 'verified', tenantID: 't', datasourceID: 'd', listenerType: 'webhook', listenerConfig: {} };
+    const actions = [{ actionID: 'buffer', actionType: 'save_to_buffer', actionConfig: {}, isEnabled: true, orderIndex: 0 }];
+    mockPrisma.tblListenerActions.findMany.mockResolvedValue(actions);
+    mockPrisma.tblListeners.findFirst.mockResolvedValue({ ...listener, tblListenerActions: actions });
+    const hash = require('../../../modules/listener/listenerDefinition').listenerDefinitionHash({ ...listener, tblListenerActions: actions });
+    await processEventFn({ listenerID: 'verified', tenantID: 't', rawEvent: { id: 1, __metadata: { provider: 'test' } }, listenerDefinitionHash: hash });
+    expect(mockPrisma.tblListenerEvents.create.mock.calls[0][0].data.eventMeta).toEqual({ provider: 'test', applicationDefinitionHash: hash });
+    await processEventFn({ listenerID: 'verified', tenantID: 't', rawEvent: { __metadata: { applicationDefinitionHash: hash, provider: 'unverified' } }, listenerDefinitionHash: 'old-hash' });
+    expect(mockPrisma.tblListenerEvents.create.mock.calls[1][0].data.eventMeta).toEqual({ provider: 'unverified' });
   });
 
   it('should abort pipeline on transformation error', async () => {

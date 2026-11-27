@@ -92,6 +92,12 @@ A visual drag-and-drop page builder based on Craft.js, allowing you to compose c
 
 **Features:** Z-Stack layout · Component tree · Custom styling · Data binding · Responsive layouts
 
+### 🧩 Applications (foundation preview)
+
+Compose existing App Pages into a routed application workspace with a shared shell, typed route parameters/queries, route guards and nested declarations, keep-alive, not-found routing, application-scoped state, environment bindings, consumer route/action policy, managed page adoption, immutable versions with diff/restore, and release history/rollback.
+
+**Current scope:** application drafts, referenced/managed page linking, route lifecycle settings, shell home/not-found/expression settings, scoped permissions, execution-disabled composition preview, immutable asset versions with per-editor history/impact review, version diff and draft restore, thin releases with exact page version pointers, page-version pinning, version-readiness review, release history with deploy/rollback, application state with write/navigation actions, typed route query routing, opt-in page-variable synchronization, environment datasource binding revisions, consumer route/action policy, managed page adoption, workflow run history, and opt-in strict expression mode. Query and workflow definitions determine behavior; there is no application-level effect classification. Live Temporal/Redis/listener-proxy verification remains blocked. See [the architecture proposal](docs/specs/2026-11-22-applications-architecture.md), [implementation status](docs/specs/2026-11-22-applications-foundation-status.md), [E2E matrix](docs/specs/2026-11-23-applications-e2e-matrix.md), [asset versioning](docs/specs/2026-11-23-asset-versioning-plan.md), and [the workflow/listener plan](docs/specs/2026-11-22-applications-workflow-listener-plan.md).
+
 ---
 
 ### 📊 Dashboard & Widget System

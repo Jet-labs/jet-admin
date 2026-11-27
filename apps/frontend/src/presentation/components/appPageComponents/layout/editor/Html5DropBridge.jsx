@@ -14,6 +14,57 @@ import PropTypes from "prop-types";
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useEditor } from "@craftjs/core";
 import { Element } from "@craftjs/core";
+import { subscribeCanvasDrag } from "./canvasDragStore";
+import { findSectionTemplate } from "./sectionTemplates";
+import {
+  createWidgetInstanceKey,
+  parseWidgetKey,
+} from "../../editor/appPageLayoutUtils";
+
+/** Widget instance keys currently mounted on the canvas. */
+function collectCraftWidgetKeys(query) {
+  const keys = [];
+  try {
+    const nodes = query.getSerializedNodes();
+    for (const node of Object.values(nodes || {})) {
+      const key = node?.props?.widgetKey;
+      if (node?.displayName === "CanvasWidgetSlot" && key) keys.push(key);
+    }
+  } catch {
+    /* canvas not ready */
+  }
+  return keys;
+}
+
+/**
+ * Saved snippets reuse the source page's widget instance keys. Inserting the
+ * same snippet twice must not merge widget state, so give every inserted
+ * widget a fresh instance key while keeping the underlying widget ID.
+ */
+function remapSnippetWidgetKeys(tree, existingKeys = []) {
+  const keys = [...existingKeys];
+  const addedKeys = [];
+  const visit = (node) => {
+    if (!node || typeof node !== "object") return node;
+    if (Array.isArray(node)) return node.map(visit);
+    if (node.type === "widget" && node.widgetKey) {
+      const widgetID = parseWidgetKey(node.widgetKey);
+      if (!widgetID) return node;
+      const widgetKey = createWidgetInstanceKey(widgetID, keys);
+      keys.push(widgetKey);
+      addedKeys.push(widgetKey);
+      return { ...node, widgetKey };
+    }
+    if (Array.isArray(node.children)) {
+      return { ...node, children: node.children.map(visit) };
+    }
+    if (node.children && typeof node.children === "object") {
+      return { ...node, children: visit(node.children) };
+    }
+    return node;
+  };
+  return { tree: visit(tree), widgetKeys: addedKeys };
+}
 
 const CANVAS_DISPLAY_NAMES = [
   "CanvasRow",
@@ -22,6 +73,117 @@ const CANVAS_DISPLAY_NAMES = [
   "CanvasStack",
   "CanvasZStack",
 ];
+
+/**
+ * Build a React element tree for a section template. `Element` is needed for
+ * canvas nodes so Craft can parse the children into a node tree.
+ */
+function buildTemplateElement(definition, resolver, keyPrefix = "template") {
+  if (!definition) return null;
+  // Container snippets come from craftToTree with a single inner column
+  // object (`children: { type: "column", ... }`) instead of the array shape
+  // used by built-in templates. Flatten that shape here.
+  const childDefinitions = Array.isArray(definition.children)
+    ? definition.children
+    : Array.isArray(definition.children?.children)
+      ? definition.children.children
+      : [];
+  const children = childDefinitions
+    .map((child, index) =>
+      buildTemplateElement(child, resolver, `${keyPrefix}-${index}`)
+    )
+    .filter(Boolean);
+  const props = definition.props || {};
+
+  switch (definition.type) {
+    case "row":
+      return (
+        <Element key={keyPrefix} is={resolver.CanvasRow} canvas {...props}>
+          {children}
+        </Element>
+      );
+    case "container":
+      return (
+        <Element key={keyPrefix} is={resolver.CanvasContainer} canvas {...props}>
+          <Element is={resolver.CanvasColumn} canvas>
+            {children}
+          </Element>
+        </Element>
+      );
+    case "widget":
+      return (
+        <Element
+          key={keyPrefix}
+          is={resolver.CanvasWidgetSlot}
+          widgetKey={definition.widgetKey}
+          span={definition.span || 6}
+          sizing={definition.sizing || "fill"}
+          width={definition.width ?? null}
+          height={definition.height ?? null}
+          fixedHeight={definition.fixedHeight || null}
+          style={definition.style || {}}
+          condition={definition.condition || null}
+          repeat={definition.repeat || null}
+          hideMode={definition.hideMode || null}
+          keepMounted={!!definition.keepMounted}
+          responsive={definition.responsive || null}
+          locked={false}
+        />
+      );
+    case "stack":
+      return (
+        <Element key={keyPrefix} is={resolver.CanvasStack} canvas {...props}>
+          {children}
+        </Element>
+      );
+    case "z-stack":
+      return (
+        <Element key={keyPrefix} is={resolver.CanvasZStack} canvas {...props}>
+          {children}
+        </Element>
+      );
+    case "column":
+      return (
+        <Element key={keyPrefix} is={resolver.CanvasColumn} canvas {...props}>
+          {children}
+        </Element>
+      );
+    default:
+      return null;
+  }
+}
+
+function buildTemplateTree(query, template) {
+  const resolver = query.getOptions().resolver;
+  return query
+    .parseReactElement(buildTemplateElement(template.tree, resolver))
+    .toNodeTree();
+}
+
+/**
+ * Section templates are row-based; find the nearest column that may legally
+ * contain a row (page root, a container's inner column, or an ancestor).
+ */
+function findTemplateColumn(query, nodeId) {
+  let current = nodeId;
+  for (let depth = 0; current && depth < 60; depth += 1) {
+    let node = null;
+    try {
+      node = query.node(current).get();
+    } catch {
+      return "ROOT";
+    }
+    if (!node) return "ROOT";
+    const displayName = node.data.displayName;
+    if (displayName === "CanvasColumn") return current;
+    if (displayName === "CanvasContainer") {
+      const columnId = (node.data.nodes || [])[0];
+      if (columnId) return columnId;
+    }
+    current = node.data.parent;
+  }
+  return "ROOT";
+}
 
 /**
  * Walks up the DOM from the drop target to find the nearest Craft canvas node.
@@ -110,21 +272,135 @@ export default function Html5DropBridge({ setWidgets }) {
     setDropIndicator(null);
   }, []);
 
-  const handleDrop = useCallback(
-    (e) => {
+  const registerWidgetKeys = useCallback(
+    (keys) => {
+      if (!setWidgets || !Array.isArray(keys) || keys.length === 0) return;
+      setWidgets((prev) => {
+        const next = Array.isArray(prev) ? [...prev] : [];
+        for (const key of keys) {
+          if (!next.includes(key)) next.push(key);
+        }
+        return next;
+      });
+    },
+    [setWidgets]
+  );
+
+  /** Insert a saved snippet into the nearest legal column. */
+  const insertSnippetIntoColumn = useCallback(
+    ({ targetNodeId, snippetTree }) => {
+      if (!snippetTree) return null;
+      const remapped = remapSnippetWidgetKeys(
+        snippetTree,
+        collectCraftWidgetKeys(query)
+      );
+      const columnId = findTemplateColumn(query, targetNodeId);
+      const tree = buildTemplateTree(query, { tree: remapped.tree });
+      actions.addNodeTree(tree, columnId);
+      actions.selectNode(tree.rootNodeId);
+      registerWidgetKeys(remapped.widgetKeys);
+      return tree;
+    },
+    [query, actions, registerWidgetKeys]
+  );
+
+  const updateIndicatorAt = useCallback(
+    (targetEl, clientX, clientY) => {
+      const found = findCraftCanvasNode(query, targetEl);
+      if (!found) {
+        setDropIndicator(null);
+        return;
+      }
+
+      let nodeId = found.nodeId;
+      let displayName = found.displayName;
+
+      if (displayName === "CanvasStack") {
+        try {
+          const stackNode = query.node(nodeId).get();
+          const parentId = stackNode?.data?.parent;
+          if (parentId) {
+            const parentNode = query.node(parentId).get();
+            if (parentNode?.data?.displayName === "CanvasZStack") {
+              nodeId = parentId;
+              displayName = "CanvasZStack";
+            }
+          }
+        } catch {
+          /* ignore */
+        }
+      }
+
+      if (displayName === "CanvasZStack") {
+        try {
+          const zStackNode = query.node(nodeId).get();
+          const childIds = zStackNode?.data?.nodes || [];
+          let activeIndex = zStackNode?.data?.props?.activeLayerIndex;
+          if (activeIndex === undefined || activeIndex === null) activeIndex = 0;
+          const layerId = childIds[activeIndex];
+          if (layerId) {
+            const layerNode = query.node(layerId).get();
+            const layerChildIds = layerNode?.data?.nodes || [];
+            const layerEl = document.getElementById(layerId);
+            const index = layerEl
+              ? computeInsertionIndex(query, layerId, "CanvasStack", layerEl, clientX, clientY, layerChildIds)
+              : layerChildIds.length;
+            setDropIndicator({ nodeId: layerId, index, displayName: "CanvasStack" });
+            return;
+          }
+        } catch {
+          /* ignore */
+        }
+      }
+
+      try {
+        const targetNode = query.node(nodeId).get();
+        const childIds = targetNode?.data?.nodes || [];
+        const targetNodeEl = document.getElementById(nodeId) || targetEl;
+        const index = targetNodeEl
+          ? computeInsertionIndex(query, nodeId, displayName, targetNodeEl, clientX, clientY, childIds)
+          : childIds.length;
+        setDropIndicator({ nodeId, index, displayName });
+      } catch {
+        setDropIndicator(null);
+      }
+    },
+    [query]
+  );
+
+  const performDrop = useCallback(
+    ({ targetEl, clientX, clientY, widgetKey, layoutType, templateId, snippetTree }) => {
       clearDropIndicator();
       if (!enabled) return;
+      if (!widgetKey && !layoutType && !templateId && !snippetTree) return;
 
-      const widgetKey = e.dataTransfer?.getData("widget");
-      const layoutType = e.dataTransfer?.getData("layout-type");
-      if (!widgetKey && !layoutType) return;
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      const found = findCraftCanvasNode(query, e.target);
+      const found = findCraftCanvasNode(query, targetEl);
       let targetNodeId = found?.nodeId ?? "ROOT";
       let targetDisplayName = found?.displayName ?? "CanvasColumn";
+
+      // Section snippets are structural rows. Insert them into the nearest
+      // legal column instead of trying to nest a row inside a row/stack.
+      if (templateId || snippetTree) {
+        if (snippetTree) {
+          try {
+            insertSnippetIntoColumn({ targetNodeId, snippetTree });
+          } catch (err) {
+            console.error("[Html5DropBridge] Snippet insert failed:", err);
+          }
+          return;
+        }
+        const template = findSectionTemplate(templateId);
+        if (!template?.tree) return;
+        try {
+          const columnId = findTemplateColumn(query, targetNodeId);
+          const tree = buildTemplateTree(query, template);
+          actions.addNodeTree(tree, columnId);
+          actions.selectNode(tree.rootNodeId);
+        } catch (err) {
+          console.error("[Html5DropBridge] Template insert failed:", err);
+        }
+        return;
+      }
 
       const resolver = query.getOptions().resolver;
       const _CanvasWidgetSlot = resolver["CanvasWidgetSlot"];
@@ -226,11 +502,13 @@ export default function Html5DropBridge({ setWidgets }) {
             const freshZStack = query.node(zStackId).get();
             const freshChildIds = freshZStack?.data?.nodes || [];
             layerId = freshChildIds[freshChildIds.length - 1];
+            /* eslint-disable react/prop-types */
             actions.setProp(zStackId, (props) => {
               props.activeLayerIndex = freshChildIds.length - 1;
               if (!Array.isArray(props.layerOpacities)) props.layerOpacities = [];
               props.layerOpacities[freshChildIds.length - 1] = 1;
             });
+            /* eslint-enable react/prop-types */
           }
 
           if (layerId) {
@@ -250,7 +528,7 @@ export default function Html5DropBridge({ setWidgets }) {
               const layerChildIds = layerNode?.data?.nodes || [];
               const layerEl = document.getElementById(layerId);
               const layerIndex = layerEl
-                ? computeInsertionIndex(query, layerId, "CanvasStack", layerEl, e.clientX, e.clientY, layerChildIds)
+                ? computeInsertionIndex(query, layerId, "CanvasStack", layerEl, clientX, clientY, layerChildIds)
                 : layerChildIds.length;
 
               actions.addNodeTree(treeToAdd, layerId, layerIndex);
@@ -273,9 +551,9 @@ export default function Html5DropBridge({ setWidgets }) {
       // Compute insertion index for positional drops
       const targetNode = query.node(targetNodeId).get();
       const targetChildIds = targetNode?.data?.nodes || [];
-      const targetEl = document.getElementById(targetNodeId);
-      const insertIndex = targetEl
-        ? computeInsertionIndex(query, targetNodeId, targetDisplayName, targetEl, e.clientX, e.clientY, targetChildIds)
+      const targetNodeEl = document.getElementById(targetNodeId);
+      const insertIndex = targetNodeEl
+        ? computeInsertionIndex(query, targetNodeId, targetDisplayName, targetNodeEl, clientX, clientY, targetChildIds)
         : targetChildIds.length;
 
       try {
@@ -300,7 +578,7 @@ export default function Html5DropBridge({ setWidgets }) {
               const colChildIds = colNode?.data?.nodes || [];
               const colEl = document.getElementById(columnId);
               const colIndex = colEl
-                ? computeInsertionIndex(query, columnId, "CanvasColumn", colEl, e.clientX, e.clientY, colChildIds)
+                ? computeInsertionIndex(query, columnId, "CanvasColumn", colEl, clientX, clientY, colChildIds)
                 : colChildIds.length;
               actions.addNodeTree(makeRowTree(), columnId, colIndex);
             }
@@ -328,8 +606,67 @@ export default function Html5DropBridge({ setWidgets }) {
         });
       }
     },
-    [query, actions, setWidgets, enabled, clearDropIndicator]
+    [query, actions, setWidgets, enabled, clearDropIndicator, insertSnippetIntoColumn]
   );
+
+  const handleDrop = useCallback(
+    (event) => {
+      const widgetKey = event.dataTransfer?.getData("widget");
+      const layoutType = event.dataTransfer?.getData("layout-type");
+      const templateId = event.dataTransfer?.getData("template-id");
+      if (!widgetKey && !layoutType && !templateId) return;
+      event.preventDefault();
+      event.stopPropagation();
+      performDrop({
+        targetEl: event.target,
+        clientX: event.clientX,
+        clientY: event.clientY,
+        widgetKey,
+        layoutType,
+        templateId,
+      });
+    },
+    [performDrop]
+  );
+
+  useEffect(() => {
+    if (!enabled) return undefined;
+    return subscribeCanvasDrag(({ phase, event, state }) => {
+      const canvasEl = document.getElementById("craft-canvas-root");
+      if (!canvasEl || !state) return;
+
+      if (phase === "move" && event) {
+        const targetEl = document.elementFromPoint(event.clientX, event.clientY);
+        if (targetEl && canvasEl.contains(targetEl)) {
+          updateIndicatorAt(targetEl, event.clientX, event.clientY);
+        } else {
+          setDropIndicator(null);
+        }
+        return;
+      }
+
+      if (phase === "end" && event) {
+        const targetEl = document.elementFromPoint(event.clientX, event.clientY);
+        if (!targetEl || !canvasEl.contains(targetEl)) {
+          clearDropIndicator();
+          return;
+        }
+        const payload = state.payload || {};
+        performDrop({
+          targetEl,
+          clientX: event.clientX,
+          clientY: event.clientY,
+          widgetKey: payload.kind === "widget" ? payload.widgetKey : null,
+          layoutType: payload.kind === "layout" ? payload.layoutType : null,
+          templateId: payload.kind === "template" ? payload.templateId : null,
+          snippetTree: payload.kind === "snippet" ? payload.tree : null,
+        });
+        return;
+      }
+
+      if (phase === "cancel") clearDropIndicator();
+    });
+  }, [enabled, performDrop, updateIndicatorAt, clearDropIndicator]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -339,7 +676,8 @@ export default function Html5DropBridge({ setWidgets }) {
     const nativeDragOver = (e) => {
       if (
         e.dataTransfer?.types?.includes("widget") ||
-        e.dataTransfer?.types?.includes("layout-type")
+        e.dataTransfer?.types?.includes("layout-type") ||
+        e.dataTransfer?.types?.includes("template-id")
       ) {
         e.preventDefault();
         e.stopPropagation();
@@ -424,6 +762,43 @@ export default function Html5DropBridge({ setWidgets }) {
     };
   }, [handleDrop, clearDropIndicator, enabled, query]);
 
+  // Palette "insert" (click) support for built-in templates and saved snippets.
+  useEffect(() => {
+    if (!enabled) return undefined;
+    const insertTemplateTree = (treeDefinition) => {
+      if (!treeDefinition?.tree) return;
+      try {
+        const selected = query.getEvent("selected").first();
+        const columnId = findTemplateColumn(query, selected || "ROOT");
+        const tree = buildTemplateTree(query, treeDefinition);
+        actions.addNodeTree(tree, columnId);
+        actions.selectNode(tree.rootNodeId);
+      } catch (err) {
+        console.error("[Html5DropBridge] Template insert failed:", err);
+      }
+    };
+    const onInsertTemplate = (event) => {
+      insertTemplateTree(findSectionTemplate(event.detail?.templateId));
+    };
+    const onInsertSnippet = (event) => {
+      try {
+        const selected = query.getEvent("selected").first();
+        insertSnippetIntoColumn({
+          targetNodeId: selected || "ROOT",
+          snippetTree: event.detail?.tree,
+        });
+      } catch (err) {
+        console.error("[Html5DropBridge] Snippet insert failed:", err);
+      }
+    };
+    window.addEventListener("craft-insert-template", onInsertTemplate);
+    window.addEventListener("craft-insert-snippet", onInsertSnippet);
+    return () => {
+      window.removeEventListener("craft-insert-template", onInsertTemplate);
+      window.removeEventListener("craft-insert-snippet", onInsertSnippet);
+    };
+  }, [enabled, query, actions, insertSnippetIntoColumn]);
+
   // Render visual drop indicator overlay
   if (!dropIndicator || !enabled) return null;
 
@@ -433,13 +808,39 @@ export default function Html5DropBridge({ setWidgets }) {
   const targetNode = query.node(dropIndicator.nodeId).get();
   const childIds = targetNode?.data?.nodes || [];
   const indicatorChildId = childIds[Math.min(dropIndicator.index, childIds.length - 1)];
+  const canvasRect = document.getElementById("craft-canvas-root")?.getBoundingClientRect();
+  const targetRect = targetEl.getBoundingClientRect();
+
+  let snapGuides = null;
+  if (dropIndicator.displayName === "CanvasRow" && canvasRect) {
+    const gap = parseFloat(getComputedStyle(targetEl).gap) || 8;
+    const usableWidth = targetRect.width - 11 * gap;
+    const columnWidth = Math.max(1, usableWidth / 12);
+    snapGuides = Array.from({ length: 12 }).map((_, index) => (
+      <div
+        key={`snap-${index}`}
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          left: `${targetRect.left - canvasRect.left + index * (columnWidth + gap)}px`,
+          top: `${targetRect.top - canvasRect.top}px`,
+          width: `${columnWidth}px`,
+          height: `${targetRect.height}px`,
+          borderLeft: "1px solid hsl(var(--primary) / 0.22)",
+          borderRight: index === 11 ? "1px solid hsl(var(--primary) / 0.22)" : "none",
+          backgroundColor: "hsl(var(--primary) / 0.035)",
+          pointerEvents: "none",
+          zIndex: 9998,
+        }}
+      />
+    ));
+  }
 
   let indicatorStyle = { display: "none" };
 
   if (childIds.length === 0 || dropIndicator.displayName === "CanvasZStack") {
     // Highlight the empty container or Z-Stack layer addition
-    const rect = targetEl.getBoundingClientRect();
-    const canvasRect = document.getElementById("craft-canvas-root")?.getBoundingClientRect();
+    const rect = targetRect;
     indicatorStyle = {
       position: "absolute",
       left: `${rect.left - (canvasRect?.left || 0)}px`,
@@ -456,7 +857,6 @@ export default function Html5DropBridge({ setWidgets }) {
     const childEl = document.getElementById(indicatorChildId);
     if (childEl) {
       const rect = childEl.getBoundingClientRect();
-      const canvasRect = document.getElementById("craft-canvas-root")?.getBoundingClientRect();
       const orientation = getLayoutOrientation(query, dropIndicator.nodeId, dropIndicator.displayName);
       const isBefore = dropIndicator.index < childIds.length;
 
@@ -495,10 +895,13 @@ export default function Html5DropBridge({ setWidgets }) {
   }
 
   return (
-    <div
-      id="craft-html5-drop-overlay"
-      style={indicatorStyle}
-    />
+    <>
+      {snapGuides}
+      <div
+        id="craft-html5-drop-overlay"
+        style={indicatorStyle}
+      />
+    </>
   );
 }
 

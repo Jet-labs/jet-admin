@@ -678,3 +678,52 @@ To prevent mismatched heights when placing form controls side-by-side, we strict
   - `<Input size="lg" />` and `<Button size="lg" />` resolve to 40px.
 
 **Rule:** When placing a Button next to an Input or Select, ensure their `size` props match perfectly. Never place a `size="sm"` Button next to a default `Input`.
+---
+
+## 30. Widget Configurator & Theme Extensions (2026-11-24)
+
+These additions extend — they do not replace — the token rules above. Existing dark UI remains the default.
+
+### Semantic runtime tokens
+
+- Surfaces: `--surface-canvas`, `--surface-card`, `--surface-raised`, `--surface-subtle` (exposed as `bg-surface-*`).
+- Text: `--text-primary`, `--text-secondary`, `--text-muted`, `--text-faint`.
+- Borders: `--border-hairline`, `--border-hairline-strong`.
+- Status: `--status-info`, `--status-success`, `--status-warning`, `--status-danger`, `--status-neutral`; use `.status-*` / `.status-solid-*` or the Tailwind `success`/`warning`/`info`/`danger` colors. Do not use raw `emerald`/`rose`/`amber`/`blue` utility families in widget status surfaces.
+- Density: `.widget-density-compact`, `.widget-density-comfortable` and `.widget-density-spacious` set `--widget-pad-*`, `--widget-gap`, `--widget-row-height`, `--widget-font-size` and `--widget-control-height`.
+- Motion: `--motion-fast` (120ms), `--motion-base` (180ms), `--motion-ease`; wrap interactive surfaces in `.widget-surface` or `.config-shell` so `prefers-reduced-motion` is respected.
+
+### Light theme
+
+- Dark remains the default. Add `theme-light` to an ancestor (or `<html>`) to swap the semantic tokens. The full app shell is not required to switch; widgets and configurator primitives must render correctly in both.
+
+### Radius scale
+
+- Controls and buttons: 6px — keep using `rounded` / `rounded-control`.
+- Cards, popovers and grouped surfaces: 8px — use `rounded-card`.
+- Dialogs and large overlays: 12px — use `rounded-overlay`.
+- Raw `rounded-md`/`rounded-lg`/`rounded-xl` remain banned; use the semantic classes so the scale stays consistent. Pills remain reserved for badges/avatars, not buttons.
+
+### Configurator contract
+
+- Type editors use the shared kit: `ConfigSection`, `ConfigField`, `BindableInput`, `SegmentedControl`, `ColorField`, `SpacingField`, `IconPicker`, `SizeField`, `OptionListEditor` and `ConditionBuilder`.
+- Placement is Content / Style / Behavior / Advanced. Settings that change what is shown go in Content; presentation in Style; state/validation/interactions in Behavior; raw CSS, accessibility and test hooks in Advanced.
+- Every bindable field shows the `{ }` expression toggle and inline template validation.
+- Every field with a path gets a modified dot and reset-to-default affordance; panels provide undo/redo, search and a sticky footer.
+- Loading surfaces use skeletons on first load and a live-region busy indicator for refresh; not an unlabelled spinner.
+
+
+
+### Data table and export (2026-11-25)
+
+- Prefer the shared table features over bespoke grids: column pinning/resizing, saved views, expandable detail rows and bounded virtualization are config flags, not one-off code.
+- Saved views persist search, filters, sorting, widths and pinned columns in localStorage, scoped by `savedViews.storageKey` or the widget id. Never store credentials or row data in a view.
+- XLSX export uses the bundled dependency-free OOXML writer (`buildXLSXBytes`). For very large datasets use server-side export and fire `onExport` instead of building the file in the browser.
+- Conditional styling uses the shared `ConditionalStyleField` / `resolveConditionalStyle` pair with token tones (neutral/primary/success/warning/danger/info), never raw color utilities.
+
+### Stateful widget contracts
+
+- File upload: when `uploadUrl` is configured, send FormData (`uploadFieldName`) and expect a JSON URL at `responseUrlKey`. Progress, cancel and retry emit `onUploadProgress`, `onUploadCancel` and `onUploadError`; without a URL the widget remains metadata-only and labels it as such.
+- Async option lists: set `asyncOptions` and listen for `onLoadOptions` with `{ searchTerm, page, pageSize }`; refresh the bound options array from page state. The dropdown caps rendered rows and asks for the next page rather than rendering unbounded DOM.
+- Forms: `stepper` groups fields by their `section` value; `autosave` fires `onAutosave` after edits settle; `validationUrl` receives `{ values, fields }` and returns `{ errors }` to block submit.
+- Kanban and calendar drag actions emit one move event each (`onCardMove` / `onEventMove`); the page owns persistence.

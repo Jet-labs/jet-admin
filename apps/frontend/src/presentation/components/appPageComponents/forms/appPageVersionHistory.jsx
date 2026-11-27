@@ -113,8 +113,8 @@ export const AppPageVersionHistory = ({ tenantID, appPageID }) => {
         size="icon"
         square
         className="shrink-0"
-        aria-label="Version history"
-        title="Version history"
+        aria-label="Editor history"
+        title="Editor history"
         onClick={() => {
           setSelectedVersionID(null);
           setIsOpen(true);
@@ -126,9 +126,9 @@ export const AppPageVersionHistory = ({ tenantID, appPageID }) => {
       <Dialog open={isOpen} onOpenChange={(open) => { if (!open) { setIsOpen(false); setSelectedVersionID(null); } }}>
         <DialogContent className="max-w-6xl w-[95vw]">
           <DialogHeader>
-            <DialogTitle>Version history</DialogTitle>
+            <DialogTitle>Editor history</DialogTitle>
             <DialogDescription>
-              Every save snapshots the page. Preview any version, restore with one click.
+              Every save records an editor snapshot for undo/history. Preview a snapshot or restore it without creating a release version.
             </DialogDescription>
           </DialogHeader>
           <DialogBody className="max-h-[70vh] overflow-auto">

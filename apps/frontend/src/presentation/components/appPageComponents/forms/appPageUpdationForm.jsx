@@ -1,5 +1,6 @@
 ﻿import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
+import { useSearchParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { Undo } from "lucide-react";
@@ -8,6 +9,7 @@ import {
   getAppPageByIDAPI,
   updateAppPageByIDAPI,
 } from "../../../../data/apis/appPage";
+import { getApplicationAPI } from "../../../../data/apis/application";
 import { useGlobalUI } from "../../../../logic/stores/useUIStore";
 import { useUnsavedChangesGuard } from "../../../../logic/hooks/useUnsavedChangesGuard";
 import { formValidations } from "../../../../utils/formValidation";
@@ -31,6 +33,7 @@ import { AppPageWorkflowInputHost } from '../appPageWorkflowInputHost';
 
 import { PageHeader, Button } from "@jet-admin/ui";
 import { BundleExportButton } from "../../bundleComponents/bundleExportButton";
+import { AssetVersionsButton } from "../../assetVersionComponents/assetVersionsButton";
 
 const EMPTY_INITIAL_VALUES = {
   appPageTitle: "",
@@ -58,6 +61,8 @@ import { appPageConfigSignature } from "../layout/engine/configSignature.js";
 export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
   const queryClient = useQueryClient();
   const { showConfirmation } = useGlobalUI();
+  const [searchParams] = useSearchParams();
+  const linkedApplicationID = searchParams.get("applicationId");
 
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -76,6 +81,24 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
       }),
     refetchOnWindowFocus: false,
   });
+
+  // When the page is opened from Application Studio, the application
+  // definition supplies declared state variables for the reactive refreshOn
+  // picker. A standalone page edit simply has no application context.
+  const { data: linkedApplicationResponse } = useQuery({
+    queryKey: ["application-page-context", tenantID, linkedApplicationID],
+    queryFn: () =>
+      getApplicationAPI({
+        tenantID,
+        applicationID: linkedApplicationID,
+      }),
+    enabled: Boolean(linkedApplicationID),
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  const linkedApplication = linkedApplicationResponse?.application || null;
+  const applicationVariables =
+    linkedApplication?.draft?.definition?.state?.application || null;
 
   const { isPending: isUpdatingAppPage, mutate: updateAppPage } =
     useMutation({
@@ -261,6 +284,11 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
           tenantID={tenantID}
           appPageID={appPageID}
         />
+        <AssetVersionsButton
+          tenantID={tenantID}
+          assetType="appPage"
+          assetID={appPageID}
+        />
         <AppPageDeletionForm
           key={`appPageDeletionForm_${appPage?.appPageID}`}
           tenantID={tenantID}
@@ -277,6 +305,13 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
           entityID={appPageID}
         />
       </PageHeader>
+
+      <div className="w-full border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs text-amber-900 dark:text-amber-200">
+        Saving this page updates the working page and its editor history only.
+        Deployed Applications keep using the page version and data-source
+        versions captured in their release until you create/select a new page
+        version and publish.
+      </div>
 
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingAppPage || !hasInitialized}
@@ -305,6 +340,8 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
                       appPageEditorForm={appPageUpdationForm}
                       tenantID={tenantID}
                       onAddWidget={handleAddWidgetToCanvas}
+                      applicationVariables={applicationVariables}
+                      applicationTitle={linkedApplication?.title || null}
                     />
                   </ResizablePanel>
                   <ResizableHandle withHandle={true} />
@@ -336,6 +373,12 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
                       }}
                       appPageEditorForm={appPageUpdationForm}
                       onAddWidget={handleAddWidgetToCanvas}
+                      saveState={{
+                        isDirty: historyIndex > 0,
+                        changeCount: historyIndex,
+                        isSaving: isUpdatingAppPage,
+                        onSave: appPageUpdationForm.handleSubmit,
+                      }}
                     />
                   </ResizablePanel>
                 </ResizablePanelGroup>

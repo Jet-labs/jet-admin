@@ -8,6 +8,11 @@
  * - writeVariablesToUrl: mirrors non-default variable values back into the
  *   URL via history.replaceState, so any filtered view can be copied/shared.
  *   Only deltas from the defaults are written — URLs stay clean.
+ *
+ * Application routes can additionally bind a subset of page variables to
+ * declared route query parameters. The route host passes an allowlist so
+ * unrelated page variables never leak into the URL, and owns the actual
+ * router navigation (instead of history.replaceState).
  */
 
 const coerceParam = (raw, type) => {
@@ -69,18 +74,26 @@ const stringifyVariable = (value) => {
 };
 
 /**
- * Write non-default variable values into the URL (replaceState — no history
- * spam). Params equal to the variable's default are removed so shared links
- * only encode meaningful state. Unrelated query params are preserved.
+ * Apply non-default variable values to a URLSearchParams instance.
+ * Returns true when at least one parameter changed. An optional `keys`
+ * allowlist limits synchronization to specific variables (used by
+ * application routes with declared query parameters).
  */
-export const writeVariablesToUrl = (definitions, values) => {
-  if (typeof window === "undefined" || !Array.isArray(definitions)) return;
-
-  const params = new URLSearchParams(window.location.search);
+export const applyVariablesToSearchParams = (
+  params,
+  definitions,
+  values,
+  { keys } = {}
+) => {
+  if (!(params instanceof URLSearchParams) || !Array.isArray(definitions)) {
+    return false;
+  }
+  const allowed = Array.isArray(keys) ? new Set(keys) : null;
   let changed = false;
 
   for (const def of definitions) {
     if (!def?.key) continue;
+    if (allowed && !allowed.has(def.key)) continue;
     const current = values[def.key];
     const isDefault =
       current === undefined ||
@@ -100,8 +113,22 @@ export const writeVariablesToUrl = (definitions, values) => {
       changed = true;
     }
   }
+  return changed;
+};
 
-  if (!changed) return;
+/**
+ * Write non-default variable values into the URL (replaceState — no history
+ * spam). Params equal to the variable's default are removed so shared links
+ * only encode meaningful state. Unrelated query params are preserved.
+ * Pass `keys` to restrict synchronization to an allowlist.
+ */
+export const writeVariablesToUrl = (definitions, values, options = {}) => {
+  if (typeof window === "undefined" || !Array.isArray(definitions)) return;
+
+  const params = new URLSearchParams(window.location.search);
+  if (!applyVariablesToSearchParams(params, definitions, values, options)) {
+    return;
+  }
 
   const qs = params.toString();
   const nextUrl = `${window.location.pathname}${qs ? `?${qs}` : ""}${window.location.hash}`;

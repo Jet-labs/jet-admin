@@ -1,45 +1,70 @@
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
-import { Input, Label, Button } from "@jet-admin/ui";
-import { TemplateAutocompleteInput } from "@jet-admin/ui";
+import {
+  ConfigSection,
+  ConfigField,
+  BindableInput,
+  OptionListEditor,
+  SegmentedControl,
+  useConfigValue,
+} from "../config";
 
-export const TabsConfigEditor = ({ widgetEditorForm, stateTree }) => {
-  const config = widgetEditorForm.values.widgetConfig || {};
+export const TabsConfigEditor = ({ stateTree }) => {
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
-  const tabs = config.tabs || [];
+  const [tabs, setTabs] = useConfigValue("tabs", []);
+  const [defaultTab, setDefaultTab] = useConfigValue("defaultTab", "");
+  const [orientation, setOrientation] = useConfigValue("orientation", "horizontal");
+  const [variant, setVariant] = useConfigValue("variant", "underline");
+  const [isLoading, setIsLoading] = useConfigValue("isLoading", "");
+
   return (
-    <div className="space-y-2">
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Tabs</Label>
-        <div className="space-y-1">
-          {tabs.map((t, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <Input type="text" className="text-xs h-8 flex-1" value={t?.label ?? ""} onChange={(e) => {
-                const next = [...tabs];
-                next[i] = { ...next[i], label: e.target.value };
-                widgetEditorForm.setFieldValue("widgetConfig.tabs", next);
-              }} placeholder="Label" />
-              <Input type="text" className="text-xs h-8 flex-1 font-mono" value={t?.value ?? ""} onChange={(e) => {
-                const next = [...tabs];
-                next[i] = { ...next[i], value: e.target.value };
-                widgetEditorForm.setFieldValue("widgetConfig.tabs", next);
-              }} placeholder="value" />
-              <Button type="button" variant="ghost" size="sm" className="h-8 w-8 shrink-0" onClick={() => widgetEditorForm.setFieldValue("widgetConfig.tabs", tabs.filter((_, x) => x !== i))}>×</Button>
-            </div>
-          ))}
-          <Button type="button" variant="outline" size="sm" className="h-7 text-xs w-full" onClick={() => widgetEditorForm.setFieldValue("widgetConfig.tabs", [...tabs, { label: `Tab ${tabs.length + 1}`, value: `tab${tabs.length + 1}` }])}>+ Add tab</Button>
+    <>
+      <ConfigSection id="tabs-content" title="Tabs" tab="content">
+        <ConfigField label="Tab list" path="tabs">
+          <OptionListEditor value={tabs || []} onChange={setTabs} itemLabel="Tab" allowDescription allowDisabled />
+        </ConfigField>
+        <ConfigField label="Default tab" path="defaultTab" helper="Tab value selected on first load.">
+          <BindableInput value={defaultTab} onChange={setDefaultTab} liveStateTree={liveStateTree} placeholder="e.g. overview" />
+        </ConfigField>
+      </ConfigSection>
+
+      <ConfigSection id="tabs-style" title="Tab bar" tab="style">
+        <div className="grid grid-cols-2 gap-2">
+          <ConfigField label="Orientation" path="orientation" defaultValue="horizontal">
+            <SegmentedControl
+              ariaLabel="Tab orientation"
+              value={orientation || "horizontal"}
+              onChange={setOrientation}
+              options={[
+                { value: "horizontal", label: "Horizontal" },
+                { value: "vertical", label: "Vertical" },
+              ]}
+            />
+          </ConfigField>
+          <ConfigField label="Variant" path="variant" defaultValue="underline">
+            <SegmentedControl
+              ariaLabel="Tab variant"
+              value={variant || "underline"}
+              onChange={setVariant}
+              options={[
+                { value: "underline", label: "Underline" },
+                { value: "pills", label: "Pills" },
+                { value: "segmented", label: "Segmented" },
+              ]}
+            />
+          </ConfigField>
         </div>
-      </div>
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Default Tab</Label>
-        <TemplateAutocompleteInput value={config.defaultTab || ""} onChange={(v) => widgetEditorForm.setFieldValue("widgetConfig.defaultTab", v)} placeholder="e.g. tab1" liveStateTree={liveStateTree} />
-      </div>
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
-        <TemplateAutocompleteInput value={config.isLoading || ""} onChange={(v) => widgetEditorForm.setFieldValue("widgetConfig.isLoading", v)} placeholder="e.g. {{ state.queries.q.isLoading }}" liveStateTree={liveStateTree} />
-      </div>
-    </div>
+      </ConfigSection>
+
+      <ConfigSection id="tabs-behavior" title="State" tab="behavior">
+        <ConfigField label="Loading template" path="isLoading">
+          <BindableInput value={isLoading} onChange={setIsLoading} liveStateTree={liveStateTree} placeholder="e.g. {{ state.queries.q.isLoading }}" />
+        </ConfigField>
+      </ConfigSection>
+    </>
   );
 };
-TabsConfigEditor.propTypes = { widgetEditorForm: PropTypes.object.isRequired, stateTree: PropTypes.object };
+
+TabsConfigEditor.propTypes = { widgetEditorForm: PropTypes.object, stateTree: PropTypes.object };
+TabsConfigEditor.usesConfigKit = true;
 export default TabsConfigEditor;

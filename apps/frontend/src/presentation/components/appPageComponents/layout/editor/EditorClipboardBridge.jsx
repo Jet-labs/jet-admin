@@ -14,6 +14,7 @@
  */
 import React, { useCallback, useEffect, useRef } from "react";
 import { useEditor, Element } from "@craftjs/core";
+import { registerEditorCommand } from "./editorCommands";
 
 const CANVAS_COMPONENTS = new Set([
   "CanvasRow",
@@ -118,6 +119,52 @@ export default function EditorClipboardBridge() {
     if (!copySelected()) return;
     pasteFromClipboard();
   }, [copySelected, pasteFromClipboard]);
+
+  const duplicateSelection = useCallback(() => {
+    const ids = Array.from(selectedNodeIds || []).filter((id) => id !== "ROOT");
+    const roots = ids.filter((id) => {
+      try {
+        const ancestors = query.node(id).ancestors(true);
+        return !ids.some((other) => other !== id && ancestors.includes(other));
+      } catch {
+        return false;
+      }
+    });
+    roots.forEach((id) => {
+      try {
+        const node = query.node(id).get();
+        const parentId = node?.data?.parent;
+        if (!parentId) return;
+        const snapshot = snapshotSubtree(query, id);
+        if (!snapshot) return;
+        const resolver = query.getOptions().resolver;
+        const element = snapshotToElement(snapshot, resolver);
+        if (!element) return;
+        const tree = query.parseReactElement(element).toNodeTree();
+        const siblings = query.node(parentId).get()?.data?.nodes || [];
+        actions.addNodeTree(tree, parentId, siblings.length);
+      } catch (err) {
+        console.error("[EditorClipboardBridge] Duplicate selection failed:", err);
+      }
+    });
+  }, [query, actions, selectedNodeIds]);
+
+  useEffect(() => {
+    if (!enabled) return undefined;
+    const unregisterCopy = registerEditorCommand("copy", copySelected);
+    const unregisterPaste = registerEditorCommand("paste", pasteFromClipboard);
+    const unregisterDuplicate = registerEditorCommand("duplicate", duplicateSelected);
+    const unregisterDuplicateSelection = registerEditorCommand(
+      "duplicate-selection",
+      duplicateSelection
+    );
+    return () => {
+      unregisterCopy();
+      unregisterPaste();
+      unregisterDuplicate();
+      unregisterDuplicateSelection();
+    };
+  }, [enabled, copySelected, pasteFromClipboard, duplicateSelected, duplicateSelection]);
 
   useEffect(() => {
     if (!enabled) return;

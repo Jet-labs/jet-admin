@@ -40,6 +40,8 @@ import progressSchema from './progress.schema.json' assert { type: 'json' };
 import timelineSchema from './timeline.schema.json' assert { type: 'json' };
 import videoSchema from './video.schema.json' assert { type: 'json' };
 import codeBlockSchema from './code-block.schema.json' assert { type: 'json' };
+import kanbanSchema from './kanban.schema.json' assert { type: 'json' };
+import calendarSchema from './calendar.schema.json' assert { type: 'json' };
 
 /**
  * Map of widgetType → full schema descriptor.
@@ -80,4 +82,6 @@ export const WIDGET_CONFIG_SCHEMAS = {
   'timeline': timelineSchema,
   'video': videoSchema,
   'code-block': codeBlockSchema,
+  'kanban': kanbanSchema,
+  'calendar': calendarSchema,
 };

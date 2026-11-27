@@ -123,7 +123,7 @@ describe('ListenerEngine', () => {
         tblDatasources: true,
         tblListenerActions: {
           where: { isEnabled: true },
-          orderBy: { orderIndex: 'asc' },
+          orderBy: [{ orderIndex: 'asc' }, { actionID: 'asc' }],
         },
       },
     });
@@ -177,6 +177,7 @@ describe('ListenerEngine', () => {
       tenantID: 'tnt-001',
       rawEvent,
       actions: sampleListener.tblListenerActions,
+      listenerDefinitionHash: require('../../../modules/listener/listenerDefinition').listenerDefinitionHash(sampleListener),
     });
   });
 

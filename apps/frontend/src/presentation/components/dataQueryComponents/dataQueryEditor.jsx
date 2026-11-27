@@ -7,6 +7,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { DATASOURCE_UI_COMPONENTS, QueryEditorContext } from "@jet-admin/datasources-ui";
 import { proxyDatasourceActionAPI, getDatasourceByIDAPI } from "../../../data/apis/datasource";
+import { getAssetVersionsAPI } from "../../../data/apis/assetVersion";
 import { getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import { MODES } from "@jet-admin/expression-engine";
 import { CONSTANTS } from "../../../constants";
@@ -21,6 +22,11 @@ import {
   SearchSelect,
   Section,
   CodeEditor,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@jet-admin/ui";
 
 
@@ -181,6 +187,25 @@ export const DataQueryEditor = ({
   } = useInfiniteDatasourceOptions(tenantID, debouncedDatasourceSearch);
 
   const selectedDatasourceID = dataQueryEditorForm.values.datasourceID;
+  const selectedDatasourceVersionMode =
+    dataQueryEditorForm.values.dataQueryOptions?.datasourceVersionMode ||
+    (dataQueryEditorForm.values.dataQueryOptions?.datasourceVersionID
+      ? "specific"
+      : "latest-at-capture");
+  const { data: datasourceVersionsData, isLoading: isLoadingDatasourceVersions } = useQuery({
+    queryKey: ["asset-versions", tenantID, "datasource", selectedDatasourceID],
+    queryFn: () =>
+      getAssetVersionsAPI({
+        tenantID,
+        assetType: "datasource",
+        assetID: selectedDatasourceID,
+        page: 1,
+        pageSize: 100,
+      }),
+    enabled: Boolean(tenantID) && Boolean(selectedDatasourceID),
+    refetchOnWindowFocus: false,
+  });
+  const datasourceVersions = datasourceVersionsData?.versions || [];
   const { data: selectedDatasourceDetail } = useQuery({
     queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATASOURCES(tenantID), "detail", selectedDatasourceID],
     queryFn: () => getDatasourceByIDAPI({ tenantID, datasourceID: selectedDatasourceID }),
@@ -208,7 +233,12 @@ export const DataQueryEditor = ({
   // This handler specifically updates the 'dataQueryOptions' part of Formik's state
   const _handleDatasourceOptionsChange = useCallback(
     ({ data }) => {
-      dataQueryEditorForm.setFieldValue("dataQueryOptions", data);
+      const previous = dataQueryEditorForm.values.dataQueryOptions || {};
+      dataQueryEditorForm.setFieldValue("dataQueryOptions", {
+        ...data,
+        datasourceVersionMode: previous.datasourceVersionMode,
+        datasourceVersionID: previous.datasourceVersionID,
+      });
     },
     [dataQueryEditorForm]
   );
@@ -217,6 +247,11 @@ export const DataQueryEditor = ({
     (val) => {
       if (!val) return; // Prevent phantom empty events from clearing the ID
       dataQueryEditorForm.setFieldValue("datasourceID", val);
+      dataQueryEditorForm.setFieldValue("dataQueryOptions", {
+        ...(dataQueryEditorForm.values.dataQueryOptions || {}),
+        datasourceVersionMode: "latest-at-capture",
+        datasourceVersionID: "",
+      });
       const selectedDatasource = datasources.find(
         (datasource) => String(datasource.value) === String(val)
       );
@@ -318,6 +353,69 @@ export const DataQueryEditor = ({
                 {dataQueryEditorForm.errors.datasourceID}
               </p>
             )}
+          </div>
+
+          <div className="space-y-1 rounded border border-border/60 bg-background/30 p-2">
+            <Label className="text-xs text-muted-foreground">Datasource version at capture</Label>
+            <Select
+              value={selectedDatasourceVersionMode}
+              onValueChange={(value) =>
+                dataQueryEditorForm.setFieldValue("dataQueryOptions", {
+                  ...(dataQueryEditorForm.values.dataQueryOptions || {}),
+                  datasourceVersionMode: value,
+                  datasourceVersionID:
+                    value === "latest-at-capture"
+                      ? ""
+                      : dataQueryEditorForm.values.dataQueryOptions?.datasourceVersionID || "",
+                })
+              }
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="latest-at-capture">Latest at capture</SelectItem>
+                <SelectItem value="specific">Specific version</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-[10px] text-muted-foreground">
+              Resolved when a query version is created. Environment bindings still select the runtime connection.
+            </p>
+            {(selectedDatasourceVersionMode === "specific" ||
+              dataQueryEditorForm.values.dataQueryOptions?.datasourceVersionID) && (
+              <Select
+                value={dataQueryEditorForm.values.dataQueryOptions?.datasourceVersionID || ""}
+                onValueChange={(value) =>
+                  dataQueryEditorForm.setFieldValue("dataQueryOptions", {
+                    ...(dataQueryEditorForm.values.dataQueryOptions || {}),
+                    datasourceVersionMode: "specific",
+                    datasourceVersionID: value,
+                  })
+                }
+                disabled={isLoadingDatasourceVersions}
+              >
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue placeholder="Choose a datasource version…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {datasourceVersions.map((version) => (
+                    <SelectItem key={version.assetVersionID} value={version.assetVersionID}>
+                      v{version.versionNumber}
+                      {version.createdAt
+                        ? ` · ${new Date(version.createdAt).toLocaleString()}`
+                        : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {!isLoadingDatasourceVersions &&
+              datasourceVersions.length === 0 &&
+              selectedDatasourceVersionMode === "specific" && (
+                <p className="text-[10px] text-destructive">
+                  No versions exist for this datasource yet.
+                </p>
+              )}
           </div>
 
           {/* Global Query Options — kept above datasource-specific fields so

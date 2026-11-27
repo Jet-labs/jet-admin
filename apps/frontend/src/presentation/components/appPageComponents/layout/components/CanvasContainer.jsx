@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /**
  * CanvasContainer.jsx — Craft.js User Component
  *
@@ -9,9 +10,28 @@ import { useCraftEditorContext, useConditionHidden } from "./CraftEditorContext.
 import { LogicBadges } from "./LogicBadges.jsx";
 import LayoutResizeHandle from "../editor/LayoutResizeHandle.jsx";
 import { SelectParentButton } from "./SelectParentButton.jsx";
+import { useLayoutBreakpoint } from "../engine/LayoutViewportContext.jsx";
+import {
+  isResponsiveHidden,
+  resolveResponsiveSpan,
+} from "../engine/responsive.js";
 
-export function CanvasContainer({ children, span, sizing, style, condition, repeat, fixedHeight, hideMode, keepMounted }) {
+export function CanvasContainer({
+  children,
+  span,
+  sizing,
+  style,
+  condition,
+  repeat,
+  fixedHeight,
+  hideMode,
+  keepMounted,
+  responsive,
+}) {
   const { previewMode, editorLiveStateTree } = useCraftEditorContext();
+  const breakpointTier = useLayoutBreakpoint();
+  const responsiveHidden = isResponsiveHidden(responsive, breakpointTier);
+  const effectiveSpan = resolveResponsiveSpan(span, responsive, breakpointTier);
   const hiddenByCondition = useConditionHidden(condition, editorLiveStateTree);
   const {
     connectors: { connect, drag },
@@ -22,15 +42,29 @@ export function CanvasContainer({ children, span, sizing, style, condition, repe
     isSelected: node.events.selected,
   }));
   // Preview mimics viewer: collapse unmounts, preserve-space/keepMounted hide via CSS.
-  if (previewMode && hiddenByCondition && hideMode !== "preserve-space" && !keepMounted) {
+  if (
+    previewMode &&
+    ((hiddenByCondition && hideMode !== "preserve-space" && !keepMounted) || responsiveHidden)
+  ) {
     return null;
   }
 
   const handleResize = (nodeId, newSpan) => {
-    setProp((props) => { props.span = Math.max(1, Math.min(12, newSpan)); });
+    const nextSpan = Math.max(1, Math.min(12, newSpan));
+    setProp((props) => {
+      if (breakpointTier === "desktop") {
+        props.span = nextSpan;
+        return;
+      }
+      if (!props.responsive) props.responsive = {};
+      props.responsive[breakpointTier] = {
+        ...(props.responsive[breakpointTier] || {}),
+        span: nextSpan,
+      };
+    });
   };
 
-  const containerSpan = `col-span-${span || 12}`;
+  const containerSpan = `col-span-${effectiveSpan}`;
   const containerSizing = `sizing-${sizing || "auto"}`;
   const previewHiddenStyle = previewMode && hiddenByCondition
     ? hideMode === "preserve-space"
@@ -44,6 +78,8 @@ export function CanvasContainer({ children, span, sizing, style, condition, repe
     overflow: style?.borderRadius ? "hidden" : undefined,
     ...(style || {}),
     ...previewHiddenStyle,
+    gridColumn: `span ${effectiveSpan} / span ${effectiveSpan}`,
+    ...(responsiveHidden && !previewMode ? { opacity: 0.45 } : {}),
   };
   if (sizing === "fixed" && fixedHeight) {
     containerStyle["--fixed-height"] = `${fixedHeight}px`;
@@ -52,17 +88,29 @@ export function CanvasContainer({ children, span, sizing, style, condition, repe
   return (
     <div
       ref={(ref) => !previewMode && connect(drag(ref))}
-      className={`flex flex-col bg-background border border-border rounded ${previewMode ? "" : "p-2"} self-stretch min-h-0 box-border transition-all craft-node craft-node-container ${containerSpan} ${containerSizing} ${
+      className={`flex flex-col bg-background border border-border rounded self-stretch min-h-0 box-border transition-all craft-node craft-node-container ${containerSpan} ${containerSizing} ${
         isSelected && !previewMode ? "craft-node-selected" : ""
       } ${hiddenByCondition && !previewMode ? "opacity-40 saturate-50" : ""}`}
       style={containerStyle}
       id={id}
       data-node-type="Container"
-      title={hiddenByCondition && !previewMode ? "Hidden by condition in viewer" : undefined}
+      data-breakpoint={breakpointTier}
+      title={
+        hiddenByCondition && !previewMode
+          ? "Hidden by condition in viewer"
+          : responsiveHidden && !previewMode
+            ? `Hidden on ${breakpointTier}`
+            : undefined
+      }
     >
-      {!previewMode && (condition || repeat) && (
-        <div className="absolute left-2 top-2 z-50 pointer-events-none">
+      {!previewMode && (condition || repeat || responsiveHidden) && (
+        <div className="absolute left-2 top-2 z-50 pointer-events-none flex gap-1">
           <LogicBadges condition={condition} repeat={repeat} />
+          {responsiveHidden && (
+            <span className="rounded border border-sky-500/30 bg-sky-500/10 px-1 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-sky-300">
+              hidden · {breakpointTier}
+            </span>
+          )}
         </div>
       )}
       {children}
@@ -70,7 +118,7 @@ export function CanvasContainer({ children, span, sizing, style, condition, repe
       {!previewMode && isSelected && (
         <>
           <LayoutResizeHandle
-            node={{ id, span: span || 12 }}
+            node={{ id, span: effectiveSpan }}
             onResize={handleResize}
           />
           <SelectParentButton />
@@ -91,6 +139,7 @@ CanvasContainer.craft = {
     repeat: null,
     hideMode: null,
     keepMounted: false,
+    responsive: null,
   },
   isCanvas: true,
   rules: {

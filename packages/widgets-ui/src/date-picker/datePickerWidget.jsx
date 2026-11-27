@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Popover, PopoverContent, PopoverTrigger, Label, Input } from '@jet-admin/ui';
+import { Popover, PopoverContent, PopoverTrigger, Label, Input, WidgetBusy, WidgetSurface, cn } from '@jet-admin/ui';
 import { Calendar as CalendarIcon, X } from 'lucide-react';
 import { CalendarGrid } from '../_shared/calendarGrid';
 import { TimeInput } from '../_shared/timeInput';
@@ -167,6 +167,10 @@ export function DatePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetSta
   const visibleError = typedError || widgetState?.error || null;
   const isLoading = widgetConfig?.isLoading === true || widgetConfig?.isLoading === "true";
   const isOpen = !!widgetState?.isOpen;
+  const density = widgetConfig?.properties?.density || "comfortable";
+  const size = widgetConfig?.size || "default";
+  const labelPosition = widgetConfig?.labelPosition || "top";
+  const sizeClass = size === "sm" ? "h-7 text-xs" : size === "lg" ? "h-10 text-sm" : "h-8 text-sm";
 
   const liveRef = useRef(null);
   liveRef.current = { parsedValue, enableTime, interactive, constraintOpts };
@@ -220,23 +224,21 @@ export function DatePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetSta
   };
 
   return (
-    <div className="relative flex flex-col gap-1.5 w-full h-full min-h-0">
-      {isLoading && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px] rounded" aria-hidden="true">
-          <div className="flex items-center gap-2 rounded bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
-            <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin motion-reduce:animate-none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
-            Updating...
-          </div>
+    <WidgetSurface density={density} className="relative flex h-full w-full min-h-0 flex-col" aria-busy={isLoading || undefined}>
+      {isLoading && <WidgetBusy label="Updating…" />}
+
+      <div className={cn("flex w-full min-w-0", labelPosition === "left" ? "flex-row items-start gap-2" : "flex-col gap-1.5")}>
+        <div className={cn(labelPosition === "left" && "w-1/3 shrink-0")}>
+          {widgetConfig.label && (
+            <Label htmlFor={fieldId} className={cn(labelPosition === "left" && "block text-right", labelPosition === "hidden" && "sr-only")}>
+              {widgetConfig.label}
+              {required && <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>}
+            </Label>
+          )}
+          {widgetConfig.help && <p id={helpId} className="text-[11px] text-muted-foreground">{widgetConfig.help}</p>}
         </div>
-      )}
 
-      {widgetConfig.label && (
-        <Label htmlFor={fieldId}>
-          {widgetConfig.label}{required && <span className="text-rose-500 ml-0.5" aria-hidden="true">*</span>}
-        </Label>
-      )}
-      {widgetConfig.help && <p id={helpId} className="text-[11px] text-muted-foreground">{widgetConfig.help}</p>}
-
+        <div className="min-w-0 flex-1">
       <Popover open={isOpen} onOpenChange={(open) => {
         if (disabled || readOnly) return;
         if (setWidgetState) setWidgetState((p) => ({ ...p, isOpen: open }));
@@ -272,9 +274,9 @@ export function DatePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetSta
                 required={required}
                 aria-invalid={visibleError ? true : undefined}
                 aria-describedby={describedBy}
-                className="pl-9 pr-8 cursor-text"
+                className={cn("pl-9 pr-8 cursor-text", sizeClass)}
               />
-              <CalendarIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" aria-hidden="true" />
+              <CalendarIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" aria-hidden="true" />
               {parsedValue && interactive && (
                 <span
                   role="button"
@@ -282,7 +284,7 @@ export function DatePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetSta
                   aria-label="Clear date"
                   onClick={(e) => { e.stopPropagation(); e.preventDefault(); initializedRef.current = true; emitCommitted(null, "clear-button"); }}
                   onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.stopPropagation(); e.preventDefault(); initializedRef.current = true; emitCommitted(null, "clear-button"); } }}
-                  className="absolute right-2 top-2.5 h-4 w-4 text-muted-foreground hover:text-foreground flex items-center justify-center pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded"
+                  className="absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground hover:text-foreground flex items-center justify-center pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded"
                 >
                   <X className="h-4 w-4" aria-hidden="true" />
                 </span>
@@ -320,10 +322,12 @@ export function DatePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetSta
       {visibleError && !isOpen && (
         <p id={errorId} role="alert" className="text-[11px] text-destructive">{visibleError}</p>
       )}
+        </div>
+      </div>
       <span className="sr-only" aria-live="polite">
         {parsedValue ? `Selected ${displayValue}` : "No date selected"}
       </span>
-    </div>
+    </WidgetSurface>
   );
 }
 

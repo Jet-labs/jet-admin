@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /**
  * CanvasZStack.jsx — Craft.js User Component
  *
@@ -16,6 +17,11 @@ import { LogicBadges } from "./LogicBadges.jsx";
 import LayoutResizeHandle from "../editor/LayoutResizeHandle.jsx";
 import { SelectParentButton } from "./SelectParentButton.jsx";
 import { Plus } from "lucide-react";
+import { useLayoutBreakpoint } from "../engine/LayoutViewportContext.jsx";
+import {
+  isResponsiveHidden,
+  resolveResponsiveSpan,
+} from "../engine/responsive.js";
 
 export function CanvasZStack({
   children,
@@ -28,9 +34,12 @@ export function CanvasZStack({
   keepMounted,
   fixedHeight,
   activeLayerIndex: activeLayerIndexProp,
-  layerOpacities: layerOpacitiesProp,
+  responsive,
 }) {
   const { previewMode, editorLiveStateTree } = useCraftEditorContext();
+  const breakpointTier = useLayoutBreakpoint();
+  const responsiveHidden = isResponsiveHidden(responsive, breakpointTier);
+  const effectiveSpan = resolveResponsiveSpan(span, responsive, breakpointTier);
   const hiddenByCondition = useConditionHidden(condition, editorLiveStateTree);
   const {
     connectors: { connect, drag },
@@ -44,12 +53,26 @@ export function CanvasZStack({
   }));
 
   const { actions: editorActions, query } = useEditor();
-  if (previewMode && hiddenByCondition && hideMode !== "preserve-space" && !keepMounted) {
+  if (
+    previewMode &&
+    ((hiddenByCondition && hideMode !== "preserve-space" && !keepMounted) || responsiveHidden)
+  ) {
     return null;
   }
 
   const handleResize = (nodeId, newSpan) => {
-    setProp((props) => { props.span = Math.max(1, Math.min(12, newSpan)); });
+    const nextSpan = Math.max(1, Math.min(12, newSpan));
+    setProp((props) => {
+      if (breakpointTier === "desktop") {
+        props.span = nextSpan;
+        return;
+      }
+      if (!props.responsive) props.responsive = {};
+      props.responsive[breakpointTier] = {
+        ...(props.responsive[breakpointTier] || {}),
+        span: nextSpan,
+      };
+    });
   };
 
   const activeLayerIndex = Math.min(
@@ -57,7 +80,6 @@ export function CanvasZStack({
     Math.max(0, childNodeIds.length - 1)
   );
   const hasLayers = childNodeIds.length > 0;
-  const layerOpacities = layerOpacitiesProp || [];
 
   const handleAddLayer = (e) => {
     e?.stopPropagation?.();
@@ -84,7 +106,7 @@ export function CanvasZStack({
     }
   };
 
-  const zStackSpan = `col-span-${span || 12}`;
+  const zStackSpan = `col-span-${effectiveSpan}`;
   const zStackSizing = `sizing-${sizing || "fill"}`;
   const zStackStyle = {
     ...(style || {}),
@@ -93,6 +115,8 @@ export function CanvasZStack({
         ? { visibility: "hidden", pointerEvents: "none" }
         : { display: "none", pointerEvents: "none" }
       : {}),
+    gridColumn: `span ${effectiveSpan} / span ${effectiveSpan}`,
+    ...(responsiveHidden && !previewMode ? { opacity: 0.45 } : {}),
   };
   if (sizing === "fixed" && fixedHeight) {
     zStackStyle["--fixed-height"] = `${fixedHeight}px`;
@@ -107,11 +131,23 @@ export function CanvasZStack({
       style={zStackStyle}
       id={id}
       data-node-type="Z-Stack"
-      title={hiddenByCondition && !previewMode ? "Hidden by condition in viewer" : undefined}
+      data-breakpoint={breakpointTier}
+      title={
+        hiddenByCondition && !previewMode
+          ? "Hidden by condition in viewer"
+          : responsiveHidden && !previewMode
+            ? `Hidden on ${breakpointTier}`
+            : undefined
+      }
     >
-      {!previewMode && (condition || repeat) && (
-        <div className="absolute right-2 top-2 z-50 pointer-events-none">
+      {!previewMode && (condition || repeat || responsiveHidden) && (
+        <div className="absolute right-2 top-2 z-50 pointer-events-none flex gap-1">
           <LogicBadges condition={condition} repeat={repeat} />
+          {responsiveHidden && (
+            <span className="rounded border border-sky-500/30 bg-sky-500/10 px-1 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-sky-300">
+              hidden · {breakpointTier}
+            </span>
+          )}
         </div>
       )}
 
@@ -189,7 +225,7 @@ export function CanvasZStack({
       {!previewMode && isSelected && (
         <>
           <LayoutResizeHandle
-            node={{ id, span: span || 12 }}
+            node={{ id, span: effectiveSpan }}
             onResize={handleResize}
           />
           <SelectParentButton />
@@ -212,6 +248,7 @@ CanvasZStack.craft = {
     keepMounted: false,
     activeLayerIndex: 0,
     layerOpacities: [],
+    responsive: null,
   },
   isCanvas: true,
   rules: {

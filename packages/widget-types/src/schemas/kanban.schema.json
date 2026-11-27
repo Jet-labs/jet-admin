@@ -1,0 +1,34 @@
+{
+  "widgetType": "kanban",
+  "description": "Kanban board grouped by a field, rendering cards with configurable title, subtitle, value and date keys.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "dataArrayTemplate": {
+        "type": "string",
+        "description": "Template resolving to an array of card objects"
+      },
+      "groupBy": {
+        "type": "string",
+        "default": "status",
+        "description": "Field used to group cards into columns"
+      },
+      "titleKey": { "type": "string", "default": "name" },
+      "subtitleKey": { "type": "string", "default": "owner" },
+      "valueKey": { "type": "string", "default": "amount" },
+      "dateKey": { "type": "string", "default": "due_date" },
+      "badgeKey": { "type": "string", "default": "status" },
+      "columns": {
+        "type": "array",
+        "items": { "type": "object" },
+        "description": "Optional ordered column definitions"
+      },
+      "emptyText": { "type": "string", "default": "No cards in this pipeline." },
+      "isLoading": {
+        "type": ["boolean", "string"],
+        "description": "Loading overlay — boolean or template expression."
+      }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onItemClick"]
+}

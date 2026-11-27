@@ -25,6 +25,7 @@ import {
 } from "@jet-admin/ui";
 import { useInfiniteDatasources } from "../../../logic/hooks/useDatasources";
 import { getDatasourceByIDAPI } from "../../../data/apis/datasource";
+import { getAssetVersionsAPI } from "../../../data/apis/assetVersion";
 import { useQuery } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
 import { RealtimeListenerGuidanceBox } from "./realtimeListenerGuidanceBox";
@@ -56,6 +57,24 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID, ingress = null })
   } = useInfiniteDatasources(tenantID, debouncedDatasourceSearch);
 
   const selectedDatasourceID = listenerEditorForm.values.datasourceID;
+  const listenerConfig = listenerEditorForm.values.listenerConfig || {};
+  const datasourceVersionMode =
+    listenerConfig.datasourceVersionMode ||
+    (listenerConfig.datasourceVersionID ? "specific" : "latest-at-capture");
+  const { data: datasourceVersionsData, isLoading: isLoadingDatasourceVersions } = useQuery({
+    queryKey: ["asset-versions", tenantID, "datasource", selectedDatasourceID],
+    queryFn: () =>
+      getAssetVersionsAPI({
+        tenantID,
+        assetType: "datasource",
+        assetID: selectedDatasourceID,
+        page: 1,
+        pageSize: 100,
+      }),
+    enabled: Boolean(tenantID) && Boolean(selectedDatasourceID),
+    refetchOnWindowFocus: false,
+  });
+  const datasourceVersions = datasourceVersionsData?.versions || [];
   const { data: selectedDatasourceDetail } = useQuery({
     queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATASOURCES(tenantID), "detail", selectedDatasourceID],
     queryFn: () => getDatasourceByIDAPI({ tenantID, datasourceID: selectedDatasourceID }),
@@ -76,7 +95,11 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID, ingress = null })
         JSON.stringify(data) !==
         JSON.stringify(listenerEditorForm.values.listenerConfig)
       ) {
-        listenerEditorForm.setFieldValue("listenerConfig", data);
+        listenerEditorForm.setFieldValue("listenerConfig", {
+          ...data,
+          datasourceVersionMode: listenerEditorForm.values.listenerConfig?.datasourceVersionMode,
+          datasourceVersionID: listenerEditorForm.values.listenerConfig?.datasourceVersionID,
+        });
       }
     },
     [listenerEditorForm]
@@ -208,12 +231,11 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID, ingress = null })
                 listenerEditorForm.setFieldValue("listenerType", ds.datasourceType);
                 // Reset config to defaults from schema
                 const typeConfig = getDatasourceTypeByValue(ds.datasourceType);
-                if (typeConfig?.listenerConfigForm?.data) {
-                  listenerEditorForm.setFieldValue(
-                    "listenerConfig",
-                    typeConfig.listenerConfigForm.data
-                  );
-                }
+                listenerEditorForm.setFieldValue("listenerConfig", {
+                  ...(typeConfig?.listenerConfigForm?.data || listenerEditorForm.values.listenerConfig || {}),
+                  datasourceVersionMode: "latest-at-capture",
+                  datasourceVersionID: "",
+                });
               }
             }}
             options={filteredDatasources.map((ds) => ({
@@ -227,6 +249,68 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID, ingress = null })
             isLoading={isLoadingDatasources}
             placeholder="Select a data source"
           />
+        </div>
+
+        <div className="space-y-1 rounded border border-border/60 bg-background/30 p-2">
+          <Label className="text-xs text-muted-foreground">Datasource version at capture</Label>
+          <Select
+            value={datasourceVersionMode}
+            onValueChange={(value) =>
+              listenerEditorForm.setFieldValue("listenerConfig", {
+                ...(listenerEditorForm.values.listenerConfig || {}),
+                datasourceVersionMode: value,
+                datasourceVersionID:
+                  value === "latest-at-capture"
+                    ? ""
+                    : listenerEditorForm.values.listenerConfig?.datasourceVersionID || "",
+              })
+            }
+          >
+            <SelectTrigger className="h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="latest-at-capture">Latest at capture</SelectItem>
+              <SelectItem value="specific">Specific version</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-[10px] text-muted-foreground">
+            Resolved when a listener version is created. Environment bindings still select the runtime connection.
+          </p>
+          {(datasourceVersionMode === "specific" || listenerConfig.datasourceVersionID) && (
+            <Select
+              value={listenerConfig.datasourceVersionID || ""}
+              onValueChange={(value) =>
+                listenerEditorForm.setFieldValue("listenerConfig", {
+                  ...(listenerEditorForm.values.listenerConfig || {}),
+                  datasourceVersionMode: "specific",
+                  datasourceVersionID: value,
+                })
+              }
+              disabled={isLoadingDatasourceVersions}
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Choose a datasource version…" />
+              </SelectTrigger>
+              <SelectContent>
+                {datasourceVersions.map((version) => (
+                  <SelectItem key={version.assetVersionID} value={version.assetVersionID}>
+                    v{version.versionNumber}
+                    {version.createdAt
+                      ? ` · ${new Date(version.createdAt).toLocaleString()}`
+                      : ""}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          {!isLoadingDatasourceVersions &&
+            datasourceVersions.length === 0 &&
+            datasourceVersionMode === "specific" && (
+              <p className="text-[10px] text-destructive">
+                No versions exist for this datasource yet.
+              </p>
+            )}
         </div>
 
         {/* Show selected datasource badge */}

@@ -85,7 +85,51 @@
       "decimals": {
         "type": "number",
         "description": "Number of decimal places to display",
-        "default": 0
+        "default": 2
+      },
+      "format": {
+        "type": "string",
+        "enum": ["number", "compact", "currency", "percent"],
+        "default": "number"
+      },
+      "currency": {
+        "type": "string",
+        "default": "USD"
+      },
+      "locale": {
+        "type": "string"
+      },
+      "valueSize": {
+        "type": "string",
+        "enum": ["sm", "default", "lg"],
+        "default": "default"
+      },
+      "comparisonLabel": {
+        "type": "string",
+        "description": "e.g. 'vs last month'"
+      },
+      "sparklineTemplate": {
+        "type": "string",
+        "description": "Expression resolving to an array of numbers."
+      },
+      "animateValue": {
+        "type": "boolean",
+        "default": false
+      },
+      "thresholds": {
+        "type": "array",
+        "description": "Numeric value thresholds with semantic colors.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "number" },
+            "status": {
+              "type": "string",
+              "enum": ["success", "warning", "danger", "neutral"]
+            }
+          },
+          "required": ["min", "status"]
+        }
       }
     }
   },

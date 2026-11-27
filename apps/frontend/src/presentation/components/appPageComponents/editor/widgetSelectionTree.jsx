@@ -85,20 +85,12 @@ export const WidgetSelectionTree = ({
   const _renderItemLeaf = (item) => (
     <div
       key={item[idField]}
-      draggable
-      onDragStart={(event) => {
-        event.dataTransfer.setData(
-          "application/x-jet-entity-item",
-          JSON.stringify({
-            kind: "item",
-            entityType,
-            id: item[idField],
-            currentFolderID: item.folderID || null,
-          })
-        );
-        event.dataTransfer.effectAllowed = "move";
+      onPointerDown={(event) => {
+        if (event.button !== 0) return;
+        if (event.target?.closest?.("button, a, input, textarea, select")) return;
         if (onItemDragStart) onItemDragStart(event, item);
       }}
+      style={{ touchAction: "none" }}
     >
       {renderItemRow(item)}
     </div>

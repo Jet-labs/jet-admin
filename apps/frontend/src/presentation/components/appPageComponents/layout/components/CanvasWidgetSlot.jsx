@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /**
  * CanvasWidgetSlot.jsx — Craft.js User Component
  *
@@ -19,6 +20,11 @@ import { LogicBadges } from "./LogicBadges.jsx";
 import WidgetResizeHandles from "../editor/WidgetResizeHandles.jsx";
 import LayoutResizeHandle from "../editor/LayoutResizeHandle.jsx";
 import { SelectParentButton } from "./SelectParentButton.jsx";
+import { useLayoutBreakpoint } from "../engine/LayoutViewportContext.jsx";
+import {
+  isResponsiveHidden,
+  resolveResponsiveSpan,
+} from "../engine/responsive.js";
 
 const resolveWidthStyle = (width, isInRow) => {
   if (width == null || width === "" || isInRow) return {};
@@ -78,8 +84,12 @@ export function CanvasWidgetSlot({
   hideMode,
   keepMounted,
   locked,
+  responsive,
 }) {
   const { renderWidget, previewMode, editorLiveStateTree } = useCraftEditorContext();
+  const breakpointTier = useLayoutBreakpoint();
+  const responsiveHidden = isResponsiveHidden(responsive, breakpointTier);
+  const effectiveSpan = resolveResponsiveSpan(span, responsive, breakpointTier);
   // Edit-canvas dimming: node stays visible for editing but shows its
   // viewer-hidden state via reduced opacity (badge still explains why).
   // Preview mimics viewer: collapse unmounts, preserve/keepMounted hide via CSS.
@@ -95,16 +105,18 @@ export function CanvasWidgetSlot({
   }));
 
   // Check if this widget is a direct child of a CanvasRow (grid context)
-  const { parentId, parentDisplayName } = useEditor((state) => {
+  const { parentDisplayName } = useEditor((state) => {
     const node = state.nodes[id];
     const pId = node?.data?.parent;
     const pNode = pId ? state.nodes[pId] : null;
     return {
-      parentId: pId,
       parentDisplayName: pNode?.data?.displayName ?? null,
     };
   });
-  if (previewMode && hiddenByCondition && hideMode !== "preserve-space" && !keepMounted) {
+  if (
+    previewMode &&
+    ((hiddenByCondition && hideMode !== "preserve-space" && !keepMounted) || responsiveHidden)
+  ) {
     return null;
   }
 
@@ -120,8 +132,17 @@ export function CanvasWidgetSlot({
   };
 
   const handleSpanResize = (nodeId, newSpan) => {
+    const nextSpan = Math.max(1, Math.min(12, newSpan));
     setProp((props) => {
-      props.span = Math.max(1, Math.min(12, newSpan));
+      if (breakpointTier === "desktop") {
+        props.span = nextSpan;
+        return;
+      }
+      if (!props.responsive) props.responsive = {};
+      props.responsive[breakpointTier] = {
+        ...(props.responsive[breakpointTier] || {}),
+        span: nextSpan,
+      };
     });
   };
 
@@ -134,12 +155,18 @@ export function CanvasWidgetSlot({
         ? { visibility: "hidden", pointerEvents: "none" }
         : { display: "none", pointerEvents: "none" }
       : {}),
+    ...(responsiveHidden && !previewMode ? { opacity: 0.45 } : {}),
   };
+  if (style?.borderRadius != null && style.borderRadius !== "") {
+    slotStyle["--layout-widget-radius"] =
+      typeof style.borderRadius === "number"
+        ? `${style.borderRadius}px`
+        : style.borderRadius;
+  }
 
   // Grid placement: use inline style for guaranteed 12-column grid participation.
   // Only apply when no pixel width is set (pixel width = free placement mode).
   if (!hasPixelWidth && isInRow) {
-    const effectiveSpan = span || 6;
     slotStyle.gridColumn = `span ${effectiveSpan} / span ${effectiveSpan}`;
   }
 
@@ -154,9 +181,16 @@ export function CanvasWidgetSlot({
       style={slotStyle}
       id={id}
       data-node-type="Widget"
-      title={hiddenByCondition && !previewMode ? "Hidden by condition in viewer" : undefined}
+      data-breakpoint={breakpointTier}
+      title={
+        hiddenByCondition && !previewMode
+          ? "Hidden by condition in viewer"
+          : responsiveHidden && !previewMode
+            ? `Hidden on ${breakpointTier}`
+            : undefined
+      }
     >
-      {!previewMode && (condition || repeat || locked) && (
+      {!previewMode && (condition || repeat || locked || responsiveHidden) && (
         <div className="absolute left-2 bottom-2 z-40 pointer-events-none flex gap-1 items-center">
           {locked && (
             <div className="flex items-center gap-1.5 rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase leading-none tracking-wider text-amber-400 backdrop-blur-sm">
@@ -165,6 +199,11 @@ export function CanvasWidgetSlot({
             </div>
           )}
           <LogicBadges condition={condition} repeat={repeat} />
+          {responsiveHidden && (
+            <span className="rounded border border-sky-500/30 bg-sky-500/10 px-1 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-sky-300">
+              hidden · {breakpointTier}
+            </span>
+          )}
         </div>
       )}
 
@@ -177,7 +216,9 @@ export function CanvasWidgetSlot({
           overflow: style?.borderRadius ? "hidden" : undefined,
         }}
       >
-        {renderWidget?.(widgetKey, sizing)}
+        {renderWidget?.(widgetKey, sizing, undefined, undefined, {
+          borderRadius: style?.borderRadius,
+        })}
       </div>
 
       {!previewMode && isSelected && (
@@ -185,7 +226,7 @@ export function CanvasWidgetSlot({
           {/* Span-based width resize when in a grid row (snaps to 12-col grid) */}
           {isInRow && !hasPixelWidth && !locked && (
             <LayoutResizeHandle
-              node={{ id, span: span || 6 }}
+              node={{ id, span: effectiveSpan }}
               onResize={handleSpanResize}
             />
           )}
@@ -224,6 +265,7 @@ CanvasWidgetSlot.craft = {
     hideMode: null,
     keepMounted: false,
     locked: false,
+    responsive: null,
   },
   rules: {
     canDrag: (node) => !node.data.props.locked,

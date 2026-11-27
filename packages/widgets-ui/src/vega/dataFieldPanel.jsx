@@ -121,10 +121,10 @@ export const DataFieldPanel = ({
 
   const getCategoryIcon = (cat) => {
     switch (cat) {
-      case 'node': return <GitMerge className="w-3 h-3 shrink-0 text-emerald-500" />;
+      case 'node': return <GitMerge className="w-3 h-3 shrink-0 text-success" />;
       case 'output': return <ArrowRightFromLine className="w-3 h-3 shrink-0 text-fuchsia-500" />;
-      case 'runtime': return <Zap className="w-3 h-3 shrink-0 text-amber-500" />;
-      case 'datasource': return <Database className="w-3 h-3 shrink-0 text-blue-500" />;
+      case 'runtime': return <Zap className="w-3 h-3 shrink-0 text-warning" />;
+      case 'datasource': return <Database className="w-3 h-3 shrink-0 text-info" />;
       default: return <Database className="w-3 h-3 shrink-0 text-muted-foreground" />;
     }
   };
@@ -194,7 +194,7 @@ export const DataFieldPanel = ({
                     {getCategoryIcon(s.source || s.category)}
                     <span className="font-mono truncate flex-1 min-w-0 text-foreground">{s.label}</span>
                     {s.source === 'runtime' && (
-                      <span className="text-[8px] font-bold text-amber-500 bg-amber-500/15 px-1 py-px rounded shrink-0 uppercase tracking-wider">LIVE</span>
+                      <span className="text-[8px] font-bold text-warning bg-amber-500/15 px-1 py-px rounded shrink-0 uppercase tracking-wider">LIVE</span>
                     )}
                   </div>
                 ))}
@@ -243,9 +243,9 @@ export const DataFieldPanel = ({
       <div className="flex-1 overflow-y-auto px-2.5 py-2 min-h-0">
         {fields.length > 0 ? (
           <>
-            {renderFieldGroup(quantFields, 'Measures', 'text-emerald-500')}
-            {renderFieldGroup(catFields, 'Dimensions', 'text-blue-500')}
-            {renderFieldGroup(tempFields, 'Temporal', 'text-amber-500')}
+            {renderFieldGroup(quantFields, 'Measures', 'text-success')}
+            {renderFieldGroup(catFields, 'Dimensions', 'text-info')}
+            {renderFieldGroup(tempFields, 'Temporal', 'text-warning')}
           </>
         ) : (
           <div className="flex flex-col items-center justify-center py-3 text-center">

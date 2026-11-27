@@ -4,7 +4,7 @@ import { JsonForms } from '@jsonforms/react';
 import { useWorkflowNodes } from '../context';
 import { workflowNodeRenderers } from '../jsonFormsRenderers';
 import { Layers, RefreshCw, Ban } from 'lucide-react';
-import { Button } from '@jet-admin/ui';
+import { Button, Label } from '@jet-admin/ui';
 
 const ERROR_HANDLING_OPTIONS = {
   FAIL_WORKFLOW: 'fail_workflow',
@@ -23,12 +23,15 @@ export const SubWorkflowNodeConfigurator = ({ data, onChange, nodeId }) => {
     workflowNodes,
     workflowEdges,
     workflowInputDefinitions,
+    getAssetVersions,
   } = useWorkflowNodes();
 
   const [formData, setFormData] = useState({
     title: data?.title || '',
     description: data?.description || '',
     childWorkflowID: data?.childWorkflowID || '',
+    versionMode: data?.versionMode || (data?.childWorkflowVersionID ? 'specific' : 'latest-at-capture'),
+    childWorkflowVersionID: data?.childWorkflowVersionID || '',
     inputMapping: data?.inputMapping || {},
     outputVariable: data?.outputVariable || 'subResult',
     ctxMode: data?.ctxMode || 'isolated',
@@ -47,6 +50,8 @@ export const SubWorkflowNodeConfigurator = ({ data, onChange, nodeId }) => {
         title: data.title || '',
         description: data.description || '',
         childWorkflowID: data.childWorkflowID || '',
+        versionMode: data.versionMode || (data.childWorkflowVersionID ? 'specific' : 'latest-at-capture'),
+        childWorkflowVersionID: data.childWorkflowVersionID || '',
         inputMapping: data.inputMapping || {},
         outputVariable: data.outputVariable || 'subResult',
         ctxMode: data.ctxMode || 'isolated',
@@ -71,6 +76,29 @@ export const SubWorkflowNodeConfigurator = ({ data, onChange, nodeId }) => {
   const selectedChild = useMemo(() => {
     return (workflows || []).find((w) => String(w.workflowID) === String(formData.childWorkflowID)) || null;
   }, [workflows, formData.childWorkflowID]);
+
+  const [childVersions, setChildVersions] = useState([]);
+  const [isLoadingChildVersions, setIsLoadingChildVersions] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    if (!getAssetVersions || !formData.childWorkflowID) {
+      setChildVersions([]);
+      setIsLoadingChildVersions(false);
+      return () => { cancelled = true; };
+    }
+    setIsLoadingChildVersions(true);
+    Promise.resolve(getAssetVersions({ assetType: 'workflow', assetID: formData.childWorkflowID }))
+      .then((result) => {
+        if (!cancelled) setChildVersions(result?.versions || []);
+      })
+      .catch(() => {
+        if (!cancelled) setChildVersions([]);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingChildVersions(false);
+      });
+    return () => { cancelled = true; };
+  }, [getAssetVersions, formData.childWorkflowID]);
 
   // Guided mapping: the child's declared inputs become the mapping keys.
   const childInputDefinitions = useMemo(() => {
@@ -117,6 +145,8 @@ export const SubWorkflowNodeConfigurator = ({ data, onChange, nodeId }) => {
       title: { type: 'string', title: strings.WORKFLOW_EDITOR_SUBWORKFLOW_TITLE_LABEL || 'Node Title' },
       description: { type: 'string', title: strings.WORKFLOW_EDITOR_NODE_DESCRIPTION_LABEL || 'Description' },
       childWorkflowID: { type: 'string', title: strings.WORKFLOW_EDITOR_SUBWORKFLOW_CHILD_LABEL || 'Child Workflow' },
+      versionMode: { type: 'string', title: 'Version at workflow capture', enum: ['latest-at-capture', 'specific'], default: 'latest-at-capture' },
+      childWorkflowVersionID: { type: 'string', title: 'Child Workflow Version' },
       inputMapping: { type: 'object', title: strings.WORKFLOW_EDITOR_SUBWORKFLOW_INPUTS_LABEL || 'Child Inputs' },
       outputVariable: { type: 'string', title: strings.WORKFLOW_EDITOR_OUTPUT_VARIABLE_LABEL || 'Output Variable Name', pattern: '^[a-zA-Z_][a-zA-Z0-9_]*$' },
       mergeOutputs: { type: 'boolean', title: strings.WORKFLOW_EDITOR_SUBWORKFLOW_MERGE_LABEL || 'Merge child outputs into parent context', default: false },
@@ -192,9 +222,13 @@ export const SubWorkflowNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleFormChange = useCallback(({ data: newData }) => {
     setFormData((prev) => {
       if (prev.childWorkflowID !== newData.childWorkflowID) {
-        return { ...newData, inputMapping: {} };
+        return { ...newData, inputMapping: {}, versionMode: 'latest-at-capture', childWorkflowVersionID: '' };
       }
-      return newData;
+      return {
+        ...newData,
+        versionMode: newData.versionMode ?? prev.versionMode,
+        childWorkflowVersionID: newData.childWorkflowVersionID ?? prev.childWorkflowVersionID,
+      };
     });
   }, []);
 
@@ -203,6 +237,58 @@ export const SubWorkflowNodeConfigurator = ({ data, onChange, nodeId }) => {
   return (
     <div className="w-full">
       <JsonForms schema={schema} uischema={uischema} data={formData} renderers={workflowNodeRenderers} onChange={handleFormChange} />
+
+      <div className="px-2 pt-2">
+        <div className="rounded border border-border bg-muted/30 p-2 space-y-2">
+          <div className="flex flex-col gap-1">
+            <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Version at workflow capture
+            </Label>
+            <select
+              className="h-8 w-full rounded border border-border bg-background px-2 text-xs"
+              value={formData.versionMode || 'latest-at-capture'}
+              onChange={(event) => {
+                const versionMode = event.target.value;
+                setFormData((prev) => ({
+                  ...prev,
+                  versionMode,
+                  childWorkflowVersionID: versionMode === 'latest-at-capture' ? '' : prev.childWorkflowVersionID,
+                }));
+              }}
+            >
+              <option value="latest-at-capture">Latest at capture</option>
+              <option value="specific">Specific version</option>
+            </select>
+            <p className="text-[10px] text-muted-foreground">
+              Resolved when this workflow version is created, never at runtime.
+            </p>
+          </div>
+          {(formData.versionMode === 'specific' || formData.childWorkflowVersionID) && (
+            <div className="flex flex-col gap-1">
+              <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Child workflow version
+              </Label>
+              <select
+                className="h-8 w-full rounded border border-border bg-background px-2 text-xs"
+                value={formData.childWorkflowVersionID || ''}
+                disabled={isLoadingChildVersions}
+                onChange={(event) => setFormData((prev) => ({ ...prev, childWorkflowVersionID: event.target.value }))}
+              >
+                <option value="">Choose a version…</option>
+                {childVersions.map((version) => (
+                  <option key={version.assetVersionID} value={version.assetVersionID}>
+                    v{version.versionNumber}
+                    {version.createdAt ? ` · ${new Date(version.createdAt).toLocaleString()}` : ''}
+                  </option>
+                ))}
+              </select>
+              {!isLoadingChildVersions && childVersions.length === 0 && (
+                <p className="text-[10px] text-destructive">No versions exist for this workflow yet.</p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
 
       <div className="px-2">
         <div className="rounded border border-border bg-muted/30 p-3 text-xs text-muted-foreground space-y-2">

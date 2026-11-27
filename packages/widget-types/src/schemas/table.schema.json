@@ -72,6 +72,16 @@
             "format": {
               "type": "string",
               "description": "Display override (e.g. link label text)"
+            },
+            "align": {
+              "type": "string",
+              "enum": ["left", "center", "right"]
+            },
+            "decimals": {
+              "type": "number"
+            },
+            "currency": {
+              "type": "string"
             }
           }
         }
@@ -88,6 +98,11 @@
             "type": "number",
             "default": 10,
             "description": "Rows per page (1-500)"
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["client", "server"],
+            "default": "client"
           },
           "pageParam": {
             "type": "string",
@@ -107,14 +122,6 @@
           "totalRows": {
             "type": "number",
             "description": "Resolved total row count (set by runtime)"
-          },
-          "mode": {
-            "type": "string",
-            "enum": [
-              "client",
-              "server"
-            ],
-            "default": "client"
           }
         }
       },
@@ -167,6 +174,11 @@
           "buttonLabel": {
             "type": "string",
             "default": "Export"
+          },
+          "scope": {
+            "type": "string",
+            "enum": ["filtered", "page", "selected", "all"],
+            "default": "filtered"
           }
         }
       },
@@ -302,6 +314,19 @@
         "type": "string",
         "default": "Searching...",
         "description": "Text shown in the loading overlay while a server-side search is running."
+      },
+      "rowKey": {
+        "type": "string",
+        "default": "id",
+        "description": "Preferred stable row identifier field."
+      },
+      "hoverHighlight": {
+        "type": "boolean",
+        "default": true
+      },
+      "noResultsText": {
+        "type": "string",
+        "default": "No rows match the current filters."
       },
       "dataArrayTemplate": {
         "type": "string",

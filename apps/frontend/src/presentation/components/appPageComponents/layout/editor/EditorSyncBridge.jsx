@@ -119,33 +119,34 @@ export default function EditorSyncBridge({ onChangeLayout }) {
     const handleFlush = () => sync();
     window.addEventListener("flush-editor-sync", handleFlush);
     return () => window.removeEventListener("flush-editor-sync", handleFlush);
-  }, [sync]);  // Keyboard shortcuts (Ctrl+Z / Ctrl+Y / Delete)
+  }, [sync]);
+
+  // History shortcuts. Delete/backspace is owned by CanvasShortcuts so the
+  // widget registry and deepest-node rules stay in one place.
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!enabled) return;
+      const active = document.activeElement;
+      if (
+        active &&
+        (["INPUT", "TEXTAREA", "SELECT"].includes(active.tagName) ||
+          active.isContentEditable)
+      ) {
+        return;
+      }
       const isMac = navigator.platform.toLowerCase().includes("mac");
       const ctrl = isMac ? e.metaKey : e.ctrlKey;
-
       if (ctrl && e.key === "z" && !e.shiftKey) {
         e.preventDefault();
         actions.history?.undo?.();
       } else if (ctrl && (e.key === "y" || (e.key === "z" && e.shiftKey))) {
         e.preventDefault();
         actions.history?.redo?.();
-      } else if (e.key === "Delete" || e.key === "Backspace") {
-        const active = document.activeElement;
-        if (active?.tagName === "INPUT" || active?.tagName === "TEXTAREA") return;
-        if (selectedNodeIds && selectedNodeIds.size > 0) {
-          e.preventDefault();
-          selectedNodeIds.forEach((id) => {
-            if (id !== "ROOT") actions.delete(id);
-          });
-        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [actions, enabled, selectedNodeIds]);
+  }, [actions, enabled]);
 
   return null;
 }

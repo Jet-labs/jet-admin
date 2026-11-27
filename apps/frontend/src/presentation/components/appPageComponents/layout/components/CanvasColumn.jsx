@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /**
  * CanvasColumn.jsx — Craft.js User Component
  *
@@ -8,11 +9,12 @@ import React from "react";
 import { useNode } from "@craftjs/core";
 import { useCraftEditorContext, useConditionHidden } from "./CraftEditorContext.js";
 
-export function CanvasColumn({ children, style, condition, repeat, hideMode, keepMounted }) {
+export function CanvasColumn({ children, style, condition, hideMode, keepMounted }) {
   const { previewMode, editorLiveStateTree } = useCraftEditorContext();
   const hiddenByCondition = useConditionHidden(condition, editorLiveStateTree);
   const {
     connectors: { connect },
+    id,
   } = useNode();
   if (previewMode && hiddenByCondition) {
     if (hideMode !== "preserve-space" && !keepMounted) {
@@ -26,11 +28,17 @@ export function CanvasColumn({ children, style, condition, repeat, hideMode, kee
       : { display: "none", pointerEvents: "none" }
     : {};
 
+  const columnStyle = {
+    ...(style || {}),
+    ...previewHiddenStyle,
+  };
+
   return (
     <div
       ref={connect}
+      id={id}
       className="flex flex-col w-full gap-2 box-border"
-      style={previewHiddenStyle}
+      style={columnStyle}
       aria-hidden={previewMode && hiddenByCondition ? true : undefined}
     >
       {children}

@@ -29,11 +29,13 @@ export function treeNodeToCraft(node, parentId, out) {
     case "column": {
       const childIds = (node.children || []).map((child) => treeNodeToCraft(child, id, out));
       out[id] = craftNode("CanvasColumn", {
+        label: node.label || null,
         style: node.style || {},
         condition: node.condition || null,
         repeat: node.repeat || null,
         hideMode: node.hideMode || null,
         keepMounted: !!node.keepMounted,
+        responsive: node.responsive || null,
       }, childIds, parentId);
       break;
     }
@@ -43,11 +45,13 @@ export function treeNodeToCraft(node, parentId, out) {
       out[id] = craftNode("CanvasRow", {
         sizing: node.sizing || "auto",
         fixedHeight: node.fixedHeight || null,
+        label: node.label || null,
         style: node.style || {},
         condition: node.condition || null,
         repeat: node.repeat || null,
         hideMode: node.hideMode || null,
         keepMounted: !!node.keepMounted,
+        responsive: node.responsive || null,
       }, childIds, parentId);
       break;
     }
@@ -60,11 +64,13 @@ export function treeNodeToCraft(node, parentId, out) {
         width: node.width !== undefined ? node.width : null,
         height: node.height !== undefined ? node.height : null,
         fixedHeight: node.fixedHeight || null,
+        label: node.label || null,
         style: node.style || {},
         condition: node.condition || null,
         repeat: node.repeat || null,
         hideMode: node.hideMode || null,
         keepMounted: !!node.keepMounted,
+        responsive: node.responsive || null,
         locked: false,
       }, [], parentId);
       break;
@@ -82,11 +88,13 @@ export function treeNodeToCraft(node, parentId, out) {
       out[id] = craftNode("CanvasContainer", {
         span: node.span || 12,
         sizing: node.sizing || "auto",
+        label: node.label || null,
         style: node.style || {},
         condition: node.condition || null,
         repeat: node.repeat || null,
         hideMode: node.hideMode || null,
         keepMounted: !!node.keepMounted,
+        responsive: node.responsive || null,
       }, [innerColId], parentId);
       break;
     }
@@ -98,13 +106,15 @@ export function treeNodeToCraft(node, parentId, out) {
         sizing: node.sizing || "auto",
         direction: node.direction || "vertical",
         wrap: node.wrap || false,
-        gap: node.gap || 8,
+        gap: node.gap ?? 8,
         align: node.align || "stretch",
+        label: node.label || null,
         style: node.style || {},
         condition: node.condition || null,
         repeat: node.repeat || null,
         hideMode: node.hideMode || null,
         keepMounted: !!node.keepMounted,
+        responsive: node.responsive || null,
       }, childIds, parentId);
       break;
     }
@@ -114,11 +124,13 @@ export function treeNodeToCraft(node, parentId, out) {
       out[id] = craftNode("CanvasZStack", {
         span: node.span || 12,
         sizing: node.sizing || "fill",
+        label: node.label || null,
         style: node.style || {},
         condition: node.condition || null,
         repeat: node.repeat || null,
         hideMode: node.hideMode || null,
         keepMounted: !!node.keepMounted,
+        responsive: node.responsive || null,
         activeLayerIndex: 0,
         layerOpacities: node.layerOpacities || [],
       }, childIds, parentId);
@@ -141,11 +153,11 @@ export function treeNodeToCraft(node, parentId, out) {
 
 export function treeToCraft(treeRoot) {
   const out = {};
-  const rootId = treeRoot?.id || "ROOT";
 
   const childIds = (treeRoot?.children || []).map((child) => treeNodeToCraft(child, "ROOT", out));
 
   out["ROOT"] = craftNode("CanvasColumn", {
+    label: treeRoot?.label || null,
     style: treeRoot?.style || {},
     condition: treeRoot?.condition || null,
     repeat: treeRoot?.repeat || null,
@@ -175,11 +187,13 @@ export function craftToTree(craftNodes, nodeId = "ROOT") {
         id,
         type: "column",
         children: childIds.map((cid) => craftToTree(craftNodes, cid)).filter(Boolean),
+        ...(props.label ? { label: props.label } : {}),
         ...(props.style && Object.keys(props.style).length ? { style: props.style } : {}),
         ...(props.condition ? { condition: props.condition } : {}),
         ...(props.repeat ? { repeat: props.repeat } : {}),
         ...(props.hideMode ? { hideMode: props.hideMode } : {}),
         ...(props.keepMounted ? { keepMounted: true } : {}),
+        ...(props.responsive ? { responsive: props.responsive } : {}),
       };
 
     case "CanvasRow":
@@ -189,11 +203,13 @@ export function craftToTree(craftNodes, nodeId = "ROOT") {
         sizing: props.sizing || "auto",
         ...(props.fixedHeight ? { fixedHeight: props.fixedHeight } : {}),
         children: childIds.map((cid) => craftToTree(craftNodes, cid)).filter(Boolean),
+        ...(props.label ? { label: props.label } : {}),
         ...(props.style && Object.keys(props.style).length ? { style: props.style } : {}),
         ...(props.condition ? { condition: props.condition } : {}),
         ...(props.repeat ? { repeat: props.repeat } : {}),
         ...(props.hideMode ? { hideMode: props.hideMode } : {}),
         ...(props.keepMounted ? { keepMounted: true } : {}),
+        ...(props.responsive ? { responsive: props.responsive } : {}),
       };
 
     case "CanvasWidgetSlot":
@@ -206,11 +222,13 @@ export function craftToTree(craftNodes, nodeId = "ROOT") {
         ...(props.width !== undefined && props.width !== null ? { width: props.width } : {}),
         ...(props.height !== undefined && props.height !== null ? { height: props.height } : {}),
         ...(props.fixedHeight ? { fixedHeight: props.fixedHeight } : {}),
+        ...(props.label ? { label: props.label } : {}),
         ...(props.style && Object.keys(props.style).length ? { style: props.style } : {}),
         ...(props.condition ? { condition: props.condition } : {}),
         ...(props.repeat ? { repeat: props.repeat } : {}),
         ...(props.hideMode ? { hideMode: props.hideMode } : {}),
         ...(props.keepMounted ? { keepMounted: true } : {}),
+        ...(props.responsive ? { responsive: props.responsive } : {}),
       };
 
     case "CanvasContainer": {
@@ -222,11 +240,13 @@ export function craftToTree(craftNodes, nodeId = "ROOT") {
         span: props.span || 12,
         sizing: props.sizing || "auto",
         children: innerCol ?? { id: `col_${id}`, type: "column", children: [] },
+        ...(props.label ? { label: props.label } : {}),
         ...(props.style && Object.keys(props.style).length ? { style: props.style } : {}),
         ...(props.condition ? { condition: props.condition } : {}),
         ...(props.repeat ? { repeat: props.repeat } : {}),
         ...(props.hideMode ? { hideMode: props.hideMode } : {}),
         ...(props.keepMounted ? { keepMounted: true } : {}),
+        ...(props.responsive ? { responsive: props.responsive } : {}),
       };
     }
 
@@ -238,14 +258,16 @@ export function craftToTree(craftNodes, nodeId = "ROOT") {
         sizing: props.sizing || "auto",
         direction: props.direction || "vertical",
         wrap: props.wrap || false,
-        gap: props.gap || 8,
+        gap: props.gap ?? 8,
         align: props.align || "stretch",
         children: childIds.map((cid) => craftToTree(craftNodes, cid)).filter(Boolean),
+        ...(props.label ? { label: props.label } : {}),
         ...(props.style && Object.keys(props.style).length ? { style: props.style } : {}),
         ...(props.condition ? { condition: props.condition } : {}),
         ...(props.repeat ? { repeat: props.repeat } : {}),
         ...(props.hideMode ? { hideMode: props.hideMode } : {}),
         ...(props.keepMounted ? { keepMounted: true } : {}),
+        ...(props.responsive ? { responsive: props.responsive } : {}),
       };
 
     case "CanvasZStack":
@@ -256,11 +278,13 @@ export function craftToTree(craftNodes, nodeId = "ROOT") {
         sizing: props.sizing || "fill",
         children: childIds.map((cid) => craftToTree(craftNodes, cid)).filter(Boolean),
         ...(props.layerOpacities && props.layerOpacities.length ? { layerOpacities: props.layerOpacities } : {}),
+        ...(props.label ? { label: props.label } : {}),
         ...(props.style && Object.keys(props.style).length ? { style: props.style } : {}),
         ...(props.condition ? { condition: props.condition } : {}),
         ...(props.repeat ? { repeat: props.repeat } : {}),
         ...(props.hideMode ? { hideMode: props.hideMode } : {}),
         ...(props.keepMounted ? { keepMounted: true } : {}),
+        ...(props.responsive ? { responsive: props.responsive } : {}),
       };
 
     default:

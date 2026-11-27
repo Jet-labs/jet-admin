@@ -7,7 +7,6 @@ import { CONSTANTS } from "../../../constants";
 import {
   getCronJobByIDAPI,
   updateCronJobAPI,
-  deleteCronJobByIDAPI,
 } from "../../../data/apis/cronJob";
 import { getWorkflowByIDAPI } from "../../../data/apis/workflow";
 import { formValidations } from "../../../utils/formValidation";
@@ -15,9 +14,9 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { CronJobEditor } from "./cronJobEditor";
 import { PageHeader } from "@jet-admin/ui";
-import { useGlobalUI } from "../../../logic/stores/useUIStore";
 import { CronJobCloneForm } from "./cronJobCloneForm";
 import { CronJobDeletionForm } from "./cronJobDeletionForm";
+import { AssetVersionsButton } from "../assetVersionComponents/assetVersionsButton";
 
 const EMPTY_INITIAL_VALUES = {
   cronJobTitle: "",
@@ -41,7 +40,6 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { showConfirmation } = useGlobalUI();
 
   // ── Fetch the cron job ──────────────────────────────────────────────────────
   const {
@@ -134,6 +132,11 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
       >
         <CronJobDeletionForm tenantID={tenantID} cronJobID={cronJobID} />
         <CronJobCloneForm tenantID={tenantID} cronJobID={cronJobID} />
+        <AssetVersionsButton
+          tenantID={tenantID}
+          assetType="cronjob"
+          assetID={cronJobID}
+        />
       </PageHeader>
 
       {/* ── Form body ───────────────────────────────────────────────── */}

@@ -76,6 +76,17 @@ export const appPageReducer = (state, action) => {
       };
     }
 
+    case APP_PAGE_ACTIONS.SET_VARIABLES: {
+      const { values = {} } = action.payload;
+      return {
+        ...state,
+        variables: {
+          ...state.variables,
+          ...values,
+        },
+      };
+    }
+
     case APP_PAGE_ACTIONS.SET_WIDGET_STATE: {
       const { widgetID, state: widgetState } = action.payload;
       const prevWidgetState = state.widgetStates[widgetID] || {};

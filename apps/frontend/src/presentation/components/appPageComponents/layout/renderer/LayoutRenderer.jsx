@@ -1,8 +1,15 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import "./layout.css";
 import { evaluateVisibilityCondition } from "../../../../../logic/evaluationEngine";
+import { useLayoutBreakpoint } from "../engine/LayoutViewportContext.jsx";
+import {
+  getResponsiveOverride,
+  resolveResponsiveDirection,
+  resolveResponsiveSpan,
+} from "../engine/responsive.js";
 
-export function LayoutRow({ node, children, mode }) {
+export function LayoutRow({ node, children }) {
   const rowStyle = {
     gap: node.style?.gap ?? (typeof node.gap === "number" ? `${node.gap}px` : undefined),
     padding: node.style?.padding,
@@ -83,7 +90,6 @@ export function LayoutWidgetSlot({
   node,
   renderWidget,
   mode,
-  activeNodeId,
   onNodeClick,
   stateTree = null,
   isInRow = false,
@@ -106,6 +112,16 @@ export function LayoutWidgetSlot({
     ...resolveWidthStyle(node.width, isInRow),
     ...resolveHeightStyle(node.height, node.sizing, node.fixedHeight),
   };
+  if (isInRow && !node.width) {
+    const span = node.span || 6;
+    slotStyle.gridColumn = `span ${span} / span ${span}`;
+  }
+  if (node.style?.borderRadius != null && node.style.borderRadius !== "") {
+    slotStyle["--layout-widget-radius"] =
+      typeof node.style.borderRadius === "number"
+        ? `${node.style.borderRadius}px`
+        : node.style.borderRadius;
+  }
 
   if (node.minHeight && (node.height == null || node.height === "")) slotStyle.minHeight = `${node.minHeight}px`;
   if (node.maxHeight) slotStyle.maxHeight = `${node.maxHeight}px`;
@@ -116,7 +132,7 @@ export function LayoutWidgetSlot({
 
   return (
     <div
-      className={`flex flex-col relative ${isInRow ? "w-full" : "self-stretch"} min-w-0 box-border ${spanClass} ${sizingClass}`}
+      className={`layout-widget-slot flex flex-col relative ${isInRow ? "w-full" : "self-stretch"} min-w-0 box-border ${spanClass} ${sizingClass}`}
       style={slotStyle}
       onClick={handleClick}
       id={node.id}
@@ -129,7 +145,9 @@ export function LayoutWidgetSlot({
           overflow: node.style?.borderRadius ? "hidden" : undefined,
         }}
       >
-        {renderWidget(node.widgetKey, node.sizing, stateTree, { repeatPath })}
+        {renderWidget(node.widgetKey, node.sizing, stateTree, { repeatPath }, {
+          borderRadius: node.style?.borderRadius,
+        })}
       </div>
     </div>
   );
@@ -139,7 +157,6 @@ export function LayoutContainer({
   node,
   children,
   mode,
-  activeNodeId,
   onNodeClick,
 }) {
   const spanClass = `col-span-${node.span || 12}`;
@@ -148,6 +165,7 @@ export function LayoutContainer({
   const containerStyle = {
     overflow: node.style?.borderRadius ? "hidden" : undefined,
     ...(node.style || {}),
+    gridColumn: `span ${node.span || 12} / span ${node.span || 12}`,
   };
   if (node.sizing === "fixed" && node.fixedHeight) {
     containerStyle["--fixed-height"] = `${node.fixedHeight}px`;
@@ -166,7 +184,7 @@ export function LayoutContainer({
 
   return (
     <div
-      className={`flex flex-col bg-background border border-border rounded box-border transition-all ${spanClass} ${sizingClass}`}
+      className={`layout-container flex flex-col bg-background border border-border rounded box-border transition-all ${spanClass} ${sizingClass}`}
       style={containerStyle}
       onClick={handleClick}
       id={node.id}
@@ -181,7 +199,6 @@ export function LayoutStack({
   node,
   children,
   mode,
-  activeNodeId,
   onNodeClick,
 }) {
   const spanClass = `col-span-${node.span || 12}`;
@@ -203,6 +220,7 @@ export function LayoutStack({
   const stackStyle = {
     ...(node.style || {}),
     gap: typeof node.gap === "number" ? `${node.gap}px` : node.gap,
+    gridColumn: `span ${node.span || 12} / span ${node.span || 12}`,
   };
 
   if (node.sizing === "fixed" && node.fixedHeight) {
@@ -222,7 +240,7 @@ export function LayoutStack({
 
   return (
     <div
-      className={`flex ${stackDirection} ${stackWrap} ${stackAlign} box-border ${spanClass} ${sizingClass}`}
+      className={`layout-stack flex ${stackDirection} ${stackWrap} ${stackAlign} box-border ${spanClass} ${sizingClass}`}
       style={stackStyle}
       onClick={handleClick}
       id={node.id}
@@ -242,12 +260,12 @@ const MAX_REPEAT_COUNT = 1000;
  * badge and dimming all agree. Falls back to injected resolveValue when
  * the helper is unavailable (tests).
  */
-const evaluateCondition = (node, stateTree, resolveValue) => {
+const evaluateCondition = (node, stateTree, resolveValue, evaluateVisibility) => {
   if (typeof node.condition !== "string" || !node.condition.trim()) return true;
   if (!stateTree) return true;
   try {
     // Prefer shared helper (fail-closed + logging + non-boolean detection).
-    const res = evaluateVisibilityCondition(node.condition, stateTree, { nodeId: node.id, silent: false });
+    const res = (evaluateVisibility || evaluateVisibilityCondition)(node.condition, stateTree, { nodeId: node.id, silent: false });
     return res.visible;
   } catch {
     // Last-resort fallback for injected mocks: fail-closed.
@@ -330,10 +348,12 @@ export default function LayoutRenderer({
   onNodeClick = null,
   stateTree = null,
   resolveValue = null,
+  evaluateVisibility = null,
   isInRow = false,
   repeatPath = [],
   ...rest
 }) {
+  const breakpointTier = useLayoutBreakpoint();
   if (!node) return null;
 
   const nodeProps = {
@@ -343,6 +363,7 @@ export default function LayoutRenderer({
     onNodeClick,
     stateTree,
     resolveValue,
+    evaluateVisibility,
     isInRow,
     repeatPath,
     ...rest,
@@ -380,7 +401,7 @@ export default function LayoutRenderer({
   let effectiveNode = node;
   let hiddenRenderMode = null;
   if (mode === "view" && node.condition && stateTree && resolveValue) {
-    const visible = evaluateCondition(node, stateTree, resolveValue);
+    const visible = evaluateCondition(node, stateTree, resolveValue, evaluateVisibility);
     hiddenRenderMode = getHiddenRenderMode(node, visible);
     if (hiddenRenderMode === "unmount") return null;
     if (hiddenRenderMode) effectiveNode = applyHiddenStyle(node, hiddenRenderMode);
@@ -389,10 +410,39 @@ export default function LayoutRenderer({
     ? { "aria-hidden": true, "data-hidden-by-condition": true, "data-hide-mode": hiddenRenderMode }
     : {};
 
+  // Per-breakpoint overrides. Mobile defaults to span 12 so existing layouts
+  // keep stacking without explicit overrides; tablet inherits desktop values.
+  const responsiveOverride = getResponsiveOverride(effectiveNode.responsive, breakpointTier);
+  if (mode === "view" && responsiveOverride?.hidden) return null;
+  if (
+    responsiveOverride?.span != null ||
+    responsiveOverride?.direction != null ||
+    breakpointTier === "mobile"
+  ) {
+    effectiveNode = {
+      ...effectiveNode,
+      span: resolveResponsiveSpan(effectiveNode.span, effectiveNode.responsive, breakpointTier),
+      ...(effectiveNode.type === "stack"
+        ? {
+            direction: resolveResponsiveDirection(
+              effectiveNode.direction,
+              effectiveNode.responsive,
+              breakpointTier
+            ),
+          }
+        : {}),
+    };
+  }
+
   switch (effectiveNode.type) {
+    case "inline-widget":
+      return typeof rest.renderInlineWidget === "function"
+        ? rest.renderInlineWidget(effectiveNode, { isInRow })
+        : null;
+
     case "column":
       return (
-        <div className="flex flex-col w-full gap-2 box-border" id={effectiveNode.id} style={effectiveNode.style} {...hiddenAriaProps}>
+        <div className="layout-column flex flex-col w-full gap-2 box-border" id={effectiveNode.id} style={effectiveNode.style} {...hiddenAriaProps}>
           {effectiveNode.children?.map((child) => (
             <LayoutRenderer key={child.id} node={child} {...nodeProps} />
           ))}
@@ -459,6 +509,7 @@ export default function LayoutRenderer({
         margin: effectiveNode.style?.margin,
         borderRadius: effectiveNode.style?.borderRadius,
         ...(effectiveNode.style || {}),
+        gridColumn: `span ${effectiveNode.span || 12} / span ${effectiveNode.span || 12}`,
       };
       if (effectiveNode.sizing === "fixed" && effectiveNode.fixedHeight) {
         zStackStyle["--fixed-height"] = `${effectiveNode.fixedHeight}px`;
@@ -468,7 +519,7 @@ export default function LayoutRenderer({
         <div
           key={effectiveNode.id}
           id={effectiveNode.id}
-          className={`relative box-border col-span-${effectiveNode.span || 12} ${sizingClass}`}
+          className={`layout-z-stack relative box-border col-span-${effectiveNode.span || 12} ${sizingClass}`}
           style={zStackStyle}
           {...hiddenAriaProps}
         >
@@ -477,6 +528,7 @@ export default function LayoutRenderer({
               display: "grid",
               gridTemplateColumns: "1fr",
               width: "100%",
+              height: "100%",
               minHeight: 40,
             }}
           >
@@ -490,6 +542,8 @@ export default function LayoutRenderer({
                   opacity: layerOpacities[idx] ?? 1,
                   position: "relative",
                   width: "100%",
+                  height: "100%",
+                  minHeight: 0,
                 }}
               >
                 <LayoutRenderer node={child} {...nodeProps} isInRow={false} />

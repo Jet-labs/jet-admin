@@ -413,7 +413,7 @@ async function cleanupInstall({ tenantID, slug, prefix, resources = [], tables =
   if (listenerIDs.length) await prisma.tblListeners.deleteMany({ where: { listenerID: { in: listenerIDs } } });
   const pageIDs = byType("appPage");
   if (pageIDs.length) {
-    await prisma.tblAppPageVersions.deleteMany({ where: { appPageID: { in: pageIDs } } });
+    await prisma.tblAppPageEditorHistory.deleteMany({ where: { appPageID: { in: pageIDs } } });
     await prisma.tblAppPages.deleteMany({ where: { appPageID: { in: pageIDs } } });
   }
   const widgetIDs = byType("widget");

@@ -23,6 +23,7 @@ export const WorkflowNodesProvider = ({
   workflowContext = {},      // The actual execution context (ctx)
   tenantID = null,           // Tenant ID for API calls
   onQueryTest = null,        // Callback for testing queries: (dataQueryID, inputValues) => Promise<result>
+  getAssetVersions = null,   // Callback for immutable version lists: ({assetType, assetID}) => Promise<{versions}>
   
   // Infinite Scroll props for UI
   querySearch,
@@ -57,6 +58,7 @@ export const WorkflowNodesProvider = ({
       workflowContext,
       tenantID,
       onQueryTest,
+      getAssetVersions,
       
       querySearch,
       setQuerySearch,

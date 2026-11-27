@@ -1,10 +1,10 @@
 import React, { useCallback, useState, useMemo } from "react";
-import { Plus, Trash2, Key, Database, PanelTop, MessageSquare, ChevronDown, ChevronUp, Info, GitBranch } from 'lucide-react';
+import { Plus, Trash2, Key, KeyRound, Database, PanelTop, MessageSquare, ChevronDown, ChevronUp, Info, GitBranch, Route as RouteIcon, RotateCcw, Megaphone } from 'lucide-react';
 import PropTypes from "prop-types";
 import { getWidgetEventTypes, getWidgetMethods, getEventInputDefinitions } from "@jet-admin/widget-types";
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
 import { useParams } from "react-router-dom";
-import { useQueryClient, useQueries } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { useInfiniteDataQueries } from "../../../logic/hooks/useDataQueries";
 import { useInfiniteWorkflows } from "../../../logic/hooks/useWorkflows";
 import { CONSTANTS } from "../../../constants";
@@ -22,7 +22,10 @@ import {
   SelectTrigger,
   SelectValue,
   Card,
+  Input,
   SearchSelect,
+  Switch,
+  Textarea,
 } from "@jet-admin/ui";
 
 const ACTION_TYPES = [
@@ -34,6 +37,33 @@ const ACTION_TYPES = [
     bg: "bg-muted/50",
     border: "border-border/50",
     description: "Update a page state variable",
+  },
+  {
+    value: "SET_APPLICATION_VARIABLE",
+    label: "Set Application Variable",
+    icon: KeyRound,
+    color: "text-muted-foreground",
+    bg: "bg-muted/50",
+    border: "border-border/50",
+    description: "Update a release-scoped application variable",
+  },
+  {
+    value: "RESET_APPLICATION_STATE",
+    label: "Reset Application State",
+    icon: RotateCcw,
+    color: "text-muted-foreground",
+    bg: "bg-muted/50",
+    border: "border-border/50",
+    description: "Restore every application variable to its declared default",
+  },
+  {
+    value: "EMIT_APPLICATION_EVENT",
+    label: "Emit Application Event",
+    icon: Megaphone,
+    color: "text-muted-foreground",
+    bg: "bg-muted/50",
+    border: "border-border/50",
+    description: "Broadcast a transient event to other mounted widgets/pages",
   },
   {
     value: "EXECUTE_QUERY",
@@ -72,6 +102,15 @@ const ACTION_TYPES = [
     description: "Run a background workflow directly",
   },
   {
+    value: "NAVIGATE",
+    label: "Navigate",
+    icon: RouteIcon,
+    color: "text-muted-foreground",
+    bg: "bg-muted/50",
+    border: "border-border/50",
+    description: "Go to another application route",
+  },
+  {
     value: "TRIGGER_QUERY",
     label: "Trigger Query",
     icon: Database,
@@ -81,6 +120,54 @@ const ACTION_TYPES = [
     description: "Run a data query directly",
   },
 ];
+
+const JsonObjectField = ({ label, value, onChange, placeholder = "{}" }) => {
+  const [text, setText] = useState(() =>
+    JSON.stringify(value || {}, null, 2)
+  );
+  const [error, setError] = useState("");
+  const commit = () => {
+    const trimmed = text.trim();
+    if (!trimmed) {
+      setError("");
+      onChange({});
+      return;
+    }
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        throw new Error("not an object");
+      }
+      setError("");
+      onChange(parsed);
+    } catch {
+      setError("Enter a JSON object.");
+    }
+  };
+  return (
+    <div className="space-y-1">
+      <Label className="text-xs text-muted-foreground font-semibold">
+        {label}
+      </Label>
+      <Textarea
+        value={text}
+        onChange={(event) => setText(event.target.value)}
+        onBlur={commit}
+        rows={3}
+        className="font-mono text-xs"
+        placeholder={placeholder}
+      />
+      {error && <p className="text-[11px] text-destructive">{error}</p>}
+    </div>
+  );
+};
+
+JsonObjectField.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.object,
+  onChange: PropTypes.func.isRequired,
+  placeholder: PropTypes.string,
+};
 
 const getShallowKeys = (obj) => {
   if (!obj) return {};
@@ -98,7 +185,6 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
   };
 
   const { tenantID } = useParams();
-  const queryClient = useQueryClient();
   const [querySearch, setQuerySearch] = useState("");
   const debouncedQuerySearch = useDebounce(querySearch, 300);
   const { dataQueries = [], isLoadingDataQueries, fetchNextPage: fetchNextQueriesPage, hasNextPage: hasNextQueriesPage, isFetchingNextPage: isFetchingNextQueriesPage } = useInfiniteDataQueries(tenantID, debouncedQuerySearch);
@@ -225,8 +311,6 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
   // Wrap stateTree so {{ state.X }} resolves correctly in the JS sandbox
   const liveStateTree = useMemo(() => stateTree ? { state: stateTree } : null, [stateTree]);
   const variablesStateTree = useMemo(() => stateTree ? { state: { variables: getShallowKeys(stateTree.variables) } } : null, [stateTree]);
-  const dataSourcesStateTree = useMemo(() => stateTree ? { state: { queries: getShallowKeys(stateTree.queries), workflows: getShallowKeys(stateTree.workflows) } } : null, [stateTree]);
-  const widgetsStateTree = useMemo(() => stateTree ? { state: { widgets: getShallowKeys(stateTree.widgets) } } : null, [stateTree]);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
 
@@ -271,6 +355,14 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
       let defaultConfig = {};
       if (actionTypeValue === "SET_VARIABLE") {
         defaultConfig = { key: "", value: "" };
+      } else if (actionTypeValue === "SET_APPLICATION_VARIABLE") {
+        defaultConfig = { key: "", value: "" };
+      } else if (actionTypeValue === "RESET_APPLICATION_STATE") {
+        defaultConfig = {};
+      } else if (actionTypeValue === "EMIT_APPLICATION_EVENT") {
+        defaultConfig = { name: "", payload: {} };
+      } else if (actionTypeValue === "NAVIGATE") {
+        defaultConfig = { routeID: "", params: {}, query: {}, replace: false };
       } else if (actionTypeValue === "EXECUTE_QUERY") {
         defaultConfig = { alias: "", inputValues: {} };
       } else if (actionTypeValue === "CALL_WIDGET_METHOD") {
@@ -308,6 +400,18 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
     const { actionType, config = {} } = action;
     if (actionType === "SET_VARIABLE") {
       return `Set variable: ${config.key || "..."} = ${config.value || "..."}`;
+    }
+    if (actionType === "SET_APPLICATION_VARIABLE") {
+      return `Set app variable: ${config.key || "..."} = ${config.value || "..."}`;
+    }
+    if (actionType === "RESET_APPLICATION_STATE") {
+      return "Reset application state";
+    }
+    if (actionType === "EMIT_APPLICATION_EVENT") {
+      return `Emit application event: ${config.name || "..."}`;
+    }
+    if (actionType === "NAVIGATE") {
+      return `Navigate: ${config.routeID || "..."}`;
     }
     if (actionType === "EXECUTE_QUERY") {
       return `Execute: ${config.alias || "..."}`;
@@ -528,6 +632,176 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                   liveStateTree={localStateTree}
                                 />
                               </div>
+                            </div>
+                          )}
+
+                          {action.actionType === "SET_APPLICATION_VARIABLE" && (
+                            <div className="space-y-2">
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground font-semibold">
+                                  Application Variable Key
+                                </Label>
+                                <Input
+                                  value={action.config?.key || ""}
+                                  onChange={(event) =>
+                                    handleActionConfigChange(
+                                      eventType,
+                                      actionIndex,
+                                      "key",
+                                      event.target.value
+                                    )
+                                  }
+                                  placeholder="e.g. selectedCustomerID"
+                                  className="h-8 font-mono text-xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground font-semibold">
+                                  Value Expression
+                                </Label>
+                                <TemplateAutocompleteInput
+                                  value={action.config?.value || ""}
+                                  onChange={(val) =>
+                                    handleActionConfigChange(
+                                      eventType,
+                                      actionIndex,
+                                      "value",
+                                      val
+                                    )
+                                  }
+                                  placeholder="e.g. {{ event.row.id }}"
+                                  liveStateTree={localStateTree}
+                                />
+                              </div>
+                              <p className="text-[11px] text-muted-foreground">
+                                Only executes in an Application runtime. The key must be
+                                declared in the application state definition.
+                              </p>
+                            </div>
+                          )}
+
+                          {action.actionType === "RESET_APPLICATION_STATE" && (
+                            <p className="rounded border border-border bg-muted/30 p-2 text-xs text-muted-foreground">
+                              Every declared application variable returns to its default
+                              value, and the persisted application-state snapshot is cleared.
+                            </p>
+                          )}
+
+                          {action.actionType === "EMIT_APPLICATION_EVENT" && (
+                            <div className="space-y-2">
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground font-semibold">
+                                  Event Name
+                                </Label>
+                                <Input
+                                  value={action.config?.name || ""}
+                                  onChange={(event) =>
+                                    handleActionConfigChange(
+                                      eventType,
+                                      actionIndex,
+                                      "name",
+                                      event.target.value
+                                    )
+                                  }
+                                  placeholder="invoices:refresh"
+                                  className="h-8 font-mono text-xs"
+                                />
+                                <p className="text-[10px] text-muted-foreground">
+                                  Use namespaced names such as `invoices:refresh` or
+                                  `customer.selected`. Events are transient and are not
+                                  persisted.
+                                </p>
+                              </div>
+                              <JsonObjectField
+                                key={`${eventType}-${actionIndex}-event-payload-${action.actionType}`}
+                                label="Payload (JSON)"
+                                value={action.config?.payload}
+                                onChange={(value) =>
+                                  handleActionConfigChange(
+                                    eventType,
+                                    actionIndex,
+                                    "payload",
+                                    value
+                                  )
+                                }
+                                placeholder="{}"
+                              />
+                            </div>
+                          )}
+
+                          {action.actionType === "NAVIGATE" && (
+                            <div className="space-y-2">
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground font-semibold">
+                                  Route ID
+                                </Label>
+                                <Input
+                                  value={action.config?.routeID || ""}
+                                  onChange={(event) =>
+                                    handleActionConfigChange(
+                                      eventType,
+                                      actionIndex,
+                                      "routeID",
+                                      event.target.value
+                                    )
+                                  }
+                                  placeholder="e.g. order-detail"
+                                  className="h-8 font-mono text-xs"
+                                />
+                              </div>
+                              <JsonObjectField
+                                key={`${eventType}-${actionIndex}-navigate-params-${action.actionType}`}
+                                label="Path params"
+                                value={action.config?.params}
+                                onChange={(value) =>
+                                  handleActionConfigChange(
+                                    eventType,
+                                    actionIndex,
+                                    "params",
+                                    value
+                                  )
+                                }
+                                placeholder='{ "orderID": "{{ event.row.id }}" }'
+                              />
+                              <JsonObjectField
+                                key={`${eventType}-${actionIndex}-navigate-query-${action.actionType}`}
+                                label="Query params"
+                                value={action.config?.query}
+                                onChange={(value) =>
+                                  handleActionConfigChange(
+                                    eventType,
+                                    actionIndex,
+                                    "query",
+                                    value
+                                  )
+                                }
+                                placeholder='{ "tab": "items" }'
+                              />
+                              <div className="flex items-center justify-between gap-2 rounded border border-border/60 bg-muted/20 px-2 py-1.5">
+                                <div>
+                                  <Label className="text-xs font-medium text-foreground">
+                                    Replace history entry
+                                  </Label>
+                                  <p className="text-[11px] text-muted-foreground">
+                                    Use replace when Back should skip this page.
+                                  </p>
+                                </div>
+                                <Switch
+                                  checked={action.config?.replace === true}
+                                  onCheckedChange={(checked) =>
+                                    handleActionConfigChange(
+                                      eventType,
+                                      actionIndex,
+                                      "replace",
+                                      checked
+                                    )
+                                  }
+                                />
+                              </div>
+                              <p className="text-[11px] text-muted-foreground">
+                                Only executes in an Application runtime. The route ID and path
+                                params are validated against the deployed release.
+                              </p>
                             </div>
                           )}
 

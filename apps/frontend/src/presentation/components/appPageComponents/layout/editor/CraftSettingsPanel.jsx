@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /**
  * CraftSettingsPanel.jsx
  *
@@ -23,16 +24,23 @@ import {
   Columns,
   Eye,
   FolderOpen,
+  GripVertical,
   Layers,
   Lock,
+  Pencil,
   Plus,
   Repeat,
   Rows,
+  Search,
   Settings2,
+  Smartphone,
   Sparkles,
+  Tablet,
   Trash2,
   Unlock,
 } from "lucide-react";
+import { useLayoutBreakpoint } from "../engine/LayoutViewportContext.jsx";
+import { BREAKPOINT_LABELS } from "../engine/responsive.js";
 import { useMemo, useState } from "react";
 import { CanvasContainer } from "../components/CanvasContainer.jsx";
 import { CanvasStack } from "../components/CanvasStack.jsx";
@@ -75,6 +83,208 @@ function moveNodeInCraft(actions, nodeId, parentId, direction, siblings) {
     // To place it after the next sibling (originally at index+1), we use index+2.
     actions.move(nodeId, parentId, index + 2);
   }
+}
+
+const parsePxValue = (value) => {
+  if (value === null || value === undefined || value === "") return "";
+  const match = String(value).match(/-?\d+(?:\.\d+)?/);
+  return match ? match[0] : "";
+};
+
+const parseSpacingValue = (value) => {
+  const parts = String(value ?? "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (parts.length === 0) return { top: "", right: "", bottom: "", left: "" };
+  if (parts.length === 1) {
+    return { top: parts[0], right: parts[0], bottom: parts[0], left: parts[0] };
+  }
+  if (parts.length === 2) {
+    return { top: parts[0], right: parts[1], bottom: parts[0], left: parts[1] };
+  }
+  if (parts.length === 3) {
+    return { top: parts[0], right: parts[1], bottom: parts[2], left: parts[1] };
+  }
+  return { top: parts[0], right: parts[1], bottom: parts[2], left: parts[3] };
+};
+
+const buildSpacingValue = ({ top, right, bottom, left }) => {
+  const raw = [(top || "").trim(), (right || "").trim(), (bottom || "").trim(), (left || "").trim()];
+  if (raw.every((value) => !value)) return "";
+  const [t, r, b, l] = raw.map((value) => value || "0");
+  if (t === r && r === b && b === l) return t;
+  if (t === b && r === l) return `${t} ${r}`;
+  if (r === l) return `${t} ${r} ${b}`;
+  return `${t} ${r} ${b} ${l}`;
+};
+
+/**
+ * Four-sided spacing editor. Keeps the existing CSS shorthand support while
+ * making the common padding/margin workflow visual.
+ */
+function BoxSpacingControl({ label, value, onChange }) {
+  const sides = parseSpacingValue(value);
+  const setSide = (side, next) => {
+    onChange(buildSpacingValue({ ...sides, [side]: next }));
+  };
+  const input = (side) => (
+    <input
+      type="text"
+      value={sides[side]}
+      onChange={(e) => setSide(side, e.target.value)}
+      placeholder="0"
+      aria-label={`${label} ${side}`}
+      className="min-w-0 rounded border border-border bg-background px-1 py-1 text-center font-mono text-[10px] text-foreground placeholder:text-muted-foreground/30"
+    />
+  );
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] font-medium text-foreground">{label}</span>
+        <span className="text-[9px] font-mono text-muted-foreground/60">
+          {value || "auto"}
+        </span>
+      </div>
+      <div className="grid grid-cols-3 gap-1">
+        <span />
+        {input("top")}
+        <span />
+        {input("left")}
+        <span className="flex items-center justify-center rounded bg-muted/40 text-[8px] font-semibold uppercase tracking-wider text-muted-foreground">
+          {label}
+        </span>
+        {input("right")}
+        <span />
+        {input("bottom")}
+        <span />
+      </div>
+    </div>
+  );
+}
+
+const COLOR_PRESETS = [
+  "transparent",
+  "#ffffff",
+  "#f8fafc",
+  "#e2e8f0",
+  "#0f172a",
+  "#1e293b",
+  "#334155",
+  "#3b82f6",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+];
+
+function ColorField({ label, value, onChange, placeholder = "e.g. #ffffff" }) {
+  const current = value ?? "";
+  const isHex = /^#[0-9a-f]{6}$/i.test(current);
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
+      <div className="flex items-center gap-1.5">
+        <input
+          type="color"
+          value={isHex ? current : "#000000"}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-8 w-9 cursor-pointer rounded border border-border bg-background p-0.5"
+          aria-label={`${label} color picker`}
+        />
+        <input
+          type="text"
+          value={current}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="min-w-0 flex-1 rounded border border-border bg-background p-1.5 text-xs text-foreground placeholder:text-muted-foreground/30"
+        />
+      </div>
+      <div className="flex flex-wrap gap-1">
+        {COLOR_PRESETS.map((color) => (
+          <button
+            key={color}
+            type="button"
+            onClick={() => onChange(color)}
+            className={`h-4 w-4 rounded border transition-transform hover:scale-110 ${
+              current === color ? "border-primary ring-1 ring-primary/40" : "border-border"
+            }`}
+            style={
+              color === "transparent"
+                ? {
+                    backgroundImage:
+                      "linear-gradient(135deg, transparent 45%, hsl(var(--destructive)) 45%, hsl(var(--destructive)) 55%, transparent 55%)",
+                  }
+                : { backgroundColor: color }
+            }
+            title={color}
+            aria-label={`Use ${color}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Compact numeric spacing control with quick presets. Used for page,
+ * grid, container and flex gaps/padding so the common values are one
+ * click away instead of requiring raw CSS.
+ */
+function NumericSpacingControl({
+  label,
+  value,
+  onChange,
+  presets = [0, 4, 8, 12, 16, 24],
+  help,
+  suffix = "px",
+}) {
+  const numericValue = parsePxValue(value);
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] font-medium text-foreground">{label}</span>
+        <span className="text-[9px] font-mono text-muted-foreground">
+          {numericValue === "" ? "auto" : `${numericValue}${suffix}`}
+        </span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <input
+          type="number"
+          min="0"
+          max="200"
+          value={numericValue}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="auto"
+          className="min-w-0 flex-1 bg-background border border-border rounded px-2 py-1.5 text-xs text-foreground"
+        />
+        <span className="text-[10px] text-muted-foreground">{suffix}</span>
+      </div>
+      <div className="flex flex-wrap gap-1">
+        {presets.map((preset) => {
+          const active = numericValue !== "" && Number(numericValue) === preset;
+          return (
+            <button
+              key={preset}
+              type="button"
+              onClick={() => onChange(String(preset))}
+              className={`min-w-[26px] rounded border px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
+                active
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-background text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {preset}
+            </button>
+          );
+        })}
+      </div>
+      {help && (
+        <span className="text-[9px] leading-tight text-muted-foreground/70">{help}</span>
+      )}
+    </div>
+  );
 }
 
 /**
@@ -187,22 +397,27 @@ function ConditionQuickInserts({ editorLiveStateTree, onInsert, onClear }) {
 }
 
 export default function CraftSettingsPanel({
-  onChangeLayout,
-  widgets,
   setWidgets,
   onEditWidget,
   editorLiveStateTree,
 }) {
   const [activeTab, setActiveTab] = useState("settings");
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [layerSearch, setLayerSearch] = useState("");
+  const [draggedLayerId, setDraggedLayerId] = useState(null);
+  const [dropTargetId, setDropTargetId] = useState(null);
+  const [renamingLayerId, setRenamingLayerId] = useState(null);
+  const [renameLayerValue, setRenameLayerValue] = useState("");
+  const breakpointTier = useLayoutBreakpoint();
 
-  const { selectedNodeId, selectedNode, actions, query, allNodes } = useEditor((state) => {
-    const id = state.events.selected?.size > 0
-      ? [...state.events.selected][0]
-      : null;
+  const { selectedNodeId, selectedNode, selectedCount, selectedIds, actions, query, allNodes } = useEditor((state) => {
+    const ids = Array.from(state.events.selected || []);
+    const id = ids.length > 0 ? ids[0] : null;
     return {
       selectedNodeId: id,
       selectedNode: id ? state.nodes[id] : null,
+      selectedCount: ids.length,
+      selectedIds: ids,
       allNodes: state.nodes,
     };
   });
@@ -212,6 +427,19 @@ export default function CraftSettingsPanel({
   const parentId = selectedNode?.data?.parent;
   const parentNode = parentId ? allNodes[parentId] : null;
   const isRowChild = parentNode?.data?.displayName === "CanvasRow";
+
+  // Page settings are the root CanvasColumn (Craft node "ROOT"). Container
+  // content spacing lives on the inner CanvasColumn, not the outer card.
+  const pageProps = allNodes["ROOT"]?.data?.props ?? {};
+  const pageStyle = pageProps.style ?? {};
+  const containerChildId =
+    displayName === "CanvasContainer" ? selectedNode?.data?.nodes?.[0] : null;
+  const containerChildNode = containerChildId ? allNodes[containerChildId] : null;
+  const containerUsesInnerColumn =
+    containerChildNode?.data?.displayName === "CanvasColumn";
+  const containerGapStyle = containerUsesInnerColumn
+    ? containerChildNode?.data?.props?.style ?? {}
+    : nodeProps.style ?? {};
 
   const { label: nodeLabel, icon: NodeIcon, color: nodeColor } = useMemo(
     () => getNodeMeta(displayName, nodeProps),
@@ -339,17 +567,97 @@ export default function CraftSettingsPanel({
     });
   };
 
-  const handleUpdateSize = (dim, value) => {
+  const handleUpdateResponsive = (tier, patch) => {
     if (!selectedNodeId) return;
     actions.setProp(selectedNodeId, (props) => {
-      props[dim] = value === "" || value == null ? null : Math.max(dim === "width" ? 40 : 24, parseInt(value) || 0);
+      const next = { ...(props.responsive || {}) };
+      const entry = { ...(next[tier] || {}), ...patch };
+      Object.keys(entry).forEach((key) => {
+        if (entry[key] === "" || entry[key] == null || entry[key] === false) {
+          delete entry[key];
+        }
+      });
+      if (Object.keys(entry).length) next[tier] = entry;
+      else delete next[tier];
+      props.responsive = Object.keys(next).length ? next : null;
     });
+  };
+
+  const handleResetResponsive = (tier) => {
+    if (!selectedNodeId) return;
+    actions.setProp(selectedNodeId, (props) => {
+      if (!props.responsive) return;
+      const next = { ...props.responsive };
+      delete next[tier];
+      props.responsive = Object.keys(next).length ? next : null;
+    });
+  };
+
+  const handleEqualizeRow = () => {
+    if (!selectedNodeId || !isRowChild) return;
+    const childIds = parentNode?.data?.nodes || [];
+    if (!childIds.length) return;
+    const base = Math.floor(12 / childIds.length);
+    const remainder = 12 % childIds.length;
+    childIds.forEach((childId, index) => {
+      actions.setProp(childId, (props) => {
+        props.span = base + (index < remainder ? 1 : 0);
+      });
+    });
+  };
+
+  const handleFillRemaining = () => {
+    if (!selectedNodeId || !isRowChild) return;
+    const childIds = parentNode?.data?.nodes || [];
+    const otherSum = childIds.reduce((sum, childId) => {
+      if (childId === selectedNodeId) return sum;
+      return sum + (query.node(childId).get()?.data?.props?.span || 6);
+    }, 0);
+    handleUpdateSpan(Math.max(1, 12 - otherSum));
+  };
+
+  const handleMoveSibling = (direction) => {
+    if (!selectedNodeId || !parentNode) return;
+    const siblings = parentNode.data.nodes || [];
+    const index = siblings.indexOf(selectedNodeId);
+    const nextIndex = index + direction;
+    if (index < 0 || nextIndex < 0 || nextIndex >= siblings.length) return;
+    actions.move(selectedNodeId, parentId, nextIndex);
   };
 
   const handleUpdateStyle = (styleKey, value) => {
     if (!selectedNodeId) return;
     actions.setProp(selectedNodeId, (props) => {
-      props.style = { ...(props.style || {}), [styleKey]: value };
+      const next = { ...(props.style || {}) };
+      if (value === "" || value == null) delete next[styleKey];
+      else next[styleKey] = value;
+      props.style = next;
+    });
+  };
+
+  const handleUpdatePageStyle = (styleKey, value) => {
+    actions.setProp("ROOT", (props) => {
+      const next = { ...(props.style || {}) };
+      if (value === "" || value == null) delete next[styleKey];
+      else next[styleKey] = value;
+      props.style = next;
+    });
+  };
+
+  const handleUpdatePageSpacing = (styleKey, value) => {
+    handleUpdatePageStyle(styleKey, value === "" ? "" : `${value}px`);
+  };
+
+  const handleUpdateContainerGap = (value) => {
+    // Palette-created containers wrap rows in an inner CanvasColumn;
+    // wrapped selections can place rows directly inside the container.
+    const targetId = containerUsesInnerColumn ? containerChildId : selectedNodeId;
+    if (!targetId) return;
+    actions.setProp(targetId, (props) => {
+      const next = { ...(props.style || {}) };
+      if (value === "" || value == null) delete next.gap;
+      else next.gap = `${value}px`;
+      props.style = next;
     });
   };
 
@@ -469,8 +777,6 @@ export default function CraftSettingsPanel({
   const handleAddZStackLayer = () => {
     if (displayName !== "CanvasZStack" || !selectedNodeId) return;
     try {
-      const resolver = query.getOptions().resolver;
-      const _CanvasStack = resolver["CanvasStack"];
       const layerTree = query
         .parseReactElement(
           <CanvasStack span={12} sizing="fill" direction="vertical" gap={0} />
@@ -571,44 +877,208 @@ export default function CraftSettingsPanel({
 
   // ── Layers tree walker ───────────────────────────────────────────────────────
 
+  const layerSearchTerm = layerSearch.trim().toLowerCase();
+  const layerMatches = (nodeId) => {
+    const node = allNodes[nodeId];
+    if (!node) return false;
+    if (!layerSearchTerm) return true;
+    const { label } = getNodeMeta(node.data.displayName, node.data.props);
+    const customLabel = node.data.props?.label || "";
+    const haystack = `${customLabel} ${label} ${node.data.displayName || ""} ${node.data.props?.widgetKey || ""}`.toLowerCase();
+    if (haystack.includes(layerSearchTerm)) return true;
+    return (node.data.nodes || []).some((childId) => layerMatches(childId));
+  };
+
+  const startLayerRename = (nodeId, currentName) => {
+    setRenamingLayerId(nodeId);
+    setRenameLayerValue(currentName || "");
+  };
+
+  const commitLayerRename = (nodeId) => {
+    const value = renameLayerValue.trim();
+    actions.setProp(nodeId, (props) => {
+      props.label = value || null;
+    });
+    setRenamingLayerId(null);
+    setRenameLayerValue("");
+  };
+
+  const cancelLayerRename = () => {
+    setRenamingLayerId(null);
+    setRenameLayerValue("");
+  };
+
+  const clearLayerDrag = () => {
+    setDraggedLayerId(null);
+    setDropTargetId(null);
+  };
+
+  const handleLayerDrop = (targetId) => {
+    const source = draggedLayerId ? allNodes[draggedLayerId] : null;
+    const target = allNodes[targetId];
+    if (!source || !target || draggedLayerId === targetId) {
+      clearLayerDrag();
+      return;
+    }
+    const parentId = target.data.parent;
+    if (!parentId || source.data.parent !== parentId) {
+      clearLayerDrag();
+      return;
+    }
+    const siblings = allNodes[parentId]?.data?.nodes || [];
+    const from = siblings.indexOf(draggedLayerId);
+    const to = siblings.indexOf(targetId);
+    if (from < 0 || to < 0 || from === to) {
+      clearLayerDrag();
+      return;
+    }
+    // Craft move inserts before the target index after removing the source.
+    actions.move(draggedLayerId, parentId, to > from ? to - 1 : to);
+    clearLayerDrag();
+  };
+
   const renderLayersTree = (nodeId = "ROOT", depth = 0) => {
     const node = allNodes[nodeId];
-    if (!node) return null;
+    if (!node || !layerMatches(nodeId)) return null;
 
     const hasChildren = node.data.nodes && node.data.nodes.length > 0;
-    const isSelected = selectedNodeId === nodeId;
-    const { label: name, icon: Icon, color: iconColor } = getNodeMeta(node.data.displayName, node.data.props);
+    const isSelected = selectedIds.includes(nodeId);
+    const isLocked = Boolean(node.data.props?.locked);
+    const hasCondition = Boolean(node.data.props?.condition);
+    const hasRepeat = Boolean(node.data.props?.repeat);
+    const { label: defaultName, icon: Icon, color: iconColor } = getNodeMeta(node.data.displayName, node.data.props);
+    const name = node.data.props?.label || defaultName;
+    const isRenaming = renamingLayerId === nodeId;
 
     return (
       <div key={nodeId} className="flex flex-col">
         <div
+          draggable={nodeId !== "ROOT"}
+          onDragStart={(e) => {
+            if (nodeId === "ROOT") return;
+            e.stopPropagation();
+            e.dataTransfer.effectAllowed = "move";
+            e.dataTransfer.setData("text/plain", nodeId);
+            setDraggedLayerId(nodeId);
+          }}
+          onDragOver={(e) => {
+            if (!draggedLayerId || draggedLayerId === nodeId) return;
+            const source = allNodes[draggedLayerId];
+            if (!source || source.data.parent !== node.data.parent) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+            setDropTargetId(nodeId);
+          }}
+          onDragLeave={() => setDropTargetId((current) => (current === nodeId ? null : current))}
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleLayerDrop(nodeId);
+          }}
+          onDragEnd={clearLayerDrag}
           onClick={(e) => {
             e.stopPropagation();
+            if (e.metaKey || e.ctrlKey) {
+              const next = selectedIds.includes(nodeId)
+                ? selectedIds.filter((id) => id !== nodeId)
+                : [...selectedIds, nodeId];
+              actions.selectNode(next);
+              return;
+            }
             actions.selectNode(nodeId);
           }}
-          className={`group flex items-center justify-between p-2 rounded cursor-pointer transition-all ${
+          className={`group flex items-center justify-between gap-1 p-2 rounded cursor-pointer transition-all ${
             isSelected
               ? "bg-primary/10 text-primary border border-primary/20 font-medium"
               : "hover:bg-muted/50 text-foreground border border-transparent"
+          } ${draggedLayerId === nodeId ? "opacity-40" : ""} ${
+            dropTargetId === nodeId ? "ring-1 ring-primary ring-inset" : ""
           }`}
           style={{ paddingLeft: `${Math.max(8, depth * 14)}px` }}
+          title={nodeId === "ROOT" ? "Page root" : "Drag to reorder · Ctrl/Cmd-click to multi-select"}
         >
-          <div className="flex items-center gap-2 min-w-0">
+          <div className="flex min-w-0 items-center gap-1.5">
+            {nodeId !== "ROOT" && (
+              <GripVertical className="h-3 w-3 shrink-0 text-muted-foreground/30 opacity-0 group-hover:opacity-100" />
+            )}
             <Icon className={`h-3.5 w-3.5 shrink-0 ${isSelected ? "text-primary" : iconColor}`} />
-            <span className="text-[11px] truncate">{name}</span>
+            {isRenaming ? (
+              <input
+                autoFocus
+                value={renameLayerValue}
+                onChange={(e) => setRenameLayerValue(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+                onBlur={() => commitLayerRename(nodeId)}
+                onKeyDown={(e) => {
+                  e.stopPropagation();
+                  if (e.key === "Enter") commitLayerRename(nodeId);
+                  if (e.key === "Escape") cancelLayerRename();
+                }}
+                className="min-w-0 flex-1 rounded border border-primary/40 bg-background px-1 py-0.5 text-[11px] text-foreground outline-none"
+              />
+            ) : (
+              <span
+                className="truncate text-[11px]"
+                onDoubleClick={(e) => {
+                  e.stopPropagation();
+                  startLayerRename(nodeId, name);
+                }}
+              >
+                {name}
+              </span>
+            )}
+            {(hasCondition || hasRepeat || isLocked) && (
+              <span className="ml-0.5 flex shrink-0 items-center gap-0.5 text-muted-foreground/50">
+                {hasCondition && <Eye className="h-2.5 w-2.5" aria-label="Has visibility condition" />}
+                {hasRepeat && <Repeat className="h-2.5 w-2.5" aria-label="Repeats children" />}
+                {isLocked && <Lock className="h-2.5 w-2.5" aria-label="Locked" />}
+              </span>
+            )}
           </div>
           {nodeId !== "ROOT" && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                actions.delete(nodeId);
-                if (isSelected) actions.selectNode([]);
-              }}
-              className="opacity-0 group-hover:opacity-100 hover:text-destructive p-0.5 rounded transition-all"
-              title="Delete Element"
-            >
-              <Trash2 className="h-3 w-3" />
-            </button>
+            <div className="flex items-center gap-0.5 opacity-0 transition-all group-hover:opacity-100">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  startLayerRename(nodeId, name);
+                }}
+                className="rounded p-0.5 text-muted-foreground hover:text-foreground"
+                title="Rename layer"
+                aria-label="Rename layer"
+              >
+                <Pencil className="h-3 w-3" />
+              </button>
+              {node.data.displayName === "CanvasWidgetSlot" && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    actions.setProp(nodeId, (props) => {
+                      props.locked = !props.locked;
+                    });
+                  }}
+                  className="rounded p-0.5 text-muted-foreground hover:text-foreground"
+                  title={isLocked ? "Unlock widget" : "Lock widget"}
+                  aria-label={isLocked ? "Unlock widget" : "Lock widget"}
+                >
+                  {isLocked ? <Unlock className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  actions.delete(nodeId);
+                  if (isSelected) actions.selectNode([]);
+                }}
+                className="rounded p-0.5 text-muted-foreground hover:text-destructive"
+                title="Delete element"
+                aria-label="Delete element"
+              >
+                <Trash2 className="h-3 w-3" />
+              </button>
+            </div>
           )}
         </div>
         {hasChildren && node.data.nodes.map((cid) => renderLayersTree(cid, depth + 1))}
@@ -688,23 +1158,107 @@ export default function CraftSettingsPanel({
       <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-2">
         {activeTab === "layers" ? (
           <div className="flex flex-col gap-2">
-            <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-              Page Node Tree
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                Page Node Tree
+              </div>
+              <span className="text-[9px] text-muted-foreground/60">
+                drag to reorder
+              </span>
+            </div>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/50" />
+              <input
+                type="text"
+                value={layerSearch}
+                onChange={(e) => setLayerSearch(e.target.value)}
+                placeholder="Search layers..."
+                className="w-full rounded border border-border bg-background py-1.5 pl-8 pr-12 text-xs text-foreground placeholder:text-muted-foreground/40"
+              />
+              {layerSearch && (
+                <button
+                  type="button"
+                  onClick={() => setLayerSearch("")}
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded px-1 py-0.5 text-[9px] text-muted-foreground hover:bg-muted hover:text-foreground"
+                >
+                  clear
+                </button>
+              )}
             </div>
             <div className="flex flex-col gap-2 bg-muted/20 p-2 rounded border border-border/30">
-              {renderLayersTree("ROOT")}
+              {renderLayersTree("ROOT") || (
+                <span className="p-2 text-center text-[10px] text-muted-foreground">
+                  No layers match “{layerSearch}”.
+                </span>
+              )}
             </div>
+            <span className="text-[9px] leading-tight text-muted-foreground/60">
+              Drag rows to reorder siblings. Ctrl/Cmd-click to select multiple layers.
+            </span>
           </div>
         ) : !selectedNodeId || selectedNodeId === "ROOT" ? (
-          <div className="flex flex-col items-center justify-center text-center p-2 text-muted-foreground">
-            <Sparkles className="h-8 w-8 text-muted-foreground/30 mb-2 animate-pulse" />
-            <p className="text-xs font-medium">Select an element on canvas</p>
-            <p className="text-xs text-muted-foreground/60 mt-1 max-w-[200px]">
-              Click any row, container, stack or widget on the left to configure spacing, styles, and logic.
-            </p>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2 p-2 rounded bg-muted/30">
+              <Columns className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <div className="text-xs font-semibold text-foreground">Page Layout</div>
+                <div className="text-[9px] text-muted-foreground">
+                  Spacing for the page root container
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2 pb-2 border-b border-border/30">
+              <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
+                Page Spacing
+              </div>
+              <NumericSpacingControl
+                label="Inner page padding"
+                value={pageStyle.padding}
+                onChange={(value) => handleUpdatePageSpacing("padding", value)}
+                presets={[0, 8, 16, 24, 32]}
+                help="Space inside the page frame, before the first top-level row."
+              />
+              <NumericSpacingControl
+                label="Gap between blocks"
+                value={pageStyle.gap ?? 8}
+                onChange={(value) => handleUpdatePageSpacing("gap", value)}
+                presets={[0, 4, 8, 12, 16, 24]}
+                help="Vertical space between top-level rows and containers."
+              />
+            </div>
+
+            <div className="pb-2 border-b border-border/30">
+              <ColorField
+                label="Page background"
+                value={pageStyle.backgroundColor ?? ""}
+                onChange={(value) => handleUpdatePageStyle("backgroundColor", value)}
+                placeholder="transparent"
+              />
+            </div>
+
+            <div className="rounded border border-dashed border-border/60 p-2 text-[9px] leading-relaxed text-muted-foreground">
+              Tip: select a row to set its grid gap, a container to set its content gap,
+              or a stack to set its flex gap. Click empty canvas space or press Esc to
+              return to page settings.
+            </div>
+
+            <div className="flex items-center gap-2 text-[10px] text-muted-foreground/70">
+              <Sparkles className="h-3.5 w-3.5 shrink-0" />
+              <span>Select any row, container, stack or widget to edit its own spacing and logic.</span>
+            </div>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
+            {selectedCount > 1 && (
+              <div className="flex items-start gap-2 rounded border border-primary/25 bg-primary/5 p-2 text-[11px] leading-snug text-primary">
+                <Layers className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                <span>
+                  {selectedCount} elements selected. Use the toolbar on the canvas to
+                  equalize, distribute or delete them together.
+                </span>
+              </div>
+            )}
             {/* Header info */}
             <div className="flex items-center justify-between pb-2 border-b border-border/40">
               <div className="flex items-center gap-2">
@@ -760,6 +1314,33 @@ export default function CraftSettingsPanel({
               </div>
             </div>
 
+            <div className="sticky top-0 z-20 -mx-2 flex items-center gap-1 border-b border-border/40 bg-card/95 px-2 py-1.5 backdrop-blur">
+              {[
+                ["Spacing", "inspector-spacing"],
+                ["Layout", "inspector-layout"],
+                ["Responsive", "inspector-responsive"],
+                ["Style", "inspector-style"],
+                ["Logic", "inspector-logic"],
+              ].map(([label, id]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => {
+                    const target =
+                      document.getElementById(id) ||
+                      document.getElementById("inspector-style");
+                    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                  className="rounded border border-border/60 bg-background px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground hover:text-foreground"
+                >
+                  {label}
+                </button>
+              ))}
+              <span className="ml-auto truncate text-[8px] text-muted-foreground/50">
+                inspector
+              </span>
+            </div>
+
             {/* Quick Component Actions */}
             <div className="flex flex-col gap-2">
               <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
@@ -789,8 +1370,47 @@ export default function CraftSettingsPanel({
               </div>
             </div>
 
+            {/* Row / container spacing — kept near the top so it is discoverable */}
+            {(displayName === "CanvasRow" || displayName === "CanvasContainer") && (
+              <div id="inspector-spacing" className="flex scroll-mt-10 flex-col gap-2 pb-2 border-b border-border/30">
+                <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
+                  {displayName === "CanvasRow" ? "Row Spacing" : "Container Spacing"}
+                </div>
+
+                {displayName === "CanvasRow" && (
+                  <>
+                    <NumericSpacingControl
+                      label="Gap between widgets"
+                      value={nodeProps.style?.gap ?? 8}
+                      onChange={(value) =>
+                        handleUpdateStyle("gap", value === "" ? "" : `${value}px`)
+                      }
+                      help="Space between grid columns and between wrapped rows."
+                    />
+                    <span className="text-[9px] leading-tight text-muted-foreground/70">
+                      Row padding and margin are under Spacing &amp; Card style.
+                    </span>
+                  </>
+                )}
+
+                {displayName === "CanvasContainer" && (
+                  <>
+                    <NumericSpacingControl
+                      label="Content gap"
+                      value={containerGapStyle.gap ?? (containerUsesInnerColumn ? 8 : 0)}
+                      onChange={handleUpdateContainerGap}
+                      help="Vertical space between rows inside this container."
+                    />
+                    <span className="text-[9px] leading-tight text-muted-foreground/70">
+                      Outer padding and margin are under Spacing &amp; Card style.
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
+
             {/* Layout and Column Span */}
-            <div className="flex flex-col gap-2 pb-2 border-b border-border/30">
+            <div id="inspector-layout" className="flex scroll-mt-10 flex-col gap-2 pb-2 border-b border-border/30">
               <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
                 Layout & Sizing
               </div>
@@ -809,6 +1429,52 @@ export default function CraftSettingsPanel({
                     onChange={(e) => handleUpdateSpan(parseInt(e.target.value))}
                         className="w-full h-1 bg-muted rounded appearance-none cursor-pointer accent-primary"
                   />
+                  <div className="grid grid-cols-5 gap-1">
+                    {[3, 4, 6, 8, 12].map((span) => (
+                      <button
+                        key={span}
+                        type="button"
+                        onClick={() => handleUpdateSpan(span)}
+                        className={`rounded border px-1 py-1 text-[10px] font-medium transition-colors ${
+                          (nodeProps.span || 6) === span
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border bg-background text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {span}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleMoveSibling(-1)}
+                      className="flex-1 rounded border border-border bg-background px-1 py-1 text-[10px] text-muted-foreground hover:text-foreground"
+                    >
+                      ← Move
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleEqualizeRow}
+                      className="flex-1 rounded border border-border bg-background px-1 py-1 text-[10px] text-muted-foreground hover:text-foreground"
+                    >
+                      Equalize
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleMoveSibling(1)}
+                      className="flex-1 rounded border border-border bg-background px-1 py-1 text-[10px] text-muted-foreground hover:text-foreground"
+                    >
+                      Move →
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleFillRemaining}
+                    className="rounded border border-border bg-background px-1 py-1 text-[10px] text-muted-foreground hover:text-foreground"
+                  >
+                    Fill remaining width
+                  </button>
                 </div>
               )}
 
@@ -840,6 +1506,116 @@ export default function CraftSettingsPanel({
               )}
             </div>
 
+            {/* Per-breakpoint overrides */}
+            {selectedNodeId && selectedNodeId !== "ROOT" && (
+              <div
+                id="inspector-responsive"
+                className="flex scroll-mt-10 flex-col gap-2 pb-2 border-b border-border/30"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
+                    Responsive Overrides
+                  </div>
+                  <span className="rounded border border-border/50 bg-muted/30 px-1.5 py-0.5 text-[8px] font-mono uppercase tracking-wider text-muted-foreground">
+                    editing · {BREAKPOINT_LABELS[breakpointTier]}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { id: "tablet", label: "Tablet", Icon: Tablet, range: "641–1023px" },
+                    { id: "mobile", label: "Mobile", Icon: Smartphone, range: "≤ 640px" },
+                  ].map(({ id, label, Icon, range }) => {
+                    const override = nodeProps.responsive?.[id] || {};
+                    const isCurrent = breakpointTier === id;
+                    return (
+                      <div
+                        key={id}
+                        className={`flex flex-col gap-1.5 rounded border p-1.5 ${
+                          isCurrent
+                            ? "border-primary/40 bg-primary/5"
+                            : "border-border/60 bg-background"
+                        }`}
+                      >
+                        <div className="flex items-center gap-1">
+                          <Icon className="h-3 w-3 text-muted-foreground" />
+                          <span className="text-[10px] font-semibold text-foreground">{label}</span>
+                          <span className="ml-auto text-[8px] text-muted-foreground/60">
+                            {range}
+                          </span>
+                        </div>
+                        {displayName !== "CanvasRow" && displayName !== "CanvasColumn" && (
+                          <label className="flex items-center justify-between gap-1 text-[9px] text-muted-foreground">
+                            <span>Span</span>
+                            <select
+                              value={override.span ?? ""}
+                              onChange={(e) =>
+                                handleUpdateResponsive(id, {
+                                  span: e.target.value === "" ? null : Number(e.target.value),
+                                })
+                              }
+                              className="min-w-0 rounded border border-border bg-background px-1 py-0.5 text-[10px] text-foreground"
+                            >
+                              <option value="">Inherit</option>
+                              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((span) => (
+                                <option key={span} value={span}>
+                                  {span}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                        )}
+                        {displayName === "CanvasStack" && (
+                          <label className="flex items-center justify-between gap-1 text-[9px] text-muted-foreground">
+                            <span>Direction</span>
+                            <select
+                              value={override.direction ?? ""}
+                              onChange={(e) =>
+                                handleUpdateResponsive(id, {
+                                  direction: e.target.value || null,
+                                })
+                              }
+                              className="min-w-0 rounded border border-border bg-background px-1 py-0.5 text-[10px] text-foreground"
+                            >
+                              <option value="">Inherit</option>
+                              <option value="horizontal">Horizontal</option>
+                              <option value="vertical">Vertical</option>
+                            </select>
+                          </label>
+                        )}
+                        <label className="flex items-center justify-between gap-1 text-[9px] text-muted-foreground">
+                          <span>Visible</span>
+                          <input
+                            type="checkbox"
+                            checked={!override.hidden}
+                            onChange={(e) =>
+                              handleUpdateResponsive(id, {
+                                hidden: e.target.checked ? null : true,
+                              })
+                            }
+                            className="h-3 w-3 accent-primary"
+                            aria-label={`Visible on ${label}`}
+                          />
+                        </label>
+                        {nodeProps.responsive?.[id] && (
+                          <button
+                            type="button"
+                            onClick={() => handleResetResponsive(id)}
+                            className="rounded border border-border/60 px-1 py-0.5 text-[8px] text-muted-foreground hover:text-foreground"
+                          >
+                            Reset {label.toLowerCase()}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                <span className="text-[9px] leading-tight text-muted-foreground/70">
+                  Mobile inherits a full-width span until overridden. Resize the canvas
+                  with the device buttons to preview each tier.
+                </span>
+              </div>
+            )}
+
             {/* Flex Stack specific controls */}
             {displayName === "CanvasStack" && (
               <div className="flex flex-col gap-2 pb-2 border-b border-border/30">
@@ -859,7 +1635,7 @@ export default function CraftSettingsPanel({
                     </select>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <span className="text-xs text-muted-foreground">Gap (px)</span>
+                    <span className="text-xs text-muted-foreground">Child gap (px)</span>
                     <input
                       type="number"
                       min="0"
@@ -868,6 +1644,22 @@ export default function CraftSettingsPanel({
                       onChange={(e) => actions.setProp(selectedNodeId, (props) => { props.gap = parseInt(e.target.value) || 0; })}
                       className="bg-background border border-border rounded p-2 text-xs"
                     />
+                    <div className="flex flex-wrap gap-1">
+                      {[0, 4, 8, 16, 24].map((preset) => (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() =>
+                            actions.setProp(selectedNodeId, (props) => {
+                              props.gap = preset;
+                            })
+                          }
+                          className="min-w-[20px] rounded border border-border bg-background px-0.5 py-0.5 text-[9px] font-medium text-muted-foreground hover:text-foreground"
+                        >
+                          {preset}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
@@ -1104,32 +1896,33 @@ export default function CraftSettingsPanel({
             )}
 
             {/* Styling spacing and bounds */}
-            <div className="flex flex-col gap-2 pb-2 border-b border-border/30">
+            <div id="inspector-style" className="flex scroll-mt-10 flex-col gap-2 pb-2 border-b border-border/30">
               <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
                 Spacing & Card style
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex flex-col gap-2">
-                  <span className="text-[9px] text-muted-foreground uppercase font-mono">Padding</span>
-                  <input
-                    type="text"
-                    placeholder="e.g. 8px"
-                    value={nodeProps.style?.padding || ""}
-                    onChange={(e) => handleUpdateStyle("padding", e.target.value)}
-                    className="bg-background border border-border rounded p-2 text-xs text-foreground placeholder:text-muted-foreground/30"
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <span className="text-[9px] text-muted-foreground uppercase font-mono">Margin</span>
-                  <input
-                    type="text"
-                    placeholder="e.g. 8px"
-                    value={nodeProps.style?.margin || ""}
-                    onChange={(e) => handleUpdateStyle("margin", e.target.value)}
-                    className="bg-background border border-border rounded p-2 text-xs text-foreground placeholder:text-muted-foreground/30"
-                  />
-                </div>
+              <div className="grid grid-cols-1 gap-2">
+                <BoxSpacingControl
+                  label="Padding"
+                  value={nodeProps.style?.padding ?? ""}
+                  onChange={(value) => handleUpdateStyle("padding", value)}
+                />
+                <BoxSpacingControl
+                  label="Margin"
+                  value={nodeProps.style?.margin ?? ""}
+                  onChange={(value) => handleUpdateStyle("margin", value)}
+                />
               </div>
+
+              <span className="text-[9px] leading-tight text-muted-foreground/70">
+                Each side accepts CSS values: 8px, 1rem or 0. The box writes the equivalent
+                shorthand back to the layout.
+              </span>
+              {displayName === "CanvasWidgetSlot" && (
+                <span className="text-[9px] leading-tight text-muted-foreground/70">
+                  These values wrap the layout slot. Widget-internal padding stays in the
+                  widget configuration.
+                </span>
+              )}
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-2">
@@ -1137,26 +1930,89 @@ export default function CraftSettingsPanel({
                   <input
                     type="text"
                     placeholder="e.g. 6px"
-                    value={nodeProps.style?.borderRadius || ""}
+                    value={nodeProps.style?.borderRadius ?? ""}
                     onChange={(e) => handleUpdateStyle("borderRadius", e.target.value)}
                     className="bg-background border border-border rounded p-2 text-xs text-foreground placeholder:text-muted-foreground/30"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <span className="text-[9px] text-muted-foreground uppercase font-mono">Background Color</span>
+                  <span className="text-[9px] text-muted-foreground uppercase font-mono">Border Width</span>
                   <input
-                    type="text"
-                    placeholder="e.g. #ffffff"
-                    value={nodeProps.style?.backgroundColor || ""}
-                    onChange={(e) => handleUpdateStyle("backgroundColor", e.target.value)}
+                    type="number"
+                    min="0"
+                    placeholder="auto"
+                    value={parsePxValue(nodeProps.style?.borderWidth)}
+                    onChange={(e) =>
+                      handleUpdateStyle(
+                        "borderWidth",
+                        e.target.value === "" ? "" : `${e.target.value}px`
+                      )
+                    }
                     className="bg-background border border-border rounded p-2 text-xs text-foreground placeholder:text-muted-foreground/30"
                   />
                 </div>
               </div>
+
+              <ColorField
+                label="Background Color"
+                value={nodeProps.style?.backgroundColor ?? ""}
+                onChange={(value) => handleUpdateStyle("backgroundColor", value)}
+              />
+
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-2">
+                  <span className="text-[9px] text-muted-foreground uppercase font-mono">Border Style</span>
+                  <select
+                    value={nodeProps.style?.borderStyle ?? "solid"}
+                    onChange={(e) => handleUpdateStyle("borderStyle", e.target.value)}
+                    className="bg-background border border-border rounded p-2 text-xs text-foreground"
+                  >
+                    <option value="solid">Solid</option>
+                    <option value="dashed">Dashed</option>
+                    <option value="dotted">Dotted</option>
+                    <option value="none">None</option>
+                  </select>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className="text-[9px] text-muted-foreground uppercase font-mono">Opacity</span>
+                  <input
+                    type="number"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={nodeProps.style?.opacity ?? 1}
+                    onChange={(e) =>
+                      handleUpdateStyle(
+                        "opacity",
+                        e.target.value === "" ? "" : Number(e.target.value)
+                      )
+                    }
+                    className="bg-background border border-border rounded p-2 text-xs text-foreground"
+                  />
+                </div>
+              </div>
+
+              <ColorField
+                label="Border Color"
+                value={nodeProps.style?.borderColor ?? ""}
+                onChange={(value) => handleUpdateStyle("borderColor", value)}
+                placeholder="e.g. #334155"
+              />
+
+              <div className="flex flex-col gap-2">
+                <span className="text-[9px] text-muted-foreground uppercase font-mono">Box Shadow</span>
+                <input
+                  type="text"
+                  placeholder="e.g. 0 8px 24px rgba(0,0,0,0.2)"
+                  value={nodeProps.style?.boxShadow ?? ""}
+                  onChange={(e) => handleUpdateStyle("boxShadow", e.target.value)}
+                  className="bg-background border border-border rounded p-2 text-xs text-foreground placeholder:text-muted-foreground/30"
+                />
+              </div>
             </div>
 
             {/* Visibility Conditions & Loop Logic */}
-            <div className="flex flex-col gap-2">
+            <div id="inspector-logic" className="flex scroll-mt-10 flex-col gap-2">
               <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
                 Visibility & Loop Logic
               </div>

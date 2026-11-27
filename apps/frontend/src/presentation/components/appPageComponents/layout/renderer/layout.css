@@ -7,6 +7,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  container-type: inline-size;
   gap: 12px;
   box-sizing: border-box;
 }
@@ -50,15 +51,9 @@
 .col-span-11 { grid-column: span 11 / span 11; }
 .col-span-12 { grid-column: span 12 / span 12; }
 
-/* Responsive adjustments for Mobile */
-@media (max-width: 768px) {
-  .layout-row {
-    grid-template-columns: 1fr !important;
-  }
-  .layout-row > * {
-    grid-column: span 1 / span 1 !important;
-  }
-}
+/* Responsive stacking is resolved per node in JS (span 12 by default on
+   mobile), so explicit mobile spans keep working instead of being
+   overridden by an !important one-column rule. */
 
 /* Sizing Modes */
 .layout-widget-slot {
@@ -105,10 +100,9 @@
   flex-direction: column;
   background-color: hsl(var(--background));
   border: 1px solid hsl(var(--border));
-  border-radius: 8px;
-  padding: 8px;
   box-sizing: border-box;
   transition: all 0.2s ease;
+  container-type: inline-size;
 }
 
 .layout-container.sizing-auto,
@@ -351,4 +345,398 @@
   border-color: hsl(var(--primary)) !important;
   background-color: hsl(var(--primary) / 0.05) !important;
   color: hsl(var(--primary)) !important;
+}
+
+/* -- Canvas viewport (Figma-style interaction layer) --------------------- */
+
+.craft-canvas-area {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  touch-action: none;
+  background-color: hsl(var(--muted) / 0.18);
+  background-image: radial-gradient(hsl(var(--border) / 0.55) 1px, transparent 1px);
+  background-size: 16px 16px;
+  background-position: 0 0;
+  overscroll-behavior: contain;
+}
+
+.craft-canvas-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+  padding: 0;
+}
+
+.craft-canvas-page {
+  min-height: 640px;
+  box-sizing: border-box;
+  padding: 16px;
+  container-type: inline-size;
+  border: 1px solid hsl(var(--border));
+  border-radius: 10px;
+  background-color: hsl(var(--background));
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.25),
+    0 18px 50px rgb(0 0 0 / 0.22);
+  overflow: hidden;
+}
+
+.craft-canvas-space {
+  cursor: grab;
+}
+
+.craft-canvas-panning,
+.craft-canvas-panning * {
+  cursor: grabbing !important;
+  user-select: none !important;
+}
+
+.craft-zoom-hud {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 3px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  background: hsl(var(--card) / 0.94);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.24);
+  backdrop-filter: blur(10px);
+}
+
+.canvas-drag-ghost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  pointer-events: none;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 7px 10px;
+  border: 1px solid hsl(var(--primary) / 0.55);
+  border-radius: 8px;
+  background: hsl(var(--card) / 0.97);
+  color: hsl(var(--foreground));
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow:
+    0 10px 30px rgb(0 0 0 / 0.35),
+    0 0 0 1px hsl(var(--primary) / 0.12);
+  will-change: transform;
+  transform: translate3d(-200vw, -200vw, 0);
+}
+
+.canvas-dragging,
+.canvas-dragging * {
+  cursor: grabbing !important;
+  user-select: none !important;
+}
+
+.canvas-dragging #craft-canvas-root {
+  background-image: radial-gradient(hsl(var(--primary) / 0.24) 1px, transparent 1px);
+}
+
+/* Offscreen culling for widget-rich pages: Chrome skips layout/paint work for
+   widgets far outside the viewport and remembers each widget's last rendered
+   size. Selected widgets stay fully rendered so handles and badges are intact. */
+.layout-widget-slot-edit:not(.craft-node-selected) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 180px;
+}
+
+/* ─── Canvas rulers ──────────────────────────────────────────────────────── */
+
+.craft-ruler {
+  position: absolute;
+  z-index: 130;
+  pointer-events: none;
+  background: hsl(var(--card) / 0.94);
+  color: hsl(var(--muted-foreground));
+  user-select: none;
+  overflow: hidden;
+}
+
+.craft-ruler-top {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 18px;
+  border-bottom: 1px solid hsl(var(--border) / 0.8);
+}
+
+.craft-ruler-left {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 18px;
+  border-right: 1px solid hsl(var(--border) / 0.8);
+}
+
+.craft-ruler-corner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 131;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  background: hsl(var(--card) / 0.98);
+  border-right: 1px solid hsl(var(--border) / 0.8);
+  border-bottom: 1px solid hsl(var(--border) / 0.8);
+}
+
+.craft-ruler-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.craft-ruler-track-x {
+  height: 100%;
+  transform: translate3d(var(--canvas-pan-x, 0px), 0, 0)
+    scaleX(var(--canvas-zoom, 1));
+}
+
+.craft-ruler-track-y {
+  width: 100%;
+  transform: translate3d(0, var(--canvas-pan-y, 0px), 0)
+    scaleY(var(--canvas-zoom, 1));
+}
+
+.craft-ruler-tick {
+  position: absolute;
+  background-color: hsl(var(--muted-foreground) / 0.4);
+}
+
+.craft-ruler-track-x .craft-ruler-tick {
+  bottom: 0;
+  width: 1px;
+  height: 4px;
+}
+
+.craft-ruler-track-x .craft-ruler-tick.is-major {
+  height: 7px;
+  background-color: hsl(var(--muted-foreground) / 0.65);
+}
+
+.craft-ruler-track-y .craft-ruler-tick {
+  right: 0;
+  height: 1px;
+  width: 4px;
+}
+
+.craft-ruler-track-y .craft-ruler-tick.is-major {
+  width: 7px;
+  background-color: hsl(var(--muted-foreground) / 0.65);
+}
+
+.craft-ruler-label {
+  position: absolute;
+  top: 1px;
+  padding-left: 2px;
+  font-family: var(--font-mono, monospace);
+  font-size: 8px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: hsl(var(--muted-foreground) / 0.9);
+  transform: scaleX(calc(1 / var(--canvas-zoom, 1)));
+  transform-origin: left top;
+}
+
+/* ─── Marquee and multi-selection overlay ────────────────────────────────── */
+
+.canvas-minimap {
+  position: absolute;
+  left: 24px;
+  bottom: 16px;
+  z-index: 134;
+  overflow: hidden;
+  border: 1px solid hsl(var(--border));
+  border-radius: 7px;
+  background: hsl(var(--card) / 0.95);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.24);
+  backdrop-filter: blur(8px);
+  pointer-events: auto;
+  cursor: crosshair;
+}
+
+.canvas-minimap-page {
+  position: absolute;
+  border-radius: 2px;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+}
+
+.canvas-minimap-block {
+  position: absolute;
+  border-radius: 1px;
+  background: hsl(var(--muted-foreground) / 0.2);
+  border: 1px solid hsl(var(--border) / 0.45);
+  pointer-events: none;
+}
+
+.canvas-minimap-block-row {
+  background: hsl(var(--primary) / 0.16);
+  border-color: hsl(var(--primary) / 0.28);
+}
+
+.canvas-minimap-block-container,
+.canvas-minimap-block-stack,
+.canvas-minimap-block-z-stack {
+  background: hsl(var(--muted-foreground) / 0.24);
+}
+
+.canvas-minimap-viewport {
+  position: absolute;
+  border: 1px solid hsl(var(--primary) / 0.9);
+  border-radius: 2px;
+  background: hsl(var(--primary) / 0.08);
+  pointer-events: none;
+}
+
+.canvas-breadcrumb {
+  position: absolute;
+  top: 24px;
+  left: 26px;
+  z-index: 136;
+  display: flex;
+  max-width: calc(100% - 80px);
+  align-items: center;
+  gap: 1px;
+  padding: 3px 4px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 6px;
+  background: hsl(var(--card) / 0.95);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.18);
+  color: hsl(var(--muted-foreground));
+  font-size: 10px;
+  backdrop-filter: blur(8px);
+  pointer-events: auto;
+}
+
+.canvas-grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 62;
+  display: none;
+  border-radius: 2px;
+  background-color: hsl(var(--primary) / 0.03);
+  pointer-events: none;
+}
+
+.canvas-lasso-rect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 65;
+  display: none;
+  border: 1px solid hsl(var(--primary) / 0.85);
+  border-radius: 2px;
+  background: hsl(var(--primary) / 0.08);
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.08) inset;
+  pointer-events: none;
+  will-change: transform, width, height;
+}
+
+.canvas-lasso-armed #craft-canvas-root,
+.canvas-lassoing,
+.canvas-lassoing * {
+  cursor: crosshair !important;
+  user-select: none !important;
+}
+
+.canvas-multi-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 64;
+  display: none;
+  border: 1px dashed hsl(var(--primary) / 0.75);
+  border-radius: 3px;
+  background: hsl(var(--primary) / 0.03);
+  pointer-events: none;
+  will-change: transform, width, height;
+}
+
+.canvas-multi-count {
+  position: absolute;
+  left: 50%;
+  bottom: -17px;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: hsl(var(--primary));
+  color: hsl(var(--background));
+  padding: 1px 4px;
+  font-family: var(--font-mono, monospace);
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.canvas-multi-toolbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 140;
+  display: none;
+  align-items: center;
+  gap: 1px;
+  padding: 2px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 7px;
+  background: hsl(var(--card) / 0.97);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.24);
+  backdrop-filter: blur(8px);
+  will-change: transform;
+}
+
+.canvas-multi-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 22px;
+  border-radius: 4px;
+  color: hsl(var(--foreground) / 0.75);
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.canvas-multi-action:hover {
+  background: hsl(var(--muted));
+  color: hsl(var(--foreground));
+}
+
+.canvas-multi-action.text-destructive:hover {
+  background: hsl(var(--destructive) / 0.12);
+  color: hsl(var(--destructive));
+}
+
+.canvas-multi-divider {
+  width: 1px;
+  height: 14px;
+  margin: 0 2px;
+  background: hsl(var(--border));
+}
+
+/* Multi-selection is for bulk actions: per-node handles get in the way. */
+.canvas-multi-select .craft-node-selected .craft-resize-handle,
+.canvas-multi-select .craft-node-selected .layout-resize-handle,
+.canvas-multi-select .craft-node-selected .select-parent-button {
+  display: none !important;
 }

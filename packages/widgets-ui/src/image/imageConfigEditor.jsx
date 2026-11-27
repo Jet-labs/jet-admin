@@ -1,148 +1,130 @@
-import React, { useMemo, useContext, useState, useRef } from "react";
+import React, { useContext, useMemo, useRef, useState } from "react";
 import PropTypes from "prop-types";
-import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Button } from "@jet-admin/ui";
-import { TemplateAutocompleteInput } from "@jet-admin/ui";
 import { Upload, Loader2 } from "lucide-react";
+import { Button, Input, Switch } from "@jet-admin/ui";
+import {
+  ConfigSection,
+  ConfigField,
+  BindableInput,
+  SegmentedControl,
+  useConfigValue,
+} from "../config";
 import { WidgetEditorContext } from "../context/WidgetEditorContext";
 
-export const ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
-  const config = widgetEditorForm.values.widgetConfig || {};
+export const ImageConfigEditor = ({ stateTree }) => {
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
-  const { fileUpload } = useContext(WidgetEditorContext);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef(null);
+  const { fileUpload } = useContext(WidgetEditorContext) || {};
+  const [src, setSrc] = useConfigValue("src", "");
+  const [alt, setAlt] = useConfigValue("alt", "");
+  const [objectFit, setObjectFit] = useConfigValue("objectFit", "cover");
+  const [objectPosition, setObjectPosition] = useConfigValue("objectPosition", "center");
+  const [borderRadius, setBorderRadius] = useConfigValue("borderRadius", "none");
+  const [aspectRatio, setAspectRatio] = useConfigValue("aspectRatio", "");
+  const [caption, setCaption] = useConfigValue("caption", "");
+  const [fallbackSrc, setFallbackSrc] = useConfigValue("fallbackSrc", "");
+  const [lazy, setLazy] = useConfigValue("lazy", true);
+  const [lightbox, setLightbox] = useConfigValue("lightbox", false);
+  const [showBorder, setShowBorder] = useConfigValue("showBorder", false);
+  const [isLoading, setIsLoading] = useConfigValue("isLoading", "");
+  const [uploading, setUploading] = useState(false);
+  const inputRef = useRef(null);
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const upload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file || !fileUpload?.uploadFile) return;
     try {
-      setIsUploading(true);
-      const res = await fileUpload.uploadFile(file);
-      if (res && res.url) {
-        widgetEditorForm.setFieldValue("widgetConfig.src", res.url);
-      }
-    } catch (err) {
-      console.error("Upload failed", err);
+      setUploading(true);
+      const result = await fileUpload.uploadFile(file);
+      if (result?.url) setSrc(result.url);
     } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
     }
   };
 
   return (
-    <div className="space-y-2">
-      {/* Image Source */}
-      <div className="space-y-3">
-        <div>
-          <input
-            type="file"
-            ref={fileInputRef}
-            className="hidden"
-            accept="image/*"
-            onChange={handleFileUpload}
-          />
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full h-9 text-xs flex items-center justify-center"
-            disabled={isUploading}
-            onClick={(e) => {
-              e.preventDefault();
-              fileInputRef.current?.click();
-            }}
-          >
-            {isUploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
-            Upload Image
+    <>
+      <ConfigSection id="image-content" title="Image" tab="content">
+        <ConfigField label="Source" path="src">
+          <BindableInput value={src} onChange={setSrc} liveStateTree={liveStateTree} placeholder="https://… or {{ state.queries.user.data.avatar }}" />
+        </ConfigField>
+        <div className="flex items-center gap-2">
+          <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={upload} />
+          <Button type="button" variant="outline" size="sm" className="h-7 text-[11px]" disabled={uploading || !fileUpload} onClick={() => inputRef.current?.click()}>
+            {uploading ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Upload className="mr-1 h-3 w-3" />}
+            Upload image
           </Button>
+          <span className="text-[10px] text-muted-foreground">Or paste a URL/binding above.</span>
         </div>
+        <ConfigField label="Alt text" path="alt" htmlFor="image-alt" helper="Required for informative images. Leave empty only for decoration.">
+          <Input id="image-alt" value={alt ?? ""} onChange={(event) => setAlt(event.target.value)} placeholder="Profile photo" className="h-8 text-xs" />
+        </ConfigField>
+        <ConfigField label="Caption" path="caption">
+          <BindableInput value={caption} onChange={setCaption} liveStateTree={liveStateTree} placeholder="Optional caption" />
+        </ConfigField>
+        <ConfigField label="Fallback source" path="fallbackSrc" helper="Shown when the primary image fails to load.">
+          <BindableInput value={fallbackSrc} onChange={setFallbackSrc} liveStateTree={liveStateTree} placeholder="Fallback URL" />
+        </ConfigField>
+      </ConfigSection>
 
-        <div className="space-y-1 w-full min-w-0 overflow-hidden">
-          <Label className="text-xs font-medium text-foreground">Image URL / Source</Label>
-          <div className="w-full min-w-0">
-            <TemplateAutocompleteInput
-              value={config.src || ""}
-              onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.src", val)}
-              placeholder="e.g. {{state.queries.user.data.avatar_url}}"
-              liveStateTree={liveStateTree}
+      <ConfigSection id="image-style" title="Fit & frame" tab="style">
+        <div className="grid grid-cols-2 gap-2">
+          <ConfigField label="Object fit" path="objectFit" defaultValue="cover">
+            <SegmentedControl
+              ariaLabel="Object fit"
+              value={objectFit || "cover"}
+              onChange={setObjectFit}
+              options={[
+                { value: "cover", label: "Cover" },
+                { value: "contain", label: "Contain" },
+                { value: "fill", label: "Fill" },
+              ]}
             />
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Supports template expressions for dynamic content.
-          </p>
+          </ConfigField>
+          <ConfigField label="Object position" path="objectPosition" defaultValue="center" htmlFor="image-position">
+            <Input id="image-position" value={objectPosition ?? ""} onChange={(event) => setObjectPosition(event.target.value)} placeholder="center" className="h-8 font-mono text-xs" />
+          </ConfigField>
         </div>
-      </div>
-
-      {/* Alternative Text */}
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Alt Text (Accessibility)</Label>
-        <Input
-          type="text"
-          className="text-sm"
-          value={config.alt || ""}
-          onChange={(e) => widgetEditorForm.setFieldValue("widgetConfig.alt", e.target.value)}
-          placeholder="e.g. Profile photo"
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-2">
-        {/* Object Fit */}
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-foreground">Object Fit</Label>
-          <Select
-            value={config.objectFit || "cover"}
-            onValueChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.objectFit", val)}
-          >
-            <SelectTrigger className="text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="cover">Cover (crop to fit)</SelectItem>
-              <SelectItem value="contain">Contain (show all)</SelectItem>
-              <SelectItem value="fill">Fill (stretch)</SelectItem>
-              <SelectItem value="none">Original Size</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="grid grid-cols-2 gap-2">
+          <ConfigField label="Corner radius" path="borderRadius" defaultValue="none">
+            <SegmentedControl
+              ariaLabel="Corner radius"
+              value={borderRadius || "none"}
+              onChange={setBorderRadius}
+              options={[
+                { value: "none", label: "0" },
+                { value: "sm", label: "6" },
+                { value: "md", label: "8" },
+                { value: "lg", label: "12" },
+              ]}
+            />
+          </ConfigField>
+          <ConfigField label="Aspect ratio" path="aspectRatio" htmlFor="image-aspect" helper="e.g. 16 / 9 or 1 / 1.">
+            <Input id="image-aspect" value={aspectRatio ?? ""} onChange={(event) => setAspectRatio(event.target.value)} placeholder="auto" className="h-8 font-mono text-xs" />
+          </ConfigField>
         </div>
-
-        {/* Border Radius */}
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-foreground">Corner Radius</Label>
-          <Select
-            value={config.borderRadius || "none"}
-            onValueChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.borderRadius", val)}
-          >
-            <SelectTrigger className="text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">Square (None)</SelectItem>
-              <SelectItem value="sm">Small</SelectItem>
-              <SelectItem value="md">Medium</SelectItem>
-              <SelectItem value="lg">Large</SelectItem>
-              <SelectItem value="full">Circle (Full)</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="grid grid-cols-3 gap-3">
+          <ConfigField label="Border" path="showBorder" defaultValue={false} inline>
+            <Switch checked={!!showBorder} onCheckedChange={setShowBorder} aria-label="Show border" />
+          </ConfigField>
+          <ConfigField label="Lazy load" path="lazy" defaultValue={true} inline>
+            <Switch checked={lazy !== false} onCheckedChange={setLazy} aria-label="Lazy load" />
+          </ConfigField>
+          <ConfigField label="Lightbox" path="lightbox" defaultValue={false} inline>
+            <Switch checked={!!lightbox} onCheckedChange={setLightbox} aria-label="Lightbox" />
+          </ConfigField>
         </div>
-      </div>
+      </ConfigSection>
 
-      {/* Is Loading Template */}
-      <div className="space-y-1 mt-2">
-        <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
-        <TemplateAutocompleteInput
-          value={config.isLoading || ""}
-          onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.isLoading', val)}
-          placeholder="e.g. {{ state.queries.myQuery.isLoading }}"
-          liveStateTree={liveStateTree}
-        />
-      </div>
-    </div>
+      <ConfigSection id="image-behavior" title="State" tab="behavior">
+        <ConfigField label="Loading template" path="isLoading">
+          <BindableInput value={isLoading} onChange={setIsLoading} liveStateTree={liveStateTree} placeholder="e.g. {{ state.queries.q.isLoading }}" />
+        </ConfigField>
+      </ConfigSection>
+    </>
   );
 };
 
-ImageConfigEditor.propTypes = {
-  widgetEditorForm: PropTypes.object.isRequired,
-  stateTree: PropTypes.object,
-};
-
+ImageConfigEditor.propTypes = { widgetEditorForm: PropTypes.object, stateTree: PropTypes.object };
+ImageConfigEditor.usesConfigKit = true;
 export default ImageConfigEditor;

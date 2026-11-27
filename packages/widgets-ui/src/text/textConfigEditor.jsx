@@ -1,105 +1,117 @@
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
-import { Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
-import { TemplateAutocompleteInput } from "@jet-admin/ui";
+import { Input } from "@jet-admin/ui";
+import {
+  ConfigSection,
+  ConfigField,
+  BindableInput,
+  ColorField,
+  ConditionalStyleField,
+  SegmentedControl,
+  useConfigValue,
+} from "../config";
 
-export const TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
-  const config = widgetEditorForm.values.widgetConfig || {};
-  // Wrap so {{ state.X }} paths resolve correctly inside the JS sandbox
+export const TextConfigEditor = ({ stateTree }) => {
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
+  const [content, setContent] = useConfigValue("content", "");
+  const [format, setFormat] = useConfigValue("format", "markdown");
+  const [preset, setPreset] = useConfigValue("preset", "body");
+  const [textAlign, setTextAlign] = useConfigValue("textAlign", "left");
+  const [color, setColor] = useConfigValue("color", "");
+  const [lineClamp, setLineClamp] = useConfigValue("lineClamp", "");
+  const [styleRules, setStyleRules] = useConfigValue("styleRules", { logic: "and", rules: [], style: {} });
+  const [isLoading, setIsLoading] = useConfigValue("isLoading", "");
 
   return (
-    <div className="space-y-2">
-      {/* Content */}
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Content</Label>
-        <p className="text-xs text-muted-foreground leading-snug">
-          Supports Markdown formatting and <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]">{"{{expression}}"}</code> templates. Full JS expressions supported.
-        </p>
-        <TemplateAutocompleteInput
-          isTextArea={true}
-          className=""
-          value={config.content || ""}
-          onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.content", val)}
-          placeholder={"# Heading\n\nSome **bold** and *italic* text.\n\nValue: {{ state.queries.myQuery.data[0].name }}"}
-          liveStateTree={liveStateTree}
-        />
-      </div>
+    <>
+      <ConfigSection id="text-content" title="Content" tab="content">
+        <ConfigField label="Content" path="content" helper="Markdown and {{ expressions }} are supported.">
+          <BindableInput
+            value={content}
+            onChange={setContent}
+            liveStateTree={liveStateTree}
+            multiline
+            rows={6}
+            placeholder={"# Heading\n\nSome **bold** text.\n\nValue: {{ state.queries.myQuery.data[0].name }}"}
+          />
+        </ConfigField>
+        <ConfigField label="Format" path="format" defaultValue="markdown">
+          <SegmentedControl
+            ariaLabel="Text format"
+            value={format || "markdown"}
+            onChange={setFormat}
+            options={[
+              { value: "markdown", label: "Markdown" },
+              { value: "plain", label: "Plain" },
+            ]}
+          />
+        </ConfigField>
+      </ConfigSection>
 
-      {/* Is Loading Template */}
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
-        <TemplateAutocompleteInput
-          value={config.isLoading || ""}
-          onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.isLoading", val)}
-          placeholder="e.g. {{ state.queries.myQuery.isLoading }}"
-          liveStateTree={liveStateTree}
-        />
-      </div>
-
-      <div className="grid grid-cols-3 gap-2">
-        {/* Format */}
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-foreground">Format</Label>
-          <Select
-            value={config.format || "markdown"}
-            onValueChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.format", val)}
-          >
-            <SelectTrigger className="text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="markdown">Markdown</SelectItem>
-              <SelectItem value="plain">Plain Text</SelectItem>
-            </SelectContent>
-          </Select>
+      <ConfigSection id="text-style" title="Typography" tab="style">
+        <ConfigField label="Preset" path="preset" defaultValue="body">
+          <SegmentedControl
+            ariaLabel="Text preset"
+            value={preset || "body"}
+            onChange={setPreset}
+            options={[
+              { value: "heading", label: "Heading" },
+              { value: "body", label: "Body" },
+              { value: "caption", label: "Caption" },
+            ]}
+          />
+        </ConfigField>
+        <div className="grid grid-cols-2 gap-2">
+          <ConfigField label="Alignment" path="textAlign" defaultValue="left">
+            <SegmentedControl
+              ariaLabel="Text alignment"
+              value={textAlign || "left"}
+              onChange={setTextAlign}
+              options={[
+                { value: "left", label: "Left" },
+                { value: "center", label: "Center" },
+                { value: "right", label: "Right" },
+              ]}
+            />
+          </ConfigField>
+          <ConfigField label="Line clamp" path="lineClamp" htmlFor="text-line-clamp" helper="Empty shows all lines.">
+            <Input
+              id="text-line-clamp"
+              type="number"
+              min={1}
+              max={20}
+              value={lineClamp ?? ""}
+              onChange={(event) => setLineClamp(event.target.value === "" ? "" : Number(event.target.value))}
+              placeholder="∞"
+              className="h-8 text-xs"
+            />
+          </ConfigField>
         </div>
+        <ConfigField label="Text color" path="color">
+          <ColorField value={color} onChange={setColor} label="Text" />
+        </ConfigField>
+        <details className="rounded-control border border-border/60 bg-muted/20 p-1.5">
+          <summary className="cursor-pointer text-[10px] text-muted-foreground">Conditional style</summary>
+          <div className="mt-1.5">
+            <ConditionalStyleField
+              value={styleRules}
+              onChange={setStyleRules}
+              fields={["value", "state.variables.status"]}
+              emptyLabel="No rules — use the typography defaults."
+            />
+          </div>
+        </details>
+      </ConfigSection>
 
-        {/* Text Align */}
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-foreground">Align</Label>
-          <Select
-            value={config.textAlign || "left"}
-            onValueChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.textAlign", val)}
-          >
-            <SelectTrigger className="text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="left">Left</SelectItem>
-              <SelectItem value="center">Center</SelectItem>
-              <SelectItem value="right">Right</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Font Size */}
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-foreground">Size</Label>
-          <Select
-            value={config.fontSize || "sm"}
-            onValueChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.fontSize", val)}
-          >
-            <SelectTrigger className="text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="xs">Extra Small</SelectItem>
-              <SelectItem value="sm">Small</SelectItem>
-              <SelectItem value="md">Medium</SelectItem>
-              <SelectItem value="lg">Large</SelectItem>
-              <SelectItem value="xl">Extra Large</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-    </div>
+      <ConfigSection id="text-behavior" title="State" tab="behavior">
+        <ConfigField label="Loading template" path="isLoading">
+          <BindableInput value={isLoading} onChange={setIsLoading} liveStateTree={liveStateTree} placeholder="e.g. {{ state.queries.q.isLoading }}" />
+        </ConfigField>
+      </ConfigSection>
+    </>
   );
 };
 
-TextConfigEditor.propTypes = {
-  widgetEditorForm: PropTypes.object.isRequired,
-  stateTree: PropTypes.object,
-};
-
+TextConfigEditor.propTypes = { widgetEditorForm: PropTypes.object, stateTree: PropTypes.object };
+TextConfigEditor.usesConfigKit = true;
 export default TextConfigEditor;

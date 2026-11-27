@@ -28,6 +28,7 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@faker-js/faker": "^9.5.1",
+    "@jet-admin/application-contracts": "^1.0.0",
     "@jet-admin/datasource-types": "^1.0.0",
     "@jet-admin/datasources-ui": "^1.0.0",
     "@jet-admin/expression-engine": "^1.0.0",
@@ -128,6 +129,7 @@
     "globals": "^15.15.0",
     "postcss": "^8.4.47",
     "puppeteer-core": "25.13.0",
+    "react-test-renderer": "^18.3.1",
     "tailwindcss": "^3.4.14",
     "vite": "^5.4.10"
   }

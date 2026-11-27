@@ -845,6 +845,27 @@ export const CONSTANTS = {
       path: (tenantID) => `/tenants/${tenantID}/app-pages`,
       title: "App Pages",
     },
+    VIEW_APPLICATIONS: {
+      code: "/tenants/:tenantID/applications",
+      path: tenantID => `/tenants/${tenantID}/applications`,
+      title: "Applications",
+    },
+    APPLICATION_STUDIO: {
+      code: "/tenants/:tenantID/applications/:applicationID",
+      path: (tenantID, applicationID) => `/tenants/${tenantID}/applications/${applicationID}`,
+      title: "Application Studio",
+    },
+    APPLICATION_PREVIEW: {
+      code: "/tenants/:tenantID/applications/:applicationID/preview/*",
+      path: (tenantID, applicationID) => `/tenants/${tenantID}/applications/${applicationID}/preview`,
+      title: "Application Preview",
+    },
+    APPLICATION_RUNTIME: {
+      code: "/tenants/:tenantID/applications/:applicationID/run/:environment/*",
+      path: (tenantID, applicationID, environment = "production") =>
+        `/tenants/${tenantID}/applications/${applicationID}/run/${environment}`,
+      title: "Application Runtime",
+    },
     UPDATE_APP_PAGE_BY_ID: {
       code: "/tenants/:tenantID/app-pages/:appPageID",
       path: (tenantID, appPageID) =>
@@ -1165,6 +1186,14 @@ export const CONSTANTS = {
       getAuthUrlAPI: (provider, tenantID) =>
         `/api/v1/oauth/${provider}/auth/${tenantID}`,
     },
+    ASSET_VERSION: {
+      getVersionsAPI: (tenantID, assetType, assetID) =>
+        `/api/v1/tenants/${tenantID}/asset-versions/${assetType}/${assetID}/versions`,
+      getVersionImpactAPI: (tenantID, assetType, assetID, versionID) =>
+        `/api/v1/tenants/${tenantID}/asset-versions/${assetType}/${assetID}/versions/${versionID}/impact`,
+      createVersionAPI: (tenantID, assetType, assetID) =>
+        `/api/v1/tenants/${tenantID}/asset-versions/${assetType}/${assetID}/versions`,
+    },
     DATASOURCE: {
       getAllDatasourcesAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/datasources`,
@@ -1325,6 +1354,9 @@ export const CONSTANTS = {
     LISTENERS: (tenantID) => `${tenantID}-LISTENERS`,
 
     DATASOURCES: (tenantID) => `${tenantID}-DATASOURCES`,
+
+    ASSET_VERSIONS: (tenantID, assetType, assetID) =>
+      ["asset-versions", tenantID, assetType, assetID],
 
     QUERIES: (tenantID) => `${tenantID}-QUERIES`,
 
@@ -1658,6 +1690,11 @@ export const CONSTANTS = {
     WORKFLOW_ADDITION_FORM_QUERY_EDITOR_SEPARATION:
       "WORKFLOW_ADDITION_FORM_QUERY_EDITOR_SEPARATION",
     MAIN_DRAWER_LIST_SEPARATION: "MAIN_DRAWER_LIST_SEPARATION",
+    APPLICATION_LAYOUT_SEPARATION: "APPLICATION_LAYOUT_SEPARATION",
+    APPLICATION_STUDIO_EDITOR_PREVIEW_SEPARATION:
+      "APPLICATION_STUDIO_EDITOR_PREVIEW_SEPARATION",
+    APPLICATION_STUDIO_PREVIEW_JSON_SEPARATION:
+      "APPLICATION_STUDIO_PREVIEW_JSON_SEPARATION",
     WORKFLOW_LAYOUT_SEPARATION: "WORKFLOW_LAYOUT_SEPARATION",
     QUERY_ADDITION_FORM_RESULT_SEPARATION:
       "QUERY_ADDITION_FORM_RESULT_SEPARATION",
@@ -1729,6 +1766,10 @@ export const CONSTANTS = {
     APP_PAGE_UPDATE_EDITOR_PANEL: "app-page-update-editor-panel",
     APP_PAGE_UPDATE_DROPZONE_PANEL: "app-page-update-dropzone-panel",
     APP_PAGE_UPDATE_CONSOLE_PANEL: "app-page-update-console-panel",
+    APPLICATION_STUDIO_EDITOR_PANEL: "application-studio-editor-panel",
+    APPLICATION_STUDIO_PREVIEW_PANEL: "application-studio-preview-panel",
+    APPLICATION_STUDIO_PREVIEW_TOP_PANEL: "application-studio-preview-top-panel",
+    APPLICATION_STUDIO_JSON_PANEL: "application-studio-json-panel",
   },
 
   PG_TRIGGER_FORM_TIMING_OPTIONS: ["BEFORE", "AFTER", "INSTEAD OF"],
