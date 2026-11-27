@@ -22,18 +22,21 @@ The build output is written to `docs/build`.
 
 ## Deploy to GitHub Pages
 
-The site uses the `gh-pages` branch:
+Pushing to `master` triggers `.github/workflows/deploy.yml`, which:
 
-```bash
-cd docs
-npm run build
-npm run deploy
-```
+1. installs dependencies with `npm ci --legacy-peer-deps`;
+2. builds the site;
+3. uploads `docs/build` as a GitHub Pages artifact;
+4. deploys the artifact with `actions/deploy-pages`.
 
-The GitHub Actions workflow in `.github/workflows/deploy.yml` also builds and
-publishes `docs/build` to the `gh-pages` branch on every push to `master`.
+The repository's **Settings → Pages → Build and deployment → Source** must be set
+to **GitHub Actions**. The workflow can also be started manually with
+`workflow_dispatch`.
 
 Production URL: <https://jet-labs.github.io/jet-admin/>
+
+The legacy `npm run deploy` script publishes the local `build` directory to the
+`gh-pages` branch. It is not used by the current Pages deployment.
 
 ## Structure
 
