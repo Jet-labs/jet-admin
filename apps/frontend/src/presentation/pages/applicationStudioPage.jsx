@@ -465,6 +465,7 @@ function ApplicationStudioSession() {
           subtitle="Unable to load this application"
           onBack={() => navigate(CONSTANTS.ROUTES.VIEW_APPLICATIONS.path(tenantID))}
           backLabel="Back to Applications"
+          backText="Apps"
           focusMode={focusMode}
           onToggleFocus={() => setFocusMode((value) => !value)}
           actions={
@@ -496,8 +497,8 @@ function ApplicationStudioSession() {
         subtitle={`Application Studio | Draft revision ${app.draft.revision}${dirty ? " | Unsaved changes" : ""}`}
         badge={
           <Badge
-            variant={archived ? "secondary" : "outline"}
-            className="h-4 px-1 text-[9px]"
+            variant={archived ? "secondary" : dirty ? "secondary" : "outline"}
+            className={`h-5 px-1.5 text-[10px] ${dirty && !archived ? "border-amber-500/40 bg-amber-500/10 text-amber-300" : ""}`}
             title="Draft changes do not affect deployed releases until you publish and deploy a new release."
           >
             {archived ? "Archived" : dirty ? "Unsaved" : "Draft"}
@@ -505,6 +506,7 @@ function ApplicationStudioSession() {
         }
         onBack={() => navigate(CONSTANTS.ROUTES.VIEW_APPLICATIONS.path(tenantID))}
         backLabel="Back to Applications"
+        backText="Apps"
         focusMode={focusMode}
         onToggleFocus={() => setFocusMode((value) => !value)}
         actions={
@@ -581,11 +583,12 @@ function ApplicationStudioSession() {
               >
                 <div className="h-full overflow-y-auto pr-1">
         <div className="space-y-2">
-          <Callout icon={Info}>
-            Composition preview does not execute data sources. Publishing captures
-            changed page and dependency versions and deploys a thin release to production;
-            queries and workflows execute as configured, and buffered listeners can be
-            observed. Referenced pages stay shared; managed copies isolate page edits.
+          <Callout
+            icon={Info}
+            className="p-2 text-[10px] leading-snug"
+            title="Composition preview does not execute data sources. Publishing captures changed page and dependency versions; queries and workflows execute as configured; buffered listeners can be observed. Referenced pages stay shared; managed copies isolate page edits."
+          >
+            Preview is layout-only. Publishing captures page versions; queries and workflows run at runtime.
           </Callout>
           <ApplicationFeedback
             error={

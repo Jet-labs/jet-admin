@@ -676,11 +676,17 @@ button {
    ------------------------------------------------------------------------- */
 html.editor-focus .global-nav,
 html.editor-focus .main-navigation,
-html.editor-focus .main-navigation-handle {
+html.editor-focus .main-navigation-handle,
+html.editor-focus .app-page-navigation,
+html.editor-focus .app-page-navigation-handle,
+html.editor-focus .application-navigation,
+html.editor-focus .application-navigation-handle {
   display: none !important;
 }
 
-html.editor-focus .main-content-panel {
+html.editor-focus .main-content-panel,
+html.editor-focus .app-page-content,
+html.editor-focus .application-content {
   flex: 1 1 100% !important;
   max-width: 100% !important;
 }

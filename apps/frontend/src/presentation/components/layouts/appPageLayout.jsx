@@ -18,11 +18,11 @@ export const AppPageLayout = () => {
         }
         className="h-full w-full"
       >
-        <ResizablePanel defaultSize={20} className="max-md:hidden">
+        <ResizablePanel defaultSize={20} className="max-md:hidden app-page-navigation">
           <AppPageDrawerList />
         </ResizablePanel>
-        <ResizableHandle withHandle={true} className="max-md:hidden" />
-        <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
+        <ResizableHandle withHandle={true} className="max-md:hidden app-page-navigation-handle" />
+        <ResizablePanel defaultSize={80} className="app-page-content overflow-hidden bg-background">
           <Outlet />
         </ResizablePanel>
       </ResizablePanelGroup>

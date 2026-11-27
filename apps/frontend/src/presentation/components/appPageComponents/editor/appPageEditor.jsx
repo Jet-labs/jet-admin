@@ -2,6 +2,7 @@ import { CONSTANTS } from "../../../../constants";
 import React from "react";
 import PropTypes from "prop-types";
 import { Input, Label, Tabs, TabsContent, TabsList, TabsTrigger } from "@jet-admin/ui";
+import { Braces, Database, History, LayoutGrid, Settings } from "lucide-react";
 import { AppPageWidgetList } from "./appPageWidgetList";
 import { AppPageWidgetVersionsEditor } from "./appPageWidgetVersionsEditor";
 import { AppPageDataSourcesEditor } from "./appPageDataSourcesEditor";
@@ -64,12 +65,27 @@ export const AppPageEditor = ({
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-background">
       <Tabs defaultValue="widgets" className="flex flex-col h-full w-full">
-        <TabsList className="w-full justify-start overflow-x-auto">
-          <TabsTrigger value="widgets" className="shrink-0 text-[11px] font-semibold p-2">Widgets</TabsTrigger>
-          <TabsTrigger value="widget-versions" className="shrink-0 text-[11px] font-semibold p-2">Widget versions</TabsTrigger>
-          <TabsTrigger value="datasources" className="shrink-0 text-[11px] font-semibold p-2">Data</TabsTrigger>
-          <TabsTrigger value="variables" className="shrink-0 text-[11px] font-semibold p-2">Vars</TabsTrigger>
-          <TabsTrigger value="settings" className="shrink-0 text-[11px] font-semibold p-2">Settings</TabsTrigger>
+        <TabsList className="grid h-auto w-full grid-cols-5 gap-0.5 p-1">
+          <TabsTrigger value="widgets" className="flex min-w-0 flex-col gap-1 px-0.5 py-1.5 text-[9px] font-medium leading-none" title="Widgets">
+            <LayoutGrid className="h-3.5 w-3.5" />
+            <span className="w-full truncate text-center">Widgets</span>
+          </TabsTrigger>
+          <TabsTrigger value="widget-versions" className="flex min-w-0 flex-col gap-1 px-0.5 py-1.5 text-[9px] font-medium leading-none" title="Widget versions">
+            <History className="h-3.5 w-3.5" />
+            <span className="w-full truncate text-center">Versions</span>
+          </TabsTrigger>
+          <TabsTrigger value="datasources" className="flex min-w-0 flex-col gap-1 px-0.5 py-1.5 text-[9px] font-medium leading-none" title="Data sources">
+            <Database className="h-3.5 w-3.5" />
+            <span className="w-full truncate text-center">Data</span>
+          </TabsTrigger>
+          <TabsTrigger value="variables" className="flex min-w-0 flex-col gap-1 px-0.5 py-1.5 text-[9px] font-medium leading-none" title="Page variables">
+            <Braces className="h-3.5 w-3.5" />
+            <span className="w-full truncate text-center">Vars</span>
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="flex min-w-0 flex-col gap-1 px-0.5 py-1.5 text-[9px] font-medium leading-none" title="Page settings">
+            <Settings className="h-3.5 w-3.5" />
+            <span className="w-full truncate text-center">Settings</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="widgets" className="flex-1 min-h-0 m-0 data-[state=active]:flex data-[state=active]:flex-col data-[state=inactive]:hidden overflow-hidden">

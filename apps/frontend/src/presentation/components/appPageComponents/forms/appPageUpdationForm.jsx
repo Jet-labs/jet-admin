@@ -30,7 +30,7 @@ import { AppPageRuntimeProvider } from "../../../../logic/appPageRuntime/AppPage
 import { AppPageDataSourceBootstrapper } from "../editor/appPageDataSourceBootstrapper";
 import { AppPageWorkflowInputHost } from '../appPageWorkflowInputHost';
 
-import { Badge, Button } from "@jet-admin/ui";
+import { Button } from "@jet-admin/ui";
 import { BundleExportButton } from "../../bundleComponents/bundleExportButton";
 import { AssetVersionsButton } from "../../assetVersionComponents/assetVersionsButton";
 import { EditorTopBar } from "../../editorShell/editorTopBar";
@@ -64,7 +64,17 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
   const navigate = useNavigate();
   const [focusMode, setFocusMode] = useEditorFocusMode();
   const consolePanelRef = useRef(null);
-  const [consoleCollapsed, setConsoleCollapsed] = useState(false);
+  const [consoleCollapsed, setConsoleCollapsed] = useState(true);
+  const toggleConsole = () => {
+    const nextCollapsed = !consoleCollapsed;
+    setConsoleCollapsed(nextCollapsed);
+    if (nextCollapsed) {
+      consolePanelRef.current?.collapse();
+    } else {
+      consolePanelRef.current?.expand();
+      consolePanelRef.current?.resize(18);
+    }
+  };
   const { showConfirmation } = useGlobalUI();
   const [searchParams] = useSearchParams();
   const linkedApplicationID = searchParams.get("applicationId");
@@ -265,18 +275,21 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
         title={appPageUpdationForm.values.appPageTitle || appPage?.appPageTitle || "App page"}
         subtitle={`Page Builder · ID ${String(appPageID).slice(0, 8)}`}
         badge={
-          <Badge
-            variant={historyIndex > 0 ? "outline" : "secondary"}
-            className="h-4 px-1 text-[9px]"
+          <span
+            className={`inline-flex h-5 items-center gap-1 rounded-full border px-1.5 text-[10px] font-medium ${
+              historyIndex > 0
+                ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
+                : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+            }`}
             title="Saving this page updates the working page and its editor history only. Deployed Applications keep their captured page and data-source versions until you publish a new release."
           >
-            {historyIndex > 0
-              ? `${historyIndex} unsaved change${historyIndex > 1 ? "s" : ""}`
-              : "Saved"}
-          </Badge>
+            <span className={`h-1.5 w-1.5 rounded-full ${historyIndex > 0 ? "bg-amber-400" : "bg-emerald-400"}`} />
+            {historyIndex > 0 ? `${historyIndex} unsaved` : "Saved"}
+          </span>
         }
         onBack={() => navigate(CONSTANTS.ROUTES.VIEW_APP_PAGES.path(tenantID))}
         backLabel="Back to App Pages"
+        backText="Pages"
         focusMode={focusMode}
         onToggleFocus={() => setFocusMode((value) => !value)}
         actions={
@@ -408,20 +421,16 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
               <ResizablePanel
                 ref={consolePanelRef}
                 id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_UPDATE_CONSOLE_PANEL}
-                defaultSize={18}
-                minSize={10}
-                collapsedSize={5}
+                defaultSize={6}
+                minSize={6}
+                collapsedSize={6}
                 onCollapse={() => setConsoleCollapsed(true)}
                 onExpand={() => setConsoleCollapsed(false)}
                 className="overflow-hidden min-h-[40px] flex flex-col"
               >
                 <AppPageConsole
                   isCollapsed={consoleCollapsed}
-                  onToggleCollapse={() =>
-                    consolePanelRef.current?.[
-                      consoleCollapsed ? "expand" : "collapse"
-                    ]?.()
-                  }
+                  onToggleCollapse={toggleConsole}
                 />
               </ResizablePanel>
             </ResizablePanelGroup>

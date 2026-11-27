@@ -16,6 +16,7 @@ export const EditorTopBar = ({
   badge,
   onBack,
   backLabel = "Back",
+  backText,
   focusMode = false,
   onToggleFocus,
   actions,
@@ -23,7 +24,7 @@ export const EditorTopBar = ({
 }) => (
   <div
     className={cn(
-      "editor-top-bar flex h-12 shrink-0 items-center justify-between gap-2 border-b border-border bg-background px-2",
+      "editor-top-bar flex w-full h-12 shrink-0 items-center justify-between gap-2 border-b border-border bg-background px-2",
       className
     )}
   >
@@ -32,13 +33,14 @@ export const EditorTopBar = ({
         <Button
           type="button"
           variant="ghost"
-          size="icon"
-          className="h-8 w-8 shrink-0"
+          size={backText ? "sm" : "icon"}
+          className={cn("h-8 shrink-0 gap-1", backText ? "px-2" : "w-8")}
           onClick={onBack}
           aria-label={backLabel}
           title={backLabel}
         >
           <ChevronLeft className="h-4 w-4" />
+          {backText && <span className="ml-1 hidden text-xs sm:inline">{backText}</span>}
         </Button>
       )}
 
@@ -91,6 +93,7 @@ EditorTopBar.propTypes = {
   badge: PropTypes.node,
   onBack: PropTypes.func,
   backLabel: PropTypes.string,
+  backText: PropTypes.string,
   focusMode: PropTypes.bool,
   onToggleFocus: PropTypes.func,
   actions: PropTypes.node,

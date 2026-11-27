@@ -18,8 +18,8 @@ export const ApplicationLayout = () => (
       <ResizablePanel defaultSize={20} minSize={14} maxSize={32} className="max-md:hidden">
         <ApplicationDrawerList />
       </ResizablePanel>
-      <ResizableHandle withHandle className="max-md:hidden" />
-      <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
+      <ResizableHandle withHandle className="max-md:hidden application-navigation-handle" />
+      <ResizablePanel defaultSize={80} className="application-content overflow-hidden bg-background">
         <Outlet />
       </ResizablePanel>
     </ResizablePanelGroup>

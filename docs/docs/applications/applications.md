@@ -49,7 +49,7 @@ The runtime is deliberately thin. A release stores pointers to immutable page ve
 
 Open **Applications** in the sidebar, then choose an application or click **New application**. Creating one asks for a name and a lowercase slug (`orders-and-approvals`). The new application receives an empty draft definition and creator access.
 
-The Studio uses the same compact **48px editor top bar** as the Page Builder. Focus mode hides the global navigation and tenant drawer, and the preference is remembered. **Preview** and **Archive** live in the top bar and collapse into the overflow on narrow screens, leaving **Save draft** as the primary action. The `definition.json` footer starts smaller and can be resized.
+The Studio uses the same compact **48px editor top bar** as the Page Builder. Focus mode hides the global navigation, tenant drawer, and application list, and the preference is remembered. **Preview** and **Archive** live in the top bar and collapse into the overflow on narrow screens, leaving **Save draft** as the primary action. The `definition.json` footer starts smaller and can be resized.
 
 The Studio is a resizable three-pane workspace:
 

@@ -113,7 +113,7 @@ flowchart LR
 
 ![App Page editor with the widget palette, canvas, and properties panel](/img/screenshots/app-page-builder.png)
 
-The Page Builder uses a compact **48px editor top bar**: page name, save state, versions, duplicate/export/delete, design/preview toggle, and the primary **Update** action. Focus mode hides the global navigation and tenant drawer so the canvas gets the full viewport; the focus control in the top bar restores them, and the preference is remembered. The **Page data** console collapses to a status strip and expands on demand.
+The Page Builder uses a compact **48px editor top bar**: page name, save state, versions, duplicate/export/delete, design/preview toggle, and the primary **Update** action. Focus mode hides the global navigation, tenant drawer, and page list so the canvas gets the full viewport; the focus control in the top bar restores them, and the preference is remembered. The **Page data** console collapses to a status strip and expands on demand.
 
 A user opens the App Page editor, which presents a split-panel interface: a left sidebar (Widgets tab, Data tab, Variables tab, Settings tab) and a right canvas (the layout editor).
 
