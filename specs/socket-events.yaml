@@ -1,0 +1,308 @@
+asyncapi: 2.6.0
+info:
+  title: Jet Admin WebSocket API
+  version: 1.0.0
+  description: |
+    WebSocket API for Jet Admin backend, powered by Socket.IO.
+    
+    ## Namespaces
+    - `/` (Default): AI, Workflow, and Widget events
+    - `/monitor`: System monitoring events (RabbitMQ logs)
+    
+    ## Authentication
+    Socket connections are typically authenticated via handshake query parameters or auth tokens (implementation specific).
+
+servers:
+  dev:
+    url: http://localhost:3000
+    protocol: socket.io
+    description: Local Development Server
+
+channels:
+  # AI Module Channels
+  ai_chat_room_join:
+    description: Join an AI chat room for a specific user.
+    publish:
+      message:
+        name: JoinChatRoom
+        payload:
+          type: object
+          properties:
+            firebaseID:
+              type: string
+              description: User's Firebase ID
+  
+  ai_chat_room_id:
+    description: Response sending the Chat Room ID after joining.
+    subscribe:
+      message:
+        name: ChatRoomID
+        payload:
+          type: object
+          properties:
+            chatRoomID:
+              type: string
+              format: uuid
+
+  ai_chat_user_message:
+    description: User sends a message to the AI bot.
+    publish:
+      message:
+        name: UserMessage
+        payload:
+          type: object
+          properties:
+            message:
+              type: object
+              properties:
+                text:
+                  type: string
+                action:
+                  type: string
+                  enum: [approve, reject, test]
+            chatRoomID:
+              type: string
+              format: uuid
+            firebaseID:
+              type: string
+            tenantID:
+              type: string
+  
+  ai_chat_bot_message:
+    description: AI bot responds to the user.
+    subscribe:
+      message:
+        name: BotMessage
+        payload:
+          type: object
+          properties:
+            text:
+              type: string
+
+  # Workflow Module Channels
+  workflow_run_join:
+    description: Join a room to listen for updates on a specific workflow run.
+    publish:
+      message:
+        name: JoinWorkflowRun
+        payload:
+          type: object
+          properties:
+            runId:
+              type: string
+              format: uuid
+            firebaseID:
+              type: string
+
+  workflow_node_update:
+    description: Real-time update when a workflow node finishes execution.
+    subscribe:
+      message:
+        name: NodeUpdate
+        payload:
+          type: object
+          properties:
+            instanceID:
+              type: string
+              format: uuid
+            nodeID:
+              type: string
+            status:
+              type: string
+              enum: [success, failed]
+            output:
+              type: object
+            error:
+              type: string
+
+  workflow_status_update:
+    description: Notification when the entire workflow execution finishes.
+    subscribe:
+      message:
+        name: WorkflowStatusUpdate
+        payload:
+          type: object
+          properties:
+            instanceID:
+              type: string
+              format: uuid
+            status:
+              type: string
+              enum: [COMPLETED, FAILED]
+            contextData:
+              type: object
+
+  # Widget Module Channels (Widget-Workflow Bridge)
+  widget_workflow_connect:
+    description: Connect a widget to a workflow instance (start new, subscribe, or replay).
+    publish:
+      message:
+        name: ConnectWidget
+        payload:
+          type: object
+          properties:
+            widgetID:
+              type: string
+              format: uuid
+            workflowID:
+              type: string
+              format: uuid
+            mode:
+              type: string
+              enum: [execute, subscribe, replay]
+            inputParams:
+              type: object
+            instanceID:
+              type: string
+              format: uuid
+            tenantID:
+              type: string
+            firebaseID:
+              type: string
+            widgetType:
+              type: string
+            datasetFields:
+              type: object
+            parameters:
+              type: object
+
+  widget_workflow_connected:
+    description: Confirmation that widget is successfully connected.
+    subscribe:
+      message:
+        name: WidgetConnected
+        payload:
+          type: object
+          properties:
+            widgetID:
+              type: string
+              format: uuid
+            instanceID:
+              type: string
+              format: uuid
+            workflowID:
+              type: string
+              format: uuid
+            mode:
+              type: string
+            initialContext:
+              type: object
+            processedData:
+              type: object
+            workflowMeta:
+              type: object
+
+  widget_send_input:
+    description: Send interactive input from a widget to the running workflow.
+    publish:
+      message:
+        name: WidgetInput
+        payload:
+          type: object
+          properties:
+            widgetID:
+              type: string
+              format: uuid
+            instanceID:
+              type: string
+              format: uuid
+            inputType:
+              type: string
+            data:
+              type: object
+
+  widget_input_received:
+    description: Acknowledgment that widget input was received.
+    subscribe:
+      message:
+        name: InputReceived
+        payload:
+          type: object
+          properties:
+            widgetID:
+              type: string
+              format: uuid
+            instanceID:
+              type: string
+              format: uuid
+            inputType:
+              type: string
+            success:
+              type: boolean
+
+  widget_refresh:
+    description: Request to re-execute the workflow for a widget.
+    publish:
+      message:
+        name: WidgetRefresh
+        payload:
+          type: object
+          properties:
+            widgetID:
+              type: string
+              format: uuid
+            inputParams:
+              type: object
+            tenantID:
+              type: string
+
+  widget_workflow_disconnect:
+    description: Disconnect the widget from the workflow.
+    publish:
+      message:
+        name: DisconnectWidget
+        payload:
+          type: object
+          properties:
+            widgetID:
+              type: string
+              format: uuid
+  
+  widget_workflow_disconnected:
+    description: Confirmation of disconnection.
+    subscribe:
+      message:
+        name: WidgetDisconnected
+        payload:
+          type: object
+          properties:
+            widgetID:
+              type: string
+              format: uuid
+            success:
+              type: boolean
+
+  widget_workflow_error:
+    description: Error notification for widget operations.
+    subscribe:
+      message:
+        name: WidgetError
+        payload:
+          type: object
+          properties:
+            widgetID:
+              type: string
+              format: uuid
+            error:
+              type: object
+              properties:
+                code:
+                  type: string
+                message:
+                  type: string
+
+  # Monitor Module Channels (Namespace: /monitor)
+  /monitor#log:
+    description: System monitoring logs streamed via RabbitMQ (Monitor Namespace).
+    subscribe:
+      message:
+        name: MonitorLog
+        payload:
+          type: object
+          properties:
+            routingKey:
+              type: string
+            content:
+              type: object
+            timestamp:
+              type: integer

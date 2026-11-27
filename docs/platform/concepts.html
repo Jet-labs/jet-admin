@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-platform/concepts" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">Core Concepts | Jet Admin</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://jet-labs.github.io/jet-admin/img/docusaurus-social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://jet-labs.github.io/jet-admin/img/docusaurus-social-card.jpg"><meta data-rh="true" property="og:url" content="https://jet-labs.github.io/jet-admin/docs/platform/concepts"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Core Concepts | Jet Admin"><meta data-rh="true" name="description" content="The vocabulary behind Jet Admin — tenants, datasources, queries, listeners, workflows, pages, widgets, applications, routes, releases, versions, bundles, libraries, folders, state, events, and runtime environments."><meta data-rh="true" property="og:description" content="The vocabulary behind Jet Admin — tenants, datasources, queries, listeners, workflows, pages, widgets, applications, routes, releases, versions, bundles, libraries, folders, state, events, and runtime environments."><link data-rh="true" rel="icon" href="/jet-admin/img/logo.png"><link data-rh="true" rel="canonical" href="https://jet-labs.github.io/jet-admin/docs/platform/concepts"><link data-rh="true" rel="alternate" href="https://jet-labs.github.io/jet-admin/docs/platform/concepts" hreflang="en"><link data-rh="true" rel="alternate" href="https://jet-labs.github.io/jet-admin/docs/platform/concepts" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Core Concepts","item":"https://jet-labs.github.io/jet-admin/docs/platform/concepts"}]}</script><link rel="stylesheet" href="/jet-admin/assets/css/styles.60f35b6e.css">
+<script src="/jet-admin/assets/js/runtime~main.51fb6837.js" defer="defer"></script>
+<script src="/jet-admin/assets/js/main.d0b4428d.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>document.documentElement.setAttribute("data-theme","dark"),document.documentElement.setAttribute("data-theme-choice","dark"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/jet-admin/"><div class="navbar__logo"><img src="/jet-admin/img/logo.png" alt="Jet Admin Logo" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/jet-admin/img/logo.png" alt="Jet Admin Logo" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">Jet Admin</b></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/jet-admin/docs/introduction">Documentation</a><a class="navbar__item navbar__link" href="/jet-admin/docs/getting-started/quickstart">Quickstart</a><a class="navbar__item navbar__link" href="/jet-admin/docs/use-cases">Use cases</a><a class="navbar__item navbar__link" href="/jet-admin/docs/comparisons/market-comparison">Compare</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/Jet-labs/Jet-admin" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><div class="navbarSearchContainer_Bca1"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><aside class="theme-doc-sidebar-container docSidebarContainer_YfHR"><div class="sidebarViewport_aRkj"><div class="sidebar_njMd"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="true" href="/jet-admin/docs/introduction"><span title="Getting Started" class="categoryLinkLabel_W154">Getting Started</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/introduction"><span title="Introduction" class="linkLabel_WmDU">Introduction</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/getting-started/local-setup"><span title="Local Setup" class="linkLabel_WmDU">Local Setup</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/getting-started/quickstart"><span title="Quickstart" class="linkLabel_WmDU">Quickstart</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/getting-started/visual-tour"><span title="Visual Tour" class="linkLabel_WmDU">Visual Tour</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="true" href="/jet-admin/docs/tenants"><span title="Build" class="categoryLinkLabel_W154">Build</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/tenants"><span title="Tenants" class="linkLabel_WmDU">Tenants</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/data-source"><span title="Data Source" class="linkLabel_WmDU">Data Source</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/data-query"><span title="Data Query" class="linkLabel_WmDU">Data Query</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/listeners"><span title="Listeners" class="linkLabel_WmDU">Listeners</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/workflows"><span title="Workflows" class="linkLabel_WmDU">Workflows</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/app-pages-widgets"><span title="App Pages &amp; Widgets" class="linkLabel_WmDU">App Pages &amp; Widgets</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="true" tabindex="0" href="/jet-admin/docs/applications"><span title="Applications" class="categoryLinkLabel_W154">Applications</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/applications"><span title="Applications" class="linkLabel_WmDU">Applications</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/applications/navigation-and-shell"><span title="Navigation &amp; Shell" class="linkLabel_WmDU">Navigation &amp; Shell</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/applications/application-state"><span title="Application State" class="linkLabel_WmDU">Application State</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/applications/application-events"><span title="Application Events" class="linkLabel_WmDU">Application Events</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/applications/snippets-and-composites"><span title="Snippets &amp; Composites" class="linkLabel_WmDU">Snippets &amp; Composites</span></a></li></ul></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/identity-access-management"><span title="Identity &amp; Access Management" class="linkLabel_WmDU">Identity &amp; Access Management</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" href="/jet-admin/docs/platform/concepts"><span title="Platform" class="categoryLinkLabel_W154">Platform</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/jet-admin/docs/platform/concepts"><span title="Core Concepts" class="linkLabel_WmDU">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/platform/architecture"><span title="Platform Architecture" class="linkLabel_WmDU">Platform Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/platform/modules"><span title="Modules &amp; Package Map" class="linkLabel_WmDU">Modules &amp; Package Map</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/platform/feature-list"><span title="Feature Inventory" class="linkLabel_WmDU">Feature Inventory</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/platform/asset-versioning"><span title="Asset Versioning &amp; Releases" class="linkLabel_WmDU">Asset Versioning &amp; Releases</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/platform/folders"><span title="Folders" class="linkLabel_WmDU">Folders</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/platform/export-import-bundles"><span title="Export &amp; Import Bundles" class="linkLabel_WmDU">Export &amp; Import Bundles</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/platform/widget-library"><span title="Shared Widget Library" class="linkLabel_WmDU">Shared Widget Library</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/platform/limitations"><span title="Limitations" class="linkLabel_WmDU">Limitations</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="true" href="/jet-admin/docs/operations/configuration-reference"><span title="Operations" class="categoryLinkLabel_W154">Operations</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/operations/configuration-reference"><span title="Configuration Reference" class="linkLabel_WmDU">Configuration Reference</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/operations/deployment"><span title="Deployment" class="linkLabel_WmDU">Deployment</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/operations/observability"><span title="Observability" class="linkLabel_WmDU">Observability</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/operations/security"><span title="Security" class="linkLabel_WmDU">Security</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="true" href="/jet-admin/docs/developers/api-reference"><span title="Developers" class="categoryLinkLabel_W154">Developers</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/developers/api-reference"><span title="API Reference" class="linkLabel_WmDU">API Reference</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/developers/mcp-server"><span title="MCP Server" class="linkLabel_WmDU">MCP Server</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/developers/extending-widgets"><span title="Extending Widgets" class="linkLabel_WmDU">Extending Widgets</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/developers/contributing"><span title="Contributing" class="linkLabel_WmDU">Contributing</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="true" href="/jet-admin/docs/use-cases"><span title="Evaluate" class="categoryLinkLabel_W154">Evaluate</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/use-cases"><span title="Use Cases" class="linkLabel_WmDU">Use Cases</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/jet-admin/docs/comparisons/market-comparison"><span title="Market Comparison" class="linkLabel_WmDU">Market Comparison</span></a></li></ul></li></ul></nav></div></div></aside><main class="docMainContainer_TBSr"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_Z_bl" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/jet-admin/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_YNFT"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">Platform</span></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">Core Concepts</span></li></ul></nav><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Core Concepts</h1></header>
+<p>Jet Admin uses a small set of composable concepts. Most confusion comes from
+three overloaded words: <strong>datasource</strong> (connection vs page binding),
+<strong>release</strong> (platform build vs application release vs deployment), and
+<strong>runtime</strong> (browser runtime vs Temporal worker vs an application
+environment). This page defines each term and how the pieces fit.</p>
+<!-- -->
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="tenant">Tenant<a href="#tenant" class="hash-link" aria-label="Direct link to Tenant" title="Direct link to Tenant" translate="no">​</a></h2>
+<p>A <strong>tenant</strong> is the isolation boundary for data, configuration, and
+authorization. Each tenant has its own datasources, queries, workflows,
+widgets, app pages, listeners, cron jobs, folders, applications, asset
+versions, members, roles, API keys, and audit log stream.</p>
+<ul>
+<li class="">Every tenant-scoped API path starts with <code>/api/v1/tenants/:tenantID</code>.</li>
+<li class="">Membership is stored in <code>tblUsersTenantsRelationship</code>; users are global and
+can belong to multiple tenants.</li>
+<li class="">Permissions are evaluated by Casbin in the tenant domain (<code>r.dom = tenantID</code>).</li>
+<li class="">The <strong>operator</strong> realm is separate: platform operators manage deployment-wide
+registries and are not tenant members by virtue of being operators.</li>
+<li class="">The shared widget library, marketplace, and app-template catalog are
+deployment-global, even though their APIs are mounted under a tenant path for
+Casbin context.</li>
+</ul>
+<p>See <a class="" href="/jet-admin/docs/tenants">Tenants</a> and
+<a class="" href="/jet-admin/docs/identity-access-management">Identity &amp; Access Management</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="datasource">Datasource<a href="#datasource" class="hash-link" aria-label="Direct link to Datasource" title="Direct link to Datasource" translate="no">​</a></h2>
+<p>A <strong>datasource</strong> is a stored connection definition: a type (<code>postgresql</code>,
+<code>kafka</code>, <code>restapi</code>, <code>webhook</code>, …) plus encrypted connection options and
+credential references. It is owned by one tenant.</p>
+<ul>
+<li class="">45 connector types are registered in <code>@jet-admin/datasource-types</code> and
+implemented in <code>@jet-admin/datasources-logic</code>.</li>
+<li class="">13 of them expose listener/subscription forms: PostgreSQL, Firestore,
+MongoDB, GraphQL, RabbitMQ, Kafka, Redis, Webhook, MQTT, WebSocket, SSE,
+Syslog, and NATS.</li>
+<li class="">Datasource credentials are encrypted at rest and stripped from exports. A
+datasource bundle carries a structural template with
+<code>requiresReconnect: true</code>, not secrets.</li>
+<li class="">A datasource is not the same as a page data source <strong>binding</strong>. The binding
+is a page-level alias pointing at a query, workflow, or listener.</li>
+<li class="">Connection options are environment state, not part of an asset version&#x27;s
+definition hash. Rotating credentials does not create a new version.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="data-query">Data query<a href="#data-query" class="hash-link" aria-label="Direct link to Data query" title="Direct link to Data query" translate="no">​</a></h2>
+<p>A <strong>data query</strong> is a reusable, parameterized command executed against one
+datasource. The shape of <code>dataQueryOptions</code> is connector-specific: SQL text and
+args, a REST method/URL/body, a GraphQL document, a Kafka topic/message, and so
+on.</p>
+<ul>
+<li class="">Queries support <code>{{inputs.*}}</code> templates, resolved server-side before the
+connector is called.</li>
+<li class=""><code>runOnLoad</code> is a hint for consumers; execution is driven by the page,
+workflow, listener, cron job, or API caller.</li>
+<li class="">Queries are tenant-owned and can be cloned, folded, exported, and versioned.</li>
+<li class="">Execution is synchronous HTTP. There is no universal row limit, read-only
+mode, or cancellation token; use the datasource credential and connector
+limits as the safety boundary.</li>
+<li class="">Deleting a datasource cascades to dependent queries/listeners in the schema;
+version history is retained separately.</li>
+</ul>
+<p>See <a class="" href="/jet-admin/docs/data-query">Data Query</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="listener">Listener<a href="#listener" class="hash-link" aria-label="Direct link to Listener" title="Direct link to Listener" translate="no">​</a></h2>
+<p>A <strong>listener</strong> is a durable subscription or webhook endpoint attached to one
+datasource. Unlike a query, it is long-lived and reacts to inbound events.</p>
+<ul>
+<li class=""><code>listenerType</code> identifies the source (Kafka, MQTT, webhook, PostgreSQL
+notifications, etc.); <code>listenerConfig</code> holds source-specific settings.</li>
+<li class="">A listener is hard-bound to <code>datasourceID</code> (NOT NULL).</li>
+<li class=""><code>status</code> is <code>active</code> or <code>inactive</code>; activation registers the subscription in
+the listener-proxy.</li>
+<li class="">Webhook listeners get an <code>endpointPath</code> and can be called at
+<code>/webhooks/v1/inbound/:tenantID/:pathSuffix</code> or
+<code>/webhooks/v1/inbound/:listenerID</code>.</li>
+<li class=""><strong>Actions</strong> run in order: <code>transform</code>, <code>trigger_workflow</code>, <code>trigger_query</code>,
+<code>save_to_buffer</code>, and <code>push_to_app_page</code>.</li>
+<li class=""><code>save_to_buffer</code> writes to <code>tblListenerEvents</code> with a buffer name and
+sequence number; this is the durable event history used by application
+runtime observation.</li>
+<li class=""><code>push_to_app_page</code> emits a Socket.IO event to a page room; it is transient.</li>
+</ul>
+<p>Listeners are not workflows: they are ingress adapters. The action chain decides
+whether to run a query, start a workflow, store the event, or notify a page.</p>
+<p>See <a class="" href="/jet-admin/docs/listeners">Listeners</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="workflow">Workflow<a href="#workflow" class="hash-link" aria-label="Direct link to Workflow" title="Direct link to Workflow" translate="no">​</a></h2>
+<p>A <strong>workflow</strong> is a directed acyclic graph of nodes and edges, executed by
+Temporal. Nodes are metadata plus configuration; execution happens in Temporal
+activities.</p>
+<p>Registered node types (<code>packages/workflow-nodes/src/nodes</code>):</p>
+<table><thead><tr><th>Node</th><th>Purpose</th></tr></thead><tbody><tr><td><code>start</code></td><td>Entry point and input contract</td></tr><tr><td><code>dataQuery</code></td><td>Execute a saved query, optionally with a pinned query version</td></tr><tr><td><code>javascript</code></td><td>Run user JavaScript in an <code>isolated-vm</code> sandbox</td></tr><tr><td><code>condition</code></td><td>Boolean branch with operators or a JS expression</td></tr><tr><td><code>switch</code></td><td>Multi-case branch</td></tr><tr><td><code>loop</code></td><td>Iterate an array with max-iteration and per-item error policy</td></tr><tr><td><code>delay</code></td><td>Temporal timer</td></tr><tr><td><code>fanout</code></td><td>Start parallel branches</td></tr><tr><td><code>join</code></td><td>Join branches by all/any</td></tr><tr><td><code>subWorkflow</code></td><td>Invoke a child workflow, optionally pinned</td></tr><tr><td><code>approval</code></td><td>Human approval with timeout and approve/reject outcomes</td></tr><tr><td><code>dataCollection</code></td><td>Form/API-style human input; currently UI form mode</td></tr><tr><td><code>end</code></td><td>Return a context value as workflow output</td></tr></tbody></table>
+<p>A <strong>workflow run</strong> is one <code>tblWorkflowInstances</code> row. It stores status,
+<code>executionDefinition</code> (the graph + args snapshot), context projections, and an
+append-only log. <code>executionKey</code> provides idempotent starts for the same logical
+trigger. Test runs are marked <code>isTest</code> and can be deleted separately.</p>
+<p>The <strong>workflow context</strong> is the data passed between nodes (<code>ctx</code> in templates).
+Standard node templates use safe-path mode; JavaScript nodes get the whole
+context object in a sandbox.</p>
+<p>See <a class="" href="/jet-admin/docs/workflows">Workflows</a> and
+<a class="" href="/jet-admin/docs/platform/asset-versioning">Asset Versioning</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="app-page">App page<a href="#app-page" class="hash-link" aria-label="Direct link to App page" title="Direct link to App page" translate="no">​</a></h2>
+<p>An <strong>app page</strong> is a saved canvas: a layout tree, widget placements, page data
+sources, and page variables. It is a reusable UI asset, not a route by itself.</p>
+<div class="language-jsonc codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-jsonc codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">{</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;layoutVersion&quot;: 2,</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;layout&quot;: { &quot;type&quot;: &quot;column&quot;, &quot;children&quot;: [] },</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;widgets&quot;: [&quot;widget_&lt;widgetID&gt;_&lt;suffix&gt;&quot;],</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;dataSources&quot;: [</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">    {</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">      &quot;alias&quot;: &quot;orders&quot;,</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">      &quot;type&quot;: &quot;query&quot;,</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">      &quot;queryID&quot;: &quot;&lt;uuid&gt;&quot;,</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">      &quot;triggerMode&quot;: &quot;auto&quot;,</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">      &quot;inputValues&quot;: {}</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">    }</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  ],</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;variables&quot;: [</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">    { &quot;key&quot;: &quot;selectedID&quot;, &quot;type&quot;: &quot;string&quot;, &quot;default&quot;: &quot;&quot; }</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  ]</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">}</span><br></div></code></pre></div></div>
+<ul>
+<li class="">Layout node types accepted by the backend: <code>column</code>, <code>row</code>, <code>widget</code>,
+<code>container</code>, <code>stack</code>, <code>z-stack</code>.</li>
+<li class="">A <strong>widget instance key</strong> (<code>widget_&lt;widgetID&gt;_&lt;suffix&gt;</code>) identifies one
+placement of a reusable widget definition on one page.</li>
+<li class=""><strong>Page variables</strong> are in-memory state for the open page. They reset on
+reload unless an application explicitly exposes equivalent application
+state.</li>
+<li class="">Page versions are editor-history snapshots (max 50 per page). Separately,
+immutable <strong>asset versions</strong> are captured for publishing.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="widget">Widget<a href="#widget" class="hash-link" aria-label="Direct link to Widget" title="Direct link to Widget" translate="no">​</a></h2>
+<p>A <strong>widget</strong> is a reusable UI definition: <code>widgetType</code> plus <code>widgetConfig</code>.
+The definition is stored once and can be placed on many pages and applications.</p>
+<ul>
+<li class="">35 normal renderers are registered in <code>widgets-ui</code> (<code>WIDGETS_MAP</code>); 36 widget
+descriptors exist, including the internal <code>layout-snippet</code> saved-section
+type.</li>
+<li class="">Descriptors in <code>@jet-admin/widget-types</code> define defaults, aliases, template
+props, state shape, supported events/methods, and examples.</li>
+<li class="">A widget emits <strong>events</strong> (<code>onClick</code>, <code>onRowSelect</code>, <code>onSubmit</code>, …). An event
+handler is an ordered action chain (<code>SET_VARIABLE</code>, <code>EXECUTE_QUERY</code>,
+<code>TRIGGER_WORKFLOW</code>, <code>SHOW_TOAST</code>, <code>NAVIGATE</code>, <code>CALL_WIDGET_METHOD</code>, …).</li>
+<li class="">A widget can expose <strong>methods</strong> (<code>refresh</code>, <code>setSelectedRow</code>, <code>clearSelection</code>,
+<code>resize</code>, <code>click</code>) that another widget can call. Method coverage varies by
+type.</li>
+<li class="">Widget-level data sources are authoring conveniences. In an application
+release, page-level data sources are the execution boundary; standalone
+widget data sources are not sent to the deployed client.</li>
+</ul>
+<p>See <a class="" href="/jet-admin/docs/app-pages-widgets">App Pages &amp; Widgets</a> and
+<a class="" href="/jet-admin/docs/platform/widget-library">Widget Library</a>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="composite-widget">Composite widget<a href="#composite-widget" class="hash-link" aria-label="Direct link to Composite widget" title="Direct link to Composite widget" translate="no">​</a></h3>
+<p>A <strong>composite widget</strong> is a saved section: a captured layout tree with inline
+widget definitions, declared inputs/outputs, and values. It renders its
+children inside one widget slot.</p>
+<ul>
+<li class="">Inputs resolve from <code>composite.values</code> and defaults; children read them via
+<code>state.composite.inputs.&lt;key&gt;</code>.</li>
+<li class="">Composite child definitions are inlined at capture time, so later edits to
+the original widget do not propagate.</li>
+<li class="">Nested composite capture is explicitly rejected
+(<code>Nested composite widgets are not supported yet</code>).</li>
+<li class="">Application compiler support exists, but it does not recursively re-validate
+inline child widget types against the runtime allowlist.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="application">Application<a href="#application" class="hash-link" aria-label="Direct link to Application" title="Direct link to Application" translate="no">​</a></h2>
+<p>An <strong>application</strong> is a composed, routable workspace built from app pages and
+other assets. It adds a shell, routes, application state, environment
+deployments, and immutable releases.</p>
+<table><thead><tr><th>Part</th><th>Meaning</th></tr></thead><tbody><tr><td><strong>Draft</strong></td><td>Editable definition at a monotonic <code>revision</code>; optimistic concurrency via <code>expectedRevision</code></td></tr><tr><td><strong>Asset link</strong></td><td>Tenant asset attached under an <code>assetKey</code>; app pages can be <code>referenced</code> or <code>managed</code> (owned copy)</td></tr><tr><td><strong>Shell</strong></td><td>Sidebar/topbar/bottom-bar/hamburger, navigation, branding, appearance</td></tr><tr><td><strong>Route</strong></td><td>A path mapped to a page asset key, with params, query, guard, and keep-alive</td></tr><tr><td><strong>Application state</strong></td><td>Declared variables shared across routes; persistence is opt-in per browser</td></tr><tr><td><strong>Environment</strong></td><td>Named deployment target (for example <code>production</code>) with datasource bindings and revisions</td></tr><tr><td><strong>Release</strong></td><td>Immutable compiled snapshot of the draft + exact page versions</td></tr><tr><td><strong>Consumer policy</strong></td><td>Per-user/role/API-key route/action allow/deny rules for the deployed runtime</td></tr><tr><td><strong>Runtime manifest</strong></td><td>Client-safe definition served for a deployed release</td></tr></tbody></table>
+<p>Applications are currently a <strong>foundation preview</strong> (see the repository README
+and the specs under <code>docs/specs/</code>). The API and Studio cover the core lifecycle;
+some operational paths (notably live Temporal/Redis/listener-proxy
+verification) remain incomplete.</p>
+<p>See <a href="#application" class="">Applications</a> below and
+<a class="" href="/jet-admin/docs/platform/feature-list">Feature List</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="route">Route<a href="#route" class="hash-link" aria-label="Direct link to Route" title="Direct link to Route" translate="no">​</a></h2>
+<p>Two different things are called a route:</p>
+<ol>
+<li class=""><strong>HTTP route</strong> — an Express mount such as
+<code>/api/v1/tenants/:tenantID/queries/:dataQueryID</code>.</li>
+<li class=""><strong>Application route</strong> — an object in an application definition:</li>
+</ol>
+<div class="language-jsonc codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-jsonc codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">{</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;id&quot;: &quot;orders&quot;,</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;path&quot;: &quot;/orders/:orderID&quot;,</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;pageAssetKey&quot;: &quot;ordersPage&quot;,</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;params&quot;: { &quot;orderID&quot;: &quot;uuid&quot; },</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;query&quot;: { &quot;tab&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;default&quot;: &quot;summary&quot; } },</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;keepAlive&quot;: false,</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;guard&quot;: { &quot;expression&quot;: &quot;{{ state.application.variables.canViewOrders }}&quot;, &quot;redirectRouteID&quot;: &quot;home&quot; }</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">}</span><br></div></code></pre></div></div>
+<p>Route IDs are stable keys; paths can contain <code>:param</code> segments. Declared route
+query values are typed/coerced (<code>string</code>, <code>number</code>, <code>integer</code>, <code>boolean</code>,
+<code>uuid</code>); undeclared query params pass through as strings. Guards fail closed:
+only a literal <code>true</code> admits the route; otherwise the guard&#x27;s redirect route is
+used. <code>notFoundRouteID</code> and shell <code>homeRouteID</code> are also route IDs.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="release">Release<a href="#release" class="hash-link" aria-label="Direct link to Release" title="Direct link to Release" translate="no">​</a></h2>
+<p>Depending on context, <strong>release</strong> means:</p>
+<table><thead><tr><th>Term</th><th>Definition</th></tr></thead><tbody><tr><td><strong>Platform release</strong></td><td>A build of the monorepo/images (current version <code>2.1.0-preview.1</code>)</td></tr><tr><td><strong>Application release</strong></td><td>Immutable compiled snapshot of one application at <code>releaseNumber</code>, with <code>contentHash</code>, <code>clientManifest</code>, <code>serverManifest</code>, and exact page version IDs</td></tr><tr><td><strong>Deployment</strong></td><td>Moving an environment&#x27;s <code>currentReleaseID</code> to a release; deployments are append-only history</td></tr><tr><td><strong>Rollback</strong></td><td>Deploying an older retained release; no new build and no reversal of external side effects</td></tr></tbody></table>
+<p>An application release is created by <code>POST /applications/:id/releases</code> with the
+draft&#x27;s <code>expectedRevision</code>. Publishing either uses the page version selected on
+the asset link or captures the latest page state. The release is thin: page and
+widget payloads live in asset versions, not duplicated in the release.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="asset-version">Asset version<a href="#asset-version" class="hash-link" aria-label="Direct link to Asset version" title="Direct link to Asset version" translate="no">​</a></h2>
+<p>An <strong>asset version</strong> is an immutable snapshot of an asset&#x27;s executable
+definition, stored in <code>tblAssetVersions</code>. Supported asset types:</p>
+<p><code>datasource</code>, <code>query</code>, <code>workflow</code>, <code>listener</code>, <code>widget</code>, <code>appPage</code>, <code>cronjob</code>.</p>
+<p>Each version has a per-asset monotonic <code>versionNumber</code>, <code>schemaVersion</code>,
+SHA-256 <code>contentHash</code>, <code>payload</code>, <code>status</code>, <code>changeNote</code>, and creator
+attribution. Versions are content-addressed: re-capturing identical content
+returns the latest version instead of creating a duplicate. Versions are
+captured explicitly (asset version API) or implicitly by application publish.</p>
+<p>An asset version is <strong>not</strong>:</p>
+<ul>
+<li class="">a page editor-history snapshot (<code>tblAppPageEditorHistory</code>, max 50/page);</li>
+<li class="">a database backup;</li>
+<li class="">a bundle (portable JSON with new IDs on import);</li>
+<li class="">a release (which pins page versions and adds routes/environments).</li>
+</ul>
+<p>See <a class="" href="/jet-admin/docs/platform/asset-versioning">Asset Versioning</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="bundle">Bundle<a href="#bundle" class="hash-link" aria-label="Direct link to Bundle" title="Direct link to Bundle" translate="no">​</a></h2>
+<p>A <strong>bundle</strong> is a self-describing JSON export of one root asset plus its
+dependency closure. Current format: <code>bundleVersion: 1</code>.</p>
+<div class="language-jsonc codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-jsonc codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">{</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;bundleVersion&quot;: 1,</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;generator&quot;: &quot;jet-admin&quot;,</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;exportedAt&quot;: &quot;2026-11-27T10:00:00.000Z&quot;,</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;sourceTenant&quot;: &quot;&lt;uuid&gt;&quot;,</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  &quot;items&quot;: [</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">    {</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">      &quot;type&quot;: &quot;widget&quot;,</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">      &quot;id&quot;: &quot;&lt;source uuid&gt;&quot;,</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">      &quot;payload&quot;: { &quot;widgetTitle&quot;: &quot;Orders&quot;, &quot;widgetType&quot;: &quot;table&quot;, &quot;widgetConfig&quot;: {} },</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">      &quot;dependencies&quot;: [</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">        { &quot;type&quot;: &quot;dataQuery&quot;, &quot;id&quot;: &quot;&lt;uuid&gt;&quot;, &quot;name&quot;: &quot;Orders&quot;, &quot;bundled&quot;: true }</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">      ]</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">    }</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  ]</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">}</span><br></div></code></pre></div></div>
+<p>Import always creates fresh UUIDs and rewrites known internal references.
+Credentials are stripped; datasources require reconnection. A bundle is not a
+live link: installed copies are independent, and later changes to the source do
+not propagate.</p>
+<p>See <a class="" href="/jet-admin/docs/platform/export-import-bundles">Export &amp; Import Bundles</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="library">Library<a href="#library" class="hash-link" aria-label="Direct link to Library" title="Direct link to Library" translate="no">​</a></h2>
+<p>The <strong>shared widget library</strong> is a deployment-scoped registry of published
+widget bundles. It is a lightweight distribution mechanism, not a package
+manager.</p>
+<ul>
+<li class="">An entry stores one bundle containing exactly one root widget item plus its
+dependency closure.</li>
+<li class="">Any tenant can install an entry; install runs the normal bundle import
+pipeline and creates independent copies.</li>
+<li class="">There is no semantic versioning, dependency resolution, ratings, or update
+channel. Unpublishing deletes the registry entry but does not affect already
+installed copies.</li>
+<li class="">The newer <strong>marketplace</strong> generalizes the idea to datasource/widget/workflow
+items and app templates. Do not confuse the two registries.</li>
+</ul>
+<p>See <a class="" href="/jet-admin/docs/platform/widget-library">Shared Widget Library</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="folder">Folder<a href="#folder" class="hash-link" aria-label="Direct link to Folder" title="Direct link to Folder" translate="no">​</a></h2>
+<p>A <strong>folder</strong> is a node in a per-entity-type tree. Scope is
+<code>(tenantID, entityType)</code>, so workflow folders never appear in the widget
+drawer.</p>
+<ul>
+<li class="">Organizable entity types: <code>widget</code>, <code>workflow</code>, <code>dataQuery</code>, <code>cronJob</code>,
+<code>appPage</code>, <code>listener</code>, <code>datasource</code>.</li>
+<li class="">Entities carry a nullable <code>folderID</code>; deleting a folder promotes child
+folders to the grandparent and un-files its items.</li>
+<li class="">Server list filters by one exact <code>folderID</code>; omitting it returns all items.</li>
+<li class="">Folders do not grant access; item and folder permissions are checked
+separately.</li>
+</ul>
+<p>See <a class="" href="/jet-admin/docs/platform/folders">Folders</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="state-and-events">State and events<a href="#state-and-events" class="hash-link" aria-label="Direct link to State and events" title="Direct link to State and events" translate="no">​</a></h2>
+<p>Jet Admin has several distinct state domains:</p>
+<table><thead><tr><th>State</th><th>Lifetime</th><th>Scope</th><th>Persistence</th></tr></thead><tbody><tr><td><strong>Page state tree</strong></td><td>Open page runtime</td><td>One page instance</td><td>Memory only</td></tr><tr><td><strong>Page variables</strong></td><td>Open page runtime</td><td>One page instance</td><td>Memory only; reset on reload</td></tr><tr><td><strong>Widget state</strong></td><td>Open widget instance</td><td>One placement</td><td>Memory only (some widgets keep local UI state)</td></tr><tr><td><strong>Application state</strong></td><td>Browser tab/profile</td><td>One application, one principal</td><td>Optional <code>none</code> / <code>session</code> / <code>local</code>, keyed by tenant + application + principal + release</td></tr><tr><td><strong>Workflow context</strong></td><td>Workflow run</td><td>One <code>tblWorkflowInstances</code> row</td><td>Persisted projections/logs in PostgreSQL; Temporal is execution authority</td></tr><tr><td><strong>Listener buffer</strong></td><td>Configured retention</td><td>One listener + buffer name</td><td><code>tblListenerEvents</code></td></tr><tr><td><strong>Audit log</strong></td><td>Retained indefinitely</td><td>Tenant</td><td><code>tblAuditLogs</code> (buffered writes; no delete API)</td></tr></tbody></table>
+<p><strong>Events</strong> are notifications, not durable messages, unless explicitly buffered:</p>
+<ul>
+<li class="">Widget events (<code>onClick</code>, <code>onRowSelect</code>, <code>onSubmit</code>, …) run an action chain
+immediately. They are not replayed after a reload.</li>
+<li class="">Application events (<code>EMIT_APPLICATION_EVENT</code>) are an in-memory bus for the
+current runtime tree. They do not cross browser tabs or users.</li>
+<li class="">Workflow progress is emitted over Socket.IO and written to instance logs;
+reconnecting clients can re-read logs but in-flight socket events can be
+missed.</li>
+<li class="">Listener <code>push_to_app_page</code> is transient; <code>save_to_buffer</code> is the durable
+path used by application runtime listener observation.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="runtime-environment">Runtime environment<a href="#runtime-environment" class="hash-link" aria-label="Direct link to Runtime environment" title="Direct link to Runtime environment" translate="no">​</a></h2>
+<p>The phrase <strong>runtime environment</strong> has three meanings:</p>
+<ol>
+<li class=""><strong>Application environment</strong> — a named deployment target such as
+<code>production</code>, stored in <code>tblApplicationEnvironments</code>. It has a
+<code>currentReleaseID</code>, <code>bindingRevision</code>, datasource bindings, and deployment
+history. Environment names are lowercase letters/numbers/hyphens, max 40
+characters.</li>
+<li class=""><strong>Process environment</strong> — Node/Docker configuration (<code>DATABASE_URL</code>,
+<code>REDIS_URL</code>, <code>TEMPORAL_ADDRESS</code>, <code>VAULT_ENCRYPTION_KEY</code>, …). See
+<a class="" href="/jet-admin/docs/operations/configuration-reference">Configuration Reference</a>.</li>
+<li class=""><strong>Browser runtime</strong> — the mounted page/application runtime that holds the
+state tree, subscriptions, and event handlers.</li>
+</ol>
+<p><strong>Environment bindings</strong> map datasource IDs captured in a release to concrete
+tenant datasource IDs in that environment. Bindings are revisioned separately
+from releases, so the same release can run against different datasource
+connections without recompiling. Binding targets must have the same datasource
+type as the release source.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="how-the-pieces-relate">How the pieces relate<a href="#how-the-pieces-relate" class="hash-link" aria-label="Direct link to How the pieces relate" title="Direct link to How the pieces relate" translate="no">​</a></h2>
+<table><thead><tr><th>Relationship</th><th>Cardinality</th><th>Notes</th></tr></thead><tbody><tr><td>Tenant → assets</td><td>1<!-- -->:N</td><td>Every asset carries <code>tenantID</code></td></tr><tr><td>Datasource → queries/listeners</td><td>1<!-- -->:N</td><td>Query/listener execution needs a tenant-scoped datasource</td></tr><tr><td>Query/listener/widget/workflow → asset versions</td><td>1<!-- -->:N</td><td>Versions are content-addressed per asset</td></tr><tr><td>Workflow → nodes/edges</td><td>1<!-- -->:N</td><td>Cascades on workflow delete</td></tr><tr><td>Workflow → runs</td><td>1<!-- -->:N</td><td>Runs retain <code>executionDefinition</code></td></tr><tr><td>App page → widgets</td><td>N<!-- -->:M<!-- --> through instance keys</td><td>One widget definition can appear many times</td></tr><tr><td>Application → app pages</td><td>N<!-- -->:M<!-- --> through <code>tblApplicationAssets</code></td><td><code>assetKey</code> is application-local</td></tr><tr><td>Application → releases</td><td>1<!-- -->:N</td><td>Release numbers are per application</td></tr><tr><td>Release → page versions</td><td>N<!-- -->:M<!-- --> through manifests/references</td><td>Exact version IDs, not live page IDs</td></tr><tr><td>Environment → release</td><td>N:1</td><td><code>currentReleaseID</code> is the deploy pointer</td></tr><tr><td>Bundle → imported assets</td><td>1<!-- -->:N</td><td>Fresh IDs; secrets stripped</td></tr><tr><td>Folder → entities</td><td>1<!-- -->:N<!-- --> per entity type</td><td>Nullable <code>folderID</code></td></tr><tr><td>Widget library entry → bundle</td><td>1:1</td><td>Bundle snapshot, no version chain</td></tr></tbody></table>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="lifecycle-summary">Lifecycle summary<a href="#lifecycle-summary" class="hash-link" aria-label="Direct link to Lifecycle summary" title="Direct link to Lifecycle summary" translate="no">​</a></h2>
+<!-- -->
+<p>Continue with <a class="" href="/jet-admin/docs/platform/modules">Modules</a>, <a class="" href="/jet-admin/docs/platform/feature-list">Feature List</a>, and
+<a class="" href="/jet-admin/docs/platform/limitations">Limitations</a>.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/jet-labs/jet-admin/tree/master/docs/docs/platform/concepts.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/jet-admin/docs/identity-access-management"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Identity &amp; Access Management</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/jet-admin/docs/platform/architecture"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Platform Architecture</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#tenant" class="table-of-contents__link toc-highlight">Tenant</a></li><li><a href="#datasource" class="table-of-contents__link toc-highlight">Datasource</a></li><li><a href="#data-query" class="table-of-contents__link toc-highlight">Data query</a></li><li><a href="#listener" class="table-of-contents__link toc-highlight">Listener</a></li><li><a href="#workflow" class="table-of-contents__link toc-highlight">Workflow</a></li><li><a href="#app-page" class="table-of-contents__link toc-highlight">App page</a></li><li><a href="#widget" class="table-of-contents__link toc-highlight">Widget</a><ul><li><a href="#composite-widget" class="table-of-contents__link toc-highlight">Composite widget</a></li></ul></li><li><a href="#application" class="table-of-contents__link toc-highlight">Application</a></li><li><a href="#route" class="table-of-contents__link toc-highlight">Route</a></li><li><a href="#release" class="table-of-contents__link toc-highlight">Release</a></li><li><a href="#asset-version" class="table-of-contents__link toc-highlight">Asset version</a></li><li><a href="#bundle" class="table-of-contents__link toc-highlight">Bundle</a></li><li><a href="#library" class="table-of-contents__link toc-highlight">Library</a></li><li><a href="#folder" class="table-of-contents__link toc-highlight">Folder</a></li><li><a href="#state-and-events" class="table-of-contents__link toc-highlight">State and events</a></li><li><a href="#runtime-environment" class="table-of-contents__link toc-highlight">Runtime environment</a></li><li><a href="#how-the-pieces-relate" class="table-of-contents__link toc-highlight">How the pieces relate</a></li><li><a href="#lifecycle-summary" class="table-of-contents__link toc-highlight">Lifecycle summary</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/jet-admin/docs/introduction">Documentation</a></li><li class="footer__item"><a class="footer__link-item" href="/jet-admin/docs/getting-started/quickstart">Quickstart</a></li><li class="footer__item"><a class="footer__link-item" href="/jet-admin/docs/use-cases">Use cases</a></li><li class="footer__item"><a class="footer__link-item" href="/jet-admin/docs/comparisons/market-comparison">Market comparison</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">More</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/Jet-labs/Jet-admin" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div></div></footer></div>
+</body>
+</html>
