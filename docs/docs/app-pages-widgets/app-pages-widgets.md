@@ -26,7 +26,7 @@ sidebar_position: 7
   - [Widget Properties (Styling)](#widget-properties-styling)
   - [Widget Events System](#widget-events-system)
   - [Widget Methods](#widget-methods)
-6. [Expression Engine & Data Binding](#expression-engine-data-binding)
+6. [JavaScript Expression Engine & Data Binding](#expression-engine-data-binding)
 7. [Applications & App Studio Integration](#applications-app-studio-integration)
 8. [Real-Time & Async Behaviour](#real-time-async-behaviour)
 9. [Integration Points](#integration-points)
@@ -72,7 +72,7 @@ A page can be used in two ways:
 | **Page Config** | The JSON object stored with an App Page that defines its layout tree, data source bindings, variable definitions, and widget placement keys. |
 | **Widget Config** | The JSON object stored with a Widget that defines its visual properties, data binding expressions, and event handlers. |
 | **State Tree** | The live, in-memory reactive data object maintained by the Page Runtime. It holds the current values of all data sources (queries, workflows, listeners), page variables, widget states, and globally accessible items. |
-| **Expression** | A `{{ }}` mustache-style template that resolves a value from the state tree at render time. Expressions may be simple path lookups or full JavaScript expressions. |
+| **Expression** | A JavaScript expression inside `{{ }}` delimiters that resolves a value from the state tree at render time. Expressions may be simple path lookups or full JavaScript expressions. |
 | **Data Source** | A binding from the page to a Data Query, Workflow, or Listener. Each data source is given an alias through which its result is accessible in expressions. |
 | **Page Variable** | A typed, named local state value (string, number, boolean, object, array) whose value can be updated at runtime by widget events. |
 | **Layout Tree** | The hierarchical node structure (column → row → widget/container/stack/z-stack) that defines where and how widgets are arranged on the page canvas. |
@@ -427,7 +427,7 @@ Identical to Vega-Lite Chart but accepts full **Vega** grammar (lower-level, mor
 
 A full-featured tabular display with support for pagination, search, export, inline editing, multi-row selection, and bulk operations.
 
-**Data binding:**
+**JavaScript data binding:**
 
 | Field | Description |
 | --- | --- |
@@ -900,9 +900,9 @@ Some widget types expose programmatic methods that can be called from another wi
 
 <a id="expression-engine-data-binding"></a>
 
-## Expression Engine & Data Binding {#expression-engine-data-binding}
+## JavaScript Expression Engine & Data Binding {#expression-engine-data-binding}
 
-Widgets and data source inputs use `{{ }}` **expressions** to bind dynamic values from the page state tree. The expression engine supports full JavaScript within template expressions.
+Widgets and data source inputs use `{{ }}` **JavaScript expressions** to bind dynamic values from the page state tree. The engine evaluates full JavaScript within the template delimiters.
 
 <a id="accessing-state"></a>
 

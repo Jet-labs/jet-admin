@@ -182,7 +182,7 @@ whole page. Test every saved query before binding it to a widget.
 2. Choose **Add widget**.
 3. Name it `Orders table`.
 4. Select type **Data Table**.
-5. Set the data bindings:
+5. Set the JavaScript data bindings:
 
    | Field | Value |
    |---|---|

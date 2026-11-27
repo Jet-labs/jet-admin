@@ -114,7 +114,7 @@ Each route has two dialogs:
 | `keepAlive` | boolean | Restores a bounded in-memory snapshot (variables, query results, widget state) when returning to the route. Path-parameter changes still reset the page. |
 | `title` | string | Optional browser title; falls back to the page title and then the route ID. |
 | `parentRouteID` | key | Hierarchy metadata. The child path must be nested under the parent path, and parent links cannot form a cycle. |
-| `guard` | object | `{ expression, redirectRouteID }`. Only a literal boolean `true` admits the route; any failure redirects. |
+| `guard` | object | `{ expression, redirectRouteID }` where `expression` is a JavaScript expression. Only a literal boolean `true` admits the route; any failure redirects. |
 
 Route guards fail closed. A missing expression, evaluation error, or non-`true` result redirects to a route that must exist, must not require path parameters, must not point at itself, and must not itself declare a guard. The Studio evaluates guards against `state.application.variables` and `state.route`.
 

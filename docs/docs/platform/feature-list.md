@@ -356,7 +356,7 @@ Applications are a **Beta foundation preview** per the repository README.
 |---|---|---|
 | Health endpoint | Stable | `GET /health`; used by Docker/Render |
 | Docker Compose stack | Stable | Frontend, backend, Postgres, Redis, listener-proxy, Temporal |
-| Optional Temporal worker | Stable | Dedicated worker and embedded worker share task queue |
+| Dedicated Temporal worker | Stable | Optional separate worker process; embedded worker shares the same task queue |
 | Optional S3/RustFS storage | Stable | `--profile storage`; bucket init makes objects public |
 | Optional MCP container | Beta | `--profile mcp`; requires Firebase credentials |
 | Docs site | Stable | Docusaurus; GitHub Pages deploy on `main`/`dev` |

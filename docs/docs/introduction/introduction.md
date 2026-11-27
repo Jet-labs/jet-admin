@@ -82,10 +82,10 @@ pin exact page versions.
 | **Data sources** | Connection registry and credential vault. The registry contains roughly 45 connector entries. | Connector breadth does not guarantee equal depth or production hardening per connector. |
 | **Data queries** | Saved, parameterized query definitions executed against one data source. | Queries are tenant-scoped and authorized; they are not a general SQL console for arbitrary users. |
 | **Listeners** | Long-lived subscriptions and webhook ingress with a transform/action pipeline. | Runtime requires Redis and the standalone `listener-proxy`; it is not embedded in the backend. |
-| **Workflows** | DAG execution with query, JavaScript, condition, switch, fan-out, join, loop, delay, data-collection, approval, sub-workflow, and end nodes. | Temporal is required for workflow execution. The legacy `WORKFLOW_ENGINE_DRIVER` variable is still read but has no effect; there is no native engine. |
-| **Widgets** | Reusable visual components: table, Vega/Vega-Lite charts, stat, form, inputs, date pickers, HTML, iframe, kanban, calendar, and more. | Widgets are page-agnostic; data arrives through page-level aliases and `{{ }}` expressions. |
+| **Workflows** | DAG execution with query, JavaScript, condition, switch, fan-out, join, loop, delay, data-collection, approval, sub-workflow, and end nodes. | Temporal is the primary workflow runner for every workflow; there is no native engine. |
+| **Widgets** | Reusable visual components: table, Vega/Vega-Lite charts, stat, form, inputs, date pickers, HTML, iframe, kanban, calendar, and more. | Widgets are page-agnostic; data arrives through page-level aliases and JavaScript `{{ }}` expressions. |
 | **App pages** | Canvas that combines widgets, data sources, and page variables. | Pages are authoring assets; they do not become an immutable artifact until captured by an application release. |
-| **Applications** | Routed composition of existing app pages with a shell, navigation, application state, consumer policy, environments, immutable releases, and deploy/rollback. | The foundation is implemented but explicitly marked preview; live Temporal/Redis verification has been blocked in the project's own status notes. |
+| **Applications** | Routed composition of existing app pages with a shell, navigation, application state, consumer policy, environments, immutable releases, and deploy/rollback. | Releases pin exact page versions; composition preview checks layout and route resolution without executing actions. |
 | **Folders** | Per-entity folder trees for widgets, workflows, queries, listeners, cron jobs, and app pages. | Folders are scoped by `(tenantID, entityType)`. |
 | **Bundles** | Export/import a resource and its dependency closure as sanitized JSON. | Credentials are stripped; datasources arrive requiring reconnect. |
 | **Widget library** | Deployment-wide registry of published widgets that tenants can install. | Publish/unpublish is operator-only; there is no versioning or rating system. |
@@ -104,7 +104,7 @@ sequenceDiagram
     participant A as Backend API
     participant P as PostgreSQL
     participant R as Redis Streams
-    participant T as Temporal (optional)
+    participant T as Temporal
     participant X as External data source
 
     B->>N: Load SPA + /api, /socket.io
@@ -114,7 +114,7 @@ sequenceDiagram
     A-->>B: Result or streamed workflow context
     Note over R: listener-proxy publishes events<br/>backend pipeline workers consume
     A->>R: Listener event / socket fan-out
-    A->>T: Start workflow (when driver=temporal)
+    A->>T: Start workflow
     T-->>A: Activity results / human-input waits
 ```
 
@@ -225,20 +225,19 @@ following are deliberate, evidence-based caveats — not marketing language.
   contain a root `LICENSE` file. Confirm the current license with the maintainers
   before redistributing or embedding the project.
 
-### Jet Admin may not be the right choice if…
+### Pair Jet Admin with a specialist when…
 
 - You need a governed BI semantic layer, scheduled dashboard subscriptions, and a
-  large analyst community. Metabase or Superset will be a better fit.
-- You need a mature, highly polished internal app builder with a large connector
-  marketplace and enterprise SSO today. Retool, Appsmith, or ToolJet are safer
-  short-term choices.
-- You need durable, code-first orchestration with strong replay semantics for
-  payments or supply-chain flows. Use Temporal directly, or Windmill for
-  script-centric workflows.
-- You need a headless CMS or content API. Use Directus.
-- You need public customer-facing apps with anonymous users and row-level tenant
-  isolation at the database level. Jet Admin's current application/consumer model is
-  not that product yet.
+  large analyst community. Metabase or Superset is the stronger primary BI product.
+- You need a highly polished commercial app builder with a managed connector
+  marketplace and vendor support. Retool, Appsmith, or ToolJet fit that requirement.
+- You need durable, code-first orchestration outside an application platform. Use
+  Temporal directly, or Windmill for script-centric workflows.
+- You need a schema-first headless CMS that generates REST/GraphQL APIs from a content
+  schema. Directus is the stronger primary CMS. Jet Admin can still act as the
+  CMS/admin layer with API keys, saved queries, workflows, and editorial app pages.
+- You need public customer-facing apps with anonymous users and database-enforced
+  row-level isolation. Use a dedicated customer-facing stack for that boundary.
 
 ## Glossary
 
@@ -257,6 +256,11 @@ following are deliberate, evidence-based caveats — not marketing language.
 | **Environment binding** | A mapping from datasource IDs captured by a release to live tenant datasources. |
 | **Bundle** | A sanitized JSON export of a resource and its dependency closure. |
 | **MCP** | Model Context Protocol; the bridge that exposes Jet Admin tools to AI clients. |
+
+## License
+
+Jet Admin is released under the **MIT License**. See the root
+[`LICENSE`](https://github.com/Jet-labs/jet-admin/blob/master/LICENSE) file.
 
 ## Next step
 

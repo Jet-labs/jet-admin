@@ -157,7 +157,7 @@ Use it in:
 
 - widget property templates;
 - page data-source input values;
-- route guard expressions in the route settings dialog;
+- route guard JavaScript expressions in the route settings dialog;
 - parent application variable values in subsequent actions;
 - custom widget props, after the page runtime resolves their expressions against the state tree.
 

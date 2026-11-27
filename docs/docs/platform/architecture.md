@@ -35,7 +35,7 @@ flowchart TD
 | `frontend` | `apps/frontend` (`Dockerfile.frontend`, nginx) | `80` | Static assets + browser state | SPA, page editor, application studio/runtime, Socket.IO client |
 | `backend` | `apps/backend/index.js` (`Dockerfile.backend`) | `8090` local; `3000` in compose behind container nginx; Node on `3001` | Mostly stateless | REST API, Casbin authorization, query execution, workflow orchestration, listener fan-out, static file proxy |
 | `listener-proxy` | `apps/listener-proxy/index.js` | `8095` | Stateless ingress; shard ownership in Redis | Datasource subscriptions, webhook ingress, raw event publication to Redis Streams |
-| `temporal-worker` | `apps/backend/modules/workflow/temporal/worker.js` | — | Worker | Optional dedicated Temporal worker; the backend also starts an embedded worker on boot |
+| `temporal-worker` | `apps/backend/modules/workflow/temporal/worker.js` | - | Worker | Dedicated worker process (optional deployment; the backend also starts an embedded worker on boot). Temporal itself is the required workflow runner |
 | `mcp-server` | `apps/mcp-server/index.js` | `5001` | Stateless | Streamable-HTTP MCP tools for the Jet Agent and external MCP clients |
 | `postgres` | `postgres:15-alpine` | `5432` | Persistent | Application data, Casbin rules, workflow projections, releases |
 | `redis` | `redis:7-alpine` | `6379` | Persistent AOF | Listener Streams/DLQ, socket adapter, proxy registry, cron locks |

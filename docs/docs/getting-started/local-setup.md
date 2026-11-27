@@ -32,7 +32,7 @@ is running. Use this page to get the stack healthy first.
 | **Firebase project** | Web app config + service-account JSON | Human sign-in. The frontend has no fallback; the backend verifies ID tokens. |
 | **S3-compatible storage (optional)** | Endpoint, keys, bucket | File uploads. The app runs without it, but uploads fail. |
 | **OpenRouter key (optional)** | `OPENROUTER_API_KEY` or tenant vault `ai_config` | Jet Agent. Everything else works without it. |
-| **Temporal (optional)** | Bundled in Docker, or standalone | Durable workflow driver. The native driver works without Temporal. |
+| **Temporal** | Bundled in Docker, or standalone | Primary and only workflow runner. Required for workflow execution, human approvals, timers, loops, and durable runs. |
 | **Redis** | Required for listeners and Socket.IO fan-out | The listener pipeline is proxy-only and publishes to Redis Streams. |
 
 :::warning Firebase is not optional for human login
@@ -182,7 +182,7 @@ packages themselves; a native checkout must do it explicitly.
 
 ```bash
 docker compose -f docker-compose-sample.yml up -d postgres redis
-npm run temporal:up   # optional
+npm run temporal:up   # required for workflow execution
 ```
 
 Do not run the standalone Temporal compose and the full sample compose at the same
@@ -404,7 +404,7 @@ Named volumes: `jet-admin-postgres-data`, `jet-admin-redis-data`,
 | `relation "tblUsers" does not exist` | `SEED_DATABASE=false` on a fresh volume | Set `true`, restart; or run db push + manual runner + seed. |
 | Backend unhealthy, API works on `:8090` | Healthcheck probes container port | Keep `http://localhost:3000/health` inside compose. |
 | `dev:all` backend environment looks wrong on macOS/Linux | Root `start:b` uses the Windows `set` form | `cd apps/backend && npm run dev`. |
-| `dev:all` hangs on Temporal | First pull of `temporalio/auto-setup:1.23` | Wait or `npm run temporal:logs`; native driver works without it. |
+| `dev:all` hangs on Temporal | First pull of `temporalio/auto-setup:1.23` | Wait or `npm run temporal:logs`; workflow execution requires Temporal. |
 | Port conflict (80/8090/5432/5433/8088/8095) | Another service bound | Stop it or remap host port; update hosts/CORS. |
 | API calls fail after frontend loads | Wrong `VITE_SERVER_HOST`/`SERVER_HOST`, or CORS | Use browser-reachable URL; add exact origin to `CORS_WHITELIST`; restart backend. |
 | `ECONNREFUSED 127.0.0.1:6379` | Redis not running | Start Redis, set `REDIS_URL`. |

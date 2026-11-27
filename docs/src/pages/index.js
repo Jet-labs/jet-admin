@@ -26,7 +26,7 @@ const CAPABILITIES = [
   {
     title: "Compose app pages",
     description:
-      "A Craft.js canvas with rows, stacks, containers, responsive breakpoints, 40+ widgets, expressions, events and saved sections.",
+      "A Craft.js canvas with rows, stacks, containers, responsive breakpoints, 40+ widgets, JavaScript expressions, events and saved sections.",
     badge: "UI",
   },
   {

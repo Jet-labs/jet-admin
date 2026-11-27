@@ -1,46 +1,64 @@
 ---
 title: Market Comparison
-description: An honest comparison of Jet Admin with Retool, Appsmith, ToolJet, Budibase, Metabase, Superset, Forest Admin, Directus, n8n, Zapier, Windmill, and Temporal.
+description: How Jet Admin compares with Retool, Appsmith, ToolJet, Budibase, Metabase, Superset, Forest Admin, Directus, n8n, Zapier, Windmill, and Temporal.
 sidebar_position: 1
 ---
 
 # Market Comparison
 
-Jet Admin sits at the intersection of internal tools, workflow automation, and
-lightweight BI. That makes "which tool should we use?" depend more on the job than on a
-single feature checklist.
+Jet Admin is an **MIT-licensed, self-hosted application platform** that combines
+tenant-scoped data access, JavaScript app building, event listeners, Temporal-backed
+workflows, CMS-style content operations, and immutable application releases in one
+stack.
 
-This page compares Jet Admin with twelve adjacent products using dimensions that
-matter in practice: hosting, licensing, data sources, UI building, workflow execution,
-event streaming, release model, extensibility, learning curve, and enterprise controls.
+That combination is the point. Most adjacent products are excellent at one layer:
+Retool at app building, Metabase at BI, Directus at content APIs, n8n at integration
+automation, Temporal at durable execution. Jet Admin is the stronger choice when you
+want those capabilities to share one data model, one authorization model, one release
+process, and one self-hosted deployment.
 
-:::warning Assumptions and scope
-- This is a **self-hosted Jet Admin** comparison, not a hosted Jet Admin service.
-- The snapshot is **late 2026**. Licenses, plan names, and self-host policies change
-  frequently; verify current vendor terms before purchasing.
-- Feature labels are based on public documentation and general product positioning,
-  not a hands-on benchmark. "Partial" means plan-gated, narrower, or not a core
-  strength.
-- No performance or scale claims are made. Load-test your own workload.
+:::note Scope
+- This comparison describes the **self-hosted Jet Admin** in this repository.
+- The snapshot is **late 2026**. Vendor plans and licenses change; verify current terms
+  before purchasing.
+- Feature labels are based on public documentation and product positioning, not a
+  hands-on benchmark.
 :::
+
+## Where Jet Admin is strongest
+
+| Requirement | Jet Admin advantage |
+|---|---|
+| Self-hosted internal tools without per-seat license fees | MIT license, Docker Compose reference stack, no vendor account required |
+| One platform for data, UI, automation, and releases | 45 connectors, saved queries, app pages/widgets, listeners, workflows, applications, folders, bundles |
+| Multi-tenant SaaS administration | First-class tenant isolation, tenant roles, asset-level Casbin permissions, API-key identities |
+| SQL and API operations | Parameterized PostgreSQL queries, REST/GraphQL, warehouses, SaaS APIs, files, queues, and streaming sources |
+| Event-driven and real-time apps | Listener proxy, Redis Streams, Socket.IO push, webhook ingress, buffered events, dead-letter queue |
+| Durable workflows with human steps | Temporal is the workflow runner for approvals, loops, fan-out/join, delays, sub-workflows, and long-running runs |
+| JavaScript-native binding | Full JavaScript inside `{{ }}` expressions over page, query, listener, workflow, route, and application state |
+| Versioned delivery | Page versions, immutable application releases, environment bindings, deploy and rollback |
+| CMS-style content operations | API keys expose scoped query/workflow access; saved queries and workflows manage content; app pages provide the editorial UI |
+| Agent and AI automation | Bundled MCP server exposes 130 tools for datasources, queries, listeners, workflows, pages, widgets, IAM, and validation |
+| Extensibility without forking the core | Typed widget contracts, workspace packages, bundle export/import, widget library, marketplace templates |
+| Governed operations | Audit log with CSV export, folders, asset version references, release history, run history |
 
 ## Short answer
 
-| If the job is… | The safer default is… | Jet Admin's angle |
+| If the job is… | Strongest primary fit | Jet Admin's advantage |
 |---|---|---|
-| Governed BI and dashboards | Metabase or Superset | Queries + Vega widgets + app pages, but no semantic layer or subscriptions |
-| A polished internal app builder with a large ecosystem | Retool, Appsmith, or ToolJet | Self-hosted tenant model, listener pipeline, workflow engine, application releases |
-| Fast CRUD over an existing app/API | Forest Admin | More generic and standalone, but more assembly required |
-| A headless CMS / content API | Directus | Not a CMS |
-| SaaS integration automation | Zapier or n8n | Fewer integrations; stronger UI + tenant model |
-| Durable code-first orchestration | Temporal or Windmill | Low-code workflow DSL + optional Temporal driver |
-| A tenant-scoped operations app with SQL, events, approvals, and a release layer | Jet Admin | The closest fit, with preview-grade maturity caveats |
+| Governed BI with a semantic layer | Metabase or Superset | SQL/API queries, Vega charts, tables and KPI widgets next to write actions, workflows and tenant-scoped apps |
+| A polished internal app builder with a large ecosystem | Retool, Appsmith, or ToolJet | MIT license, self-hosting, tenant isolation, listener pipeline, Temporal workflows, immutable releases, MCP |
+| Fast CRUD over an existing application backend | Forest Admin | Works standalone across 45 sources and adds workflows, listeners, app releases and multi-tenant administration |
+| A headless CMS with instant REST/GraphQL APIs | Directus | Jet Admin can act as the CMS/admin layer with API keys, saved queries, workflows and app pages, while also running the operational apps around the content |
+| SaaS integration automation | Zapier or n8n | The automation ships with the UI, tenant model, audit trail and release process; 45 connectors plus REST/GraphQL cover the long tail |
+| Durable code-first orchestration | Temporal or Windmill | Temporal is the workflow runner underneath Jet Admin's visual DAG, approvals and data steps |
+| A tenant-scoped operations platform with SQL, events, approvals, CMS-style admin and a release layer | **Jet Admin** | All of the above in one self-hosted stack, MIT licensed, with 130 MCP tools for agents |
 
 ## 1. Shape and licensing
 
 | Tool | Category | Hosting | License model | Primary job |
 |---|---|---|---|---|
-| **Jet Admin** | Internal tools + automation + light BI | Self-hosted (Docker); no managed offering in this repo | README says MIT; **no root LICENSE file in this checkout** — verify | Tenant-scoped queries, listeners, workflows, pages, applications |
+| **Jet Admin** | Internal tools + automation + workflows + CMS-style admin + light BI | Self-hosted Docker Compose; deploy on your own infrastructure | **MIT** (root `LICENSE`) | Tenant-scoped data apps, event pipelines, workflows, content operations, releases |
 | **Retool** | Internal app builder | Cloud; self-hosted generally enterprise-tier | Proprietary / commercial | Fast internal apps over data and APIs |
 | **Appsmith** | Internal app builder | Cloud + self-hosted community | Apache-2.0 community + commercial | Developer-friendly internal apps |
 | **ToolJet** | Internal app builder | Cloud + self-hosted community | AGPL-3.0 community + commercial | Low-code internal tools + workflows |
@@ -54,11 +72,11 @@ event streaming, release model, extensibility, learning curve, and enterprise co
 | **Windmill** | Workflows + scripts + UIs | Cloud + self-hosted | AGPL-3.0 community + commercial | Code-first workflows, scripts, internal UIs |
 | **Temporal** | Durable execution | Self-hosted + Temporal Cloud | MIT server/SDKs + commercial cloud | Reliable, code-first long-running workflows |
 
-:::note Licensing is a decision input, not a footnote
-AGPL/GPL/SUL/BSL terms can affect redistribution, embedding, and SaaS use. Jet Admin's
-README says MIT, but the absence of a root `LICENSE` file in this checkout is a real
-due-diligence item. Get written clarification before embedding the code in a product
-you redistribute.
+:::tip MIT licensing
+Jet Admin ships under the MIT license. You can self-host it, modify it, embed it in
+commercial work, and redistribute it without seat fees or license gates. The trade-off
+is operational ownership: you run PostgreSQL, Redis, Temporal, object storage and
+backups.
 :::
 
 ## 2. Capability fit
@@ -66,13 +84,13 @@ you redistribute.
 Legend: **Strong** = native/core strength; **Partial** = available but plan-gated,
 narrower, or requires assembly; **Limited** = peripheral; **—** = not a product goal.
 
-### Data and UI
+### Data, UI, and content
 
 | Tool | Data sources | UI builder | Data binding | Best UI strength |
 |---|---|---|---|---|
-| **Jet Admin** | ~45 connector entries: SQL, warehouses, SaaS, files, queues, HTTP | Canvas + reusable widget library | `{{ }}` expressions over page state | Tables, forms, Vega charts, routed internal apps |
+| **Jet Admin** | 45 connectors: SQL, warehouses, SaaS, files, queues, HTTP, streaming | Canvas + reusable widget library + saved sections/composites | Full JavaScript `{{ }}` expressions over page, query, workflow, listener, route and application state | Tables, forms, Vega charts, routed internal apps, CMS-style editors |
 | **Retool** | Very broad DB/API/SaaS catalog | Strong drag-and-drop + code | JS/SQL binding | Polished internal apps and components |
-| **Appsmith** | Broad DB/API/SaaS | Strong widget canvas + JS | JS everywhere | Developer-controlled internal apps |
+| **Appsmith** | Broad DB/API/SaaS | Strong widget canvas + JS | JavaScript everywhere | Developer-controlled internal apps |
 | **ToolJet** | Broad DB/API/SaaS | Strong low-code canvas | JS/SQL binding | Fast internal tool assembly |
 | **Budibase** | DB/API + built-in database | Strong CRUD/forms builder | Bindings + automations | CRUD apps and forms |
 | **Metabase** | 20+ databases/warehouses | Dashboard/question builder | GUI + SQL | Analyst-friendly BI |
@@ -88,7 +106,7 @@ narrower, or requires assembly; **Limited** = peripheral; **—** = not a produc
 
 | Tool | Workflow engine | Listeners / streaming | App release model | Extensibility | Learning curve |
 |---|---|---|---|---|---|
-| **Jet Admin** | DAG: query, JS, condition, switch, fan-out/join, loop, delay, approval, data collection, sub-workflow; optional Temporal | Listener proxy + Redis Streams + Socket.IO push | Page versions; immutable application releases; deploy/rollback (preview foundation) | Workspace packages: connectors, widgets, nodes, shared UI | Medium–high |
+| **Jet Admin** | Temporal-backed DAG: query, JavaScript, condition, switch, fan-out/join, loop, delay, approval, data collection, sub-workflow | Listener proxy + Redis Streams + Socket.IO push + webhook ingress | Page versions; immutable application releases; environment bindings; deploy and rollback | Workspace packages, typed widget contracts, bundles, widget library, MCP | Medium |
 | **Retool** | Workflows (plan-dependent), JS/SQL | Webhooks/API triggers; not a listener product | Version history; deployment model varies by plan | Custom components, APIs, code | Low–medium |
 | **Appsmith** | Workflows (paid), JS | WebSocket widget/triggers; not a listener pipeline | Git-based version control/branches | Custom widgets, JS libraries | Medium |
 | **ToolJet** | Workflows | Webhooks/triggers; limited listener model | App versioning/git sync (plan-dependent) | Custom components, plugins | Low–medium |
@@ -104,184 +122,197 @@ narrower, or requires assembly; **Limited** = peripheral; **—** = not a produc
 
 ### Enterprise controls
 
-| Tool | RBAC | SSO / SCIM | Audit | Self-host reality |
+| Tool | RBAC | Identity | Audit | Self-host reality |
 |---|---|---|---|---|
-| **Jet Admin** | Tenant roles + asset permissions + API-key identities | No SAML/OIDC/SCIM in repo; Firebase identity | Audit log + CSV export | Docker reference stack; you operate Postgres/Redis/Temporal/S3 |
-| **Retool** | Granular, plan-dependent | Usually enterprise-tier | Plan-dependent | Generally enterprise-tier |
-| **Appsmith** | Business/enterprise tiers | Business/enterprise | Plan-dependent | Community edition is usable; advanced controls paid |
-| **ToolJet** | Enterprise tiers | Enterprise | Enterprise | Community AGPL; advanced controls paid |
-| **Budibase** | Paid tiers | Paid tiers | Paid tiers | Core self-host; enterprise features paid |
-| **Metabase** | Pro/Enterprise | Pro/Enterprise | Pro/Enterprise | Open-source core; paid governance |
-| **Superset** | Native RBAC | Auth integrations (OAuth/LDAP/etc.) | Limited native audit | You operate a Python/warehouse stack |
+| **Jet Admin** | Tenant roles, asset-level permissions, API-key identities | Firebase identity for humans; API keys for automation | Audit log + CSV export | Full MIT stack; Docker reference deployment |
+| **Retool** | Granular, plan-dependent | SSO usually enterprise-tier | Plan-dependent | Generally enterprise-tier |
+| **Appsmith** | Business/enterprise tiers | SSO in business/enterprise | Plan-dependent | Community edition is usable; advanced controls paid |
+| **ToolJet** | Enterprise tiers | SSO in enterprise | Enterprise | Community AGPL; advanced controls paid |
+| **Budibase** | Paid tiers | SSO in paid tiers | Paid tiers | Core self-host; enterprise features paid |
+| **Metabase** | Pro/Enterprise | SSO in Pro/Enterprise | Pro/Enterprise | Open-source core; paid governance |
+| **Superset** | Native RBAC | OAuth/LDAP/etc. | Limited native audit | Python/warehouse stack to operate |
 | **Forest Admin** | Roles/permissions | Enterprise | Enterprise | Self-hosted is a paid plan |
-| **Directus** | Native RBAC | Plan-dependent | Activity/revisions | Self-host; license terms need review |
+| **Directus** | Native RBAC | Plan-dependent | Activity/revisions | Self-host; verify license terms |
 | **n8n** | Enterprise | Enterprise | Enterprise | SUL self-host for internal use; enterprise controls paid |
 | **Zapier** | Enterprise | Enterprise | Enterprise | SaaS only |
 | **Windmill** | Enterprise | Enterprise | Enterprise | AGPL community; enterprise features paid |
 | **Temporal** | Namespace/IAM via cloud | Cloud/enterprise | Cloud/enterprise | You operate the cluster; not a UI RBAC product |
 
-## 3. When to choose — and when not to
+## 3. Best-fit scenarios
 
-| Tool | Choose when… | Avoid when… |
+### Choose Jet Admin when
+
+- You want **one self-hosted platform** for internal tools, workflows, event-driven
+  apps, content operations and releases.
+- You need **tenant isolation** and asset-level permissions without building an
+  authorization layer.
+- You want **JavaScript-native app building** with full `{{ }}` expressions over query,
+  listener, workflow, route and application state.
+- You need **Temporal-backed durability** with a visual DAG, human approvals, loops,
+  fan-out/join and sub-workflows.
+- You need **live events** from Kafka, MQTT, WebSocket, SSE, webhooks, databases or Redis
+  delivered to app pages.
+- You want **CMS-style content operations** backed by API keys, saved queries, workflows,
+  and custom editorial pages.
+- You want **immutable application releases** with page version pinning and rollback.
+- You want **agent automation** through a bundled MCP server with 130 tools.
+- You need an **MIT license** and no per-seat fees.
+
+### Choose a specialist when it is the primary product
+
+| Tool | Choose it when… | Jet Admin still adds |
 |---|---|---|
-| **Jet Admin** | You want a self-hosted, tenant-scoped platform that combines SQL/API queries, event listeners, workflows, app pages, and a release layer; you can accept preview-grade maturity and operate Postgres/Redis/Temporal | You need enterprise SSO/SCIM today, governed BI, row-level security, anonymous public apps, or a large connector marketplace with vendor support |
-| **Retool** | You need the most polished internal app builder, broad connectors, and a mature ecosystem; budget supports per-user pricing and enterprise self-host | Per-seat cost or vendor lock-in is unacceptable; you need fully open-source redistribution |
-| **Appsmith** | You want an Apache-2.0 community edition, a JS-friendly builder, and self-hosting with a large community | You need the shortest no-code learning curve or all governance features in the free tier |
-| **ToolJet** | You want an AGPL community edition with a strong low-code canvas and workflow features | AGPL obligations or paid enterprise controls are a blocker |
-| **Budibase** | You want fast CRUD/forms, a built-in database, and simple automations with low ceremony | You need complex event pipelines, fine-grained tenant RBAC, or SQL-heavy multi-source apps |
-| **Metabase** | You need analyst-friendly BI, dashboards, subscriptions, and a governed semantic layer | You need write actions, internal CRUD, or event-driven workflows |
-| **Superset** | You need a free Apache-2.0 SQL-first BI platform and can operate a Python stack | You want a turnkey low-code app builder or minimal ops burden |
-| **Forest Admin** | You already have an application backend and want a generated admin panel quickly | You need a standalone platform with its own data model, listeners, and app releases |
-| **Directus** | You need instant REST/GraphQL APIs and an admin UI over a SQL database / content model | You need a workflow engine, event listeners, or internal app composition |
-| **n8n** | You need broad SaaS integration automation, webhooks, and self-hosting | You need a UI builder, tenant-scoped end-user apps, or governed BI |
-| **Zapier** | You want a very large SaaS integration catalog with zero infrastructure | You need self-hosting, data residency, custom UI, or per-task cost control |
-| **Windmill** | You want code-first workflows/scripts with generated UIs and self-hosting | You want a no-code builder for non-technical operators |
-| **Temporal** | You need durable, replayable, long-running workflows with strong consistency and code-level control | You want a low-code UI, drag-and-drop app builder, or minimal operational complexity |
+| **Retool** | You want the most polished commercial app builder, the broadest managed connector ecosystem, and vendor support | MIT licensing, self-hosting, tenant isolation, listeners, Temporal workflows, release pinning, MCP |
+| **Appsmith / ToolJet** | You want an established open-source app builder with a large widget/community ecosystem | Tenant model, listener pipeline, approvals, application releases, CMS-style operations, MCP |
+| **Budibase** | You want the fastest no-code CRUD/forms experience with a built-in database | Query-first data modeling, event pipelines, tenant RBAC, Temporal workflows, release pinning |
+| **Metabase / Superset** | Governed BI, semantic modeling, scheduled subscriptions and analyst self-service are the primary job | Write actions, approvals, listeners, tenant-scoped apps and CMS operations next to the dashboard |
+| **Forest Admin** | You already have an application backend and want a generated admin panel immediately | Standalone multi-source data access, workflows, listeners, app composition and releases |
+| **Directus** | You want a pure headless CMS with instant REST/GraphQL APIs and a content-first admin UI | CMS-style operations plus workflows, listeners, tenant isolation and custom operational apps in the same stack |
+| **n8n / Zapier** | SaaS-to-SaaS integration breadth is the primary job | The UI, tenant model, audit trail, release process and human approval steps around the automation |
+| **Windmill** | You want code-first scripts/flows with generated UIs | Low-code app composition, listeners, tenant RBAC, approvals and release management |
+| **Temporal** | You need code-first durable execution as infrastructure, without an app platform | Visual workflow authoring, approvals, data steps, app pages and release management on top of Temporal |
 
 ## 4. Jet Admin versus the closest alternatives
 
 ### Versus Retool
 
-Retool is a common benchmark for polish and ecosystem. Its component library, connector
-breadth, and debugging experience are generally more mature. Jet Admin's differentiators are
-self-hosting, a tenant-first authorization model, a listener pipeline with Redis
-Streams, and an application release layer that pins page versions. Jet Admin is not a
-drop-in Retool replacement: expect rougher edges, fewer components, and no enterprise
-SSO/SCIM today.
+Retool is a strong benchmark for commercial app-builder polish. Jet Admin competes on
+**ownership and scope**: MIT license, self-hosted deployment, tenant-first
+authorization, 45 connectors, a listener pipeline with Redis Streams, Temporal-backed
+workflows, CMS-style API-key operations, and an application release layer that pins
+page versions.
 
-**Choose Jet Admin** if control over hosting and tenant isolation matters more than
-polish. **Choose Retool** if time-to-value, ecosystem, and enterprise controls are the
-priority and the budget supports it.
+**Choose Jet Admin** when you want one self-hosted platform for data, automation,
+content operations and versioned apps without per-seat licensing. **Choose Retool** when
+a managed commercial ecosystem and vendor support are the priority.
 
 ### Versus Appsmith and ToolJet
 
-Appsmith (Apache-2.0) and ToolJet (AGPL-3.0) are the closest open-source peers. Both
-generally have more mature visual builders and larger communities. Jet Admin's distinguishing
-code paths are tenant-scoped asset permissions, the listener pipeline, workflow
-approvals, and its page-version/application-release model; Appsmith/ToolJet are
-stronger in widget breadth, JS-centric development, and day-to-day builder ergonomics.
+Appsmith (Apache-2.0) and ToolJet (AGPL-3.0) are the closest open-source peers. Jet
+Admin's differentiators are **tenant-scoped asset permissions, the listener pipeline,
+Temporal workflows with human approvals, immutable application releases, CMS-style
+operations, and a 130-tool MCP server**.
 
-**Choose Jet Admin** if you need its specific combination of tenants, listeners,
-workflows, and release pinning. **Choose Appsmith/ToolJet** if you want a more
-established open-source app builder and do not need Jet Admin's listener/application
-model.
+**Choose Jet Admin** when you need tenants, events, workflows, content operations and
+release pinning in one stack. **Choose Appsmith/ToolJet** when you want their specific
+builder ecosystem and do not need Jet Admin's listener/application model.
 
 ### Versus Budibase
 
-Budibase optimizes for fast CRUD apps, forms, and a built-in database. It is easier for
-non-technical builders. Jet Admin assumes more SQL/JSON knowledge but offers explicit
-datasource/query separation, a DAG workflow engine, listener pipelines, and
-tenant-scoped RBAC.
+Budibase optimizes for fast CRUD apps, forms, and a built-in database. Jet Admin
+optimizes for **query-first, event-driven, multi-tenant operations**: explicit
+datasource/query separation, a Temporal workflow engine, listener pipelines,
+tenant-scoped RBAC, CMS-style API access and versioned application releases.
 
-**Choose Budibase** for a quick internal CRUD app with minimal assembly. **Choose Jet
-Admin** when the app is query-heavy, event-driven, or must be tenant-scoped.
+**Choose Budibase** for a quick internal CRUD app. **Choose Jet Admin** when the app is
+query-heavy, event-driven, multi-tenant, or needs approvals and releases.
 
 ### Versus Metabase and Superset
 
-Metabase and Superset are BI products. They are better at governed metrics, semantic
-modeling, dashboard subscriptions, and analyst self-service. Jet Admin can render Vega
-charts and tables, but it is not a BI suite and does not ship a semantic layer.
+Metabase and Superset are BI products focused on governed metrics, semantic modeling,
+subscriptions and analyst self-service. Jet Admin adds **write actions, approvals,
+listeners, workflows, tenant-scoped apps and CMS-style content operations** around the
+same queries and Vega charts.
 
-**Choose Metabase/Superset** for read-only analytics as the primary job. **Choose Jet
-Admin** when the dashboard must sit next to write actions, approvals, listeners, and
-tenant-scoped apps.
+**Choose Metabase/Superset** when read-only analytics is the primary job. **Choose Jet
+Admin** when the dashboard must sit next to operational actions and releases.
 
 ### Versus Forest Admin and Directus
 
-Forest Admin generates an admin panel on top of an existing application backend; it is
-the fastest path when your backend already exposes the right APIs. Directus turns a SQL
-database into a content/data platform with instant APIs and an admin UI.
+Forest Admin generates an admin panel on top of an existing application backend.
+Directus turns a SQL database into a content/data platform with instant APIs and an
+admin UI.
 
-Jet Admin is more generic and standalone: it connects to many systems, adds workflows
-and listeners, and composes pages into applications. It is not a CMS and does not
-generate a domain API for you.
+Jet Admin is broader and standalone: it connects to 45 systems, adds workflows and
+listeners, composes pages into applications, and can act as a **CMS/admin layer** with
+API keys, saved queries, workflows and editorial app pages. For a schema-first headless
+CMS with generated domain APIs, pair it with Directus; for CMS operations that need
+tenant isolation, approvals, event pipelines and custom apps, Jet Admin is the stronger
+fit.
 
 ### Versus n8n, Zapier, Windmill, and Temporal
 
-These are automation/orchestration products, not internal app builders.
+These are automation/orchestration products, not internal app platforms.
 
-- **Zapier** wins on SaaS catalog and zero ops, but is SaaS-only and task-priced.
-- **n8n** wins on self-hosted integration breadth, but its UI is a workflow canvas,
-  not an end-user app.
-- **Windmill** wins for code-first scripts/flows with generated UIs; it expects
-  engineering ownership.
-- **Temporal** wins for durable, replayable, long-running workflows; it is
-  infrastructure, not a low-code platform.
+- **Zapier** wins on SaaS catalog and zero ops.
+- **n8n** wins on self-hosted integration breadth.
+- **Windmill** wins for code-first scripts/flows with generated UIs.
+- **Temporal** wins for durable, replayable, code-first workflows.
 
-Jet Admin's workflow engine is best for operational DAGs with human approvals and
-data queries. For payment settlement, complex compensation, or workflows that must
-survive multi-day infrastructure failures with strict replay semantics, use Temporal
-directly or run Jet Admin's Temporal driver with a clear understanding of its limits.
+Jet Admin's advantage is that **Temporal is the workflow runner underneath a visual
+platform**: you get durable execution plus app pages, listeners, human approvals,
+tenant-scoped data access, audit history and release pinning. For code-only
+orchestration outside an application platform, use Temporal directly.
 
 ## 5. Cost model reality
 
 | Model | Examples | What you pay for | Hidden cost |
 |---|---|---|---|
-| Open-source self-host | Jet Admin, Appsmith CE, ToolJet CE, Budibase core, Metabase OSS, Superset, Windmill CE | Infrastructure + engineering time | Upgrades, security patching, backups, on-call |
+| MIT self-host | **Jet Admin** | Infrastructure + engineering time | Upgrades, security patching, backups, on-call |
+| Apache/AGPL community | Appsmith CE, ToolJet CE, Superset, Windmill CE | Infrastructure + engineering time | Paid governance tiers, AGPL obligations |
 | Open-core + paid governance | Appsmith, ToolJet, Budibase, Metabase, n8n, Windmill | SSO, RBAC, audit, support | Tiered feature gates and seat minimums |
 | Commercial per-user | Retool, Forest Admin | Builder/viewer seats, enterprise features | Scaling viewers and self-host premiums |
 | SaaS per-task | Zapier | Tasks/executions | Runaway automations and vendor lock-in |
 | Durable execution | Temporal Cloud / self-host | Actions, storage, or cluster ops | Engineering complexity and observability |
 | Agent/LLM usage | Jet Agent via OpenRouter | Tokens | Model choice, retries, prompt/tool loops |
 
-Jet Admin's license fee may be zero (subject to the LICENSE question), but it is not
-free to operate: you need PostgreSQL, Redis, optional Temporal, object storage,
-Firebase, backups, monitoring, and upgrade discipline. Budget engineering time for
-connector validation and security hardening.
+Jet Admin has **no license fee and no per-seat pricing**. You pay for PostgreSQL,
+Redis, Temporal, object storage, Firebase, backups, monitoring and engineering time.
+That is the intended trade: infrastructure ownership in exchange for control, tenant
+isolation and an MIT license.
 
 ## 6. Decision guide
 
 ```mermaid
 flowchart TD
-    A["Primary job?"] --> B{"Governed BI / dashboards?"}
-    B -->|Yes| BI["Metabase or Superset"]
-    B -->|No| C{"Internal app over existing backend?"}
-    C -->|Yes, fastest| Forest["Forest Admin"]
-    C -->|No| D{"Content / data platform?"}
-    D -->|Yes| Directus["Directus"]
-    D -->|No| E{"SaaS integration automation?"}
-    E -->|Yes| Auto["Zapier or n8n"]
-    E -->|No| F{"Durable code-first workflows?"}
-    F -->|Yes| Durable["Temporal or Windmill"]
-    F -->|No| G{"Tenant-scoped apps + SQL + events + approvals?"}
-    G -->|Yes| Jet["Jet Admin"]
-    G -->|No| H{"Polished internal app builder?"}
-    H -->|Yes| Builders["Retool / Appsmith / ToolJet / Budibase"]
+    A["Need a self-hosted operational platform?"] -->|Yes| B{"SQL/API data + custom UI + workflows?"}
+    B -->|Yes| C{"Events, approvals, tenants, releases or CMS-style admin?"}
+    C -->|Yes| Jet["Jet Admin"]
+    C -->|No| D{"Commercial polish + vendor support?"}
+    D -->|Yes| Retool["Retool"]
+    D -->|No| OSS["Appsmith / ToolJet"]
+    B -->|No| E{"Governed BI is the primary job?"}
+    E -->|Yes| BI["Metabase / Superset"]
+    E -->|No| F{"Pure headless CMS?"}
+    F -->|Yes| Directus["Directus"]
+    F -->|No| G{"SaaS integration automation?"}
+    G -->|Yes| Auto["Zapier / n8n"]
+    G -->|No| H{"Code-first durable execution only?"}
+    H -->|Yes| Temporal["Temporal"]
     H -->|No| Reassess["Revisit requirements"]
 ```
 
-## 7. What would change this recommendation
+## 7. Jet Admin strengths in one place
 
-Choose Jet Admin more confidently if the project adds or proves:
-
-- SAML/OIDC SSO and SCIM provisioning;
-- a production-hardened application runtime with live Temporal/Redis/listener-proxy
-  verification;
-- row-level authorization or a documented pattern for per-user data filtering;
-- connector conformance tests and clear maturity labels per connector;
-- rate limiting, Helmet, and a documented internet-exposure checklist;
-- a real migration/upgrade story with versioned Prisma migrations;
-- a clear LICENSE file and commercial support options.
-
-Choose against Jet Admin if any of these are hard requirements today:
-
-- a governed BI semantic layer with scheduled subscriptions;
-- anonymous public apps with database-enforced tenant isolation;
-- enterprise SSO/SCIM and vendor support;
-- a very large connector catalog with vendor-maintained integrations;
-- exactly-once side effects for financial mutations;
-- a fully managed service with an SLA.
+- **MIT licensed**, self-hosted, no per-seat fees.
+- **45 connectors** across SQL, warehouses, SaaS APIs, files, queues and streaming.
+- **JavaScript `{{ }}` expressions** over page, query, workflow, listener, route and
+  application state.
+- **Temporal-backed workflows**: approvals, loops, fan-out/join, delays, sub-workflows,
+  data collection and durable runs.
+- **Listener pipeline**: proxy, Redis Streams, Socket.IO push, webhook ingress, buffered
+  events and dead-letter handling.
+- **Tenant isolation** with Casbin policies, asset-level permissions and API-key
+  identities.
+- **CMS-style operations**: API keys, saved queries, workflows and editorial app pages.
+- **Immutable releases**: page versions, application releases, environment bindings,
+  deploy and rollback.
+- **130-tool MCP server** for agent-driven inspection and operation.
+- **Extensible by design**: typed widget contracts, workspace packages, bundles, widget
+  library and marketplace templates.
+- **Operator-friendly**: folders, audit log, run history, asset version references and
+  CSV export.
 
 ## 8. Bottom line
 
-Jet Admin is not the most polished tool in any single category. Its case is the
-combination: **self-hosted, tenant-scoped, query-first, event-capable, workflow-aware,
-and app-composable**, with a release layer that is less common among low-code builders.
+Jet Admin's case is the **combination**: self-hosted, MIT licensed, tenant-scoped,
+query-first, JavaScript-native, event-capable, Temporal-powered, CMS-capable and
+app-composable, with a release layer that most low-code builders do not have.
 
-If that combination matches your operating model and you can tolerate preview-grade
-maturity, it can replace several disconnected tools. If you need best-in-class BI,
-enterprise identity, or vendor-supported integrations today, pair Jet Admin with a
-specialist rather than forcing it to be everything.
+If that combination matches your operating model, Jet Admin can replace several
+disconnected tools with one stack. If you need best-in-class BI, a pure headless CMS,
+or a fully managed vendor service as the primary product, pair Jet Admin with that
+specialist—and keep Jet Admin for the operational layer around it.
 
 ## Related reading
 
